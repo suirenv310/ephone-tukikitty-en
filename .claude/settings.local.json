@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(powershell:*)",
+      "Bash(python3 -c \"\nimport re\nwith open\\(''C:/Users/snowz/Documents/web/-k--main/index.html'', ''r'', encoding=''utf-8''\\) as f:\n    lines = f.readlines\\(\\)\n\n# Find lines with Chinese characters outside the script block \\(1-15539 and 63517+\\)\nchinese_range = list\\(range\\(0, 15539\\)\\) + list\\(range\\(63516, len\\(lines\\)\\)\\)\nresults = []\nfor i in chinese_range:\n    line = lines[i]\n    if re.search\\(r''[\\\\u4e00-\\\\u9fff]'', line\\):\n        results.append\\(\\(i+1, line.rstrip\\(\\)\\)\\)\n\nfor lineno, content in results[:60]:\n    print\\(f''{lineno}: {content}''\\)\n\")",
+      "Bash(python3:*)"
+    ]
+  }
+}
