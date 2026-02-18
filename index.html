@@ -54139,57 +54139,12 @@ const ivTags = {
               }
             });
 
-          document
-            .getElementById("import-character-card-btn")
-            .addEventListener("click", async () => {
-              const unlockKey = "isCharacterImportUnlocked";
+        document
+  .getElementById("import-character-card-btn")
+  .addEventListener("click", () => {
+    document.getElementById("character-card-input").click();
+  });
 
-              // 1. 检查是否已经解锁
-              if (localStorage.getItem(unlockKey) === "true") {
-                document.getElementById("character-card-input").click();
-                return;
-              }
-
-              // 2. 如果未解锁，获取设备码
-              const deviceCode = getDeviceCode();
-
-              // 3. 构建一个包含设备码和输入框的HTML内容
-              const modalHtmlContent = `
-			        <p style="margin-bottom: 15px;">请前往取PIN网站，使用下面的设备码获取PIN。</p>
-			        <div style="background: #eee; padding: 10px; border-radius: 6px; margin-bottom: 15px; user-select: all; cursor: copy;" title="点击复制设备码">
-			            <strong>设备码:</strong> <span id="device-code-to-copy">${deviceCode}</span>
-			        </div>
-			        <p id="copy-device-code-feedback" style="height: 15px; font-size: 12px; color: green;"></p>
-			    `;
-
-              // 4. 使用 showCustomPrompt 弹出增强版模态框
-              const userPin = await window.showCustomPrompt(
-                "功能解锁",
-                "请在此输入获取到的PIN码...", // 这是输入框的placeholder
-                "",
-                "text",
-                modalHtmlContent, // 这是我们额外添加的HTML内容
-              );
-
-              // 5. 如果用户点击了取消，则直接返回
-              if (userPin === null) return;
-
-              // 6. 验证PIN码
-              const correctPin = generatePinFromDeviceCode(deviceCode);
-              if (userPin.trim().toUpperCase() === correctPin) {
-                localStorage.setItem(unlockKey, "true");
-                await showCustomAlert(
-                  "解锁成功！",
-                  "导入功能已解锁，此设备无需再次输入PIN码。",
-                );
-                document.getElementById("character-card-input").click();
-              } else {
-                await showCustomAlert(
-                  "解锁失败",
-                  "PIN码错误，请重新获取或输入。",
-                );
-              }
-            });
 
           // 为自定义模态框添加点击复制设备码的功能
           document
@@ -55200,57 +55155,11 @@ const ivTags = {
             });
 
           document
-            .getElementById("import-world-book-btn")
-            .addEventListener("click", async () => {
-              const unlockKey = "isCharacterImportUnlocked";
+  .getElementById("import-world-book-btn")
+  .addEventListener("click", () => {
+    document.getElementById("world-book-import-input").click();
+  });
 
-              // 1. 检查是否已经解锁 (和角色卡导入共用一个解锁状态)
-              if (localStorage.getItem(unlockKey) === "true") {
-                document.getElementById("world-book-import-input").click(); // 直接打开文件选择器
-                return;
-              }
-
-              // 2. 如果未解锁，获取设备码
-              const deviceCode = getDeviceCode();
-
-              // 3. 构建一个包含设备码和输入框的HTML内容 (和角色卡导入的弹窗一样)
-              const modalHtmlContent = `
-			        <p style="margin-bottom: 15px;">请前往取PIN网站，使用下面的设备码获取PIN。</p>
-			        <div style="background: #eee; padding: 10px; border-radius: 6px; margin-bottom: 15px; user-select: all; cursor: copy;" title="点击复制设备码">
-			            <strong>设备码:</strong> <span id="device-code-to-copy">${deviceCode}</span>
-			        </div>
-			        <p id="copy-device-code-feedback" style="height: 15px; font-size: 12px; color: green;"></p>
-			    `;
-
-              // 4. 使用 showCustomPrompt 弹出增强版模态框，让用户输入PIN
-              const userPin = await window.showCustomPrompt(
-                "功能解锁",
-                "请在此输入获取到的PIN码...",
-                "",
-                "text",
-                modalHtmlContent,
-              );
-
-              // 5. 如果用户点击了取消，则直接返回
-              if (userPin === null) return;
-
-              // 6. 验证PIN码
-              const correctPin = generatePinFromDeviceCode(deviceCode);
-              if (userPin.trim().toUpperCase() === correctPin) {
-                localStorage.setItem(unlockKey, "true");
-                await showCustomAlert(
-                  "解锁成功！",
-                  "导入功能已解锁，此设备无需再次输入PIN码。",
-                );
-                // 触发世界书的文件选择器
-                document.getElementById("world-book-import-input").click();
-              } else {
-                await showCustomAlert(
-                  "解锁失败",
-                  "PIN码错误，请重新获取或输入。",
-                );
-              }
-            });
 
           document
             .getElementById("world-book-import-input")
