@@ -17791,9 +17791,9 @@ window.showCustomConfirm = function (title, message, options = {}) {
           // 1. 移除所有HTML标签 (例如 <b>, <div>)
           let cleanedText = text.replace(/<\/?[^>]+(>|$)/g, "");
 
-          // 2. 移除所有Markdown代码块 (例如 ```code``` 或 `code`)
-          cleanedText = cleanedText.replace(/```[\s\S]*?```/g, ""); // 移除多行代码块
-          cleanedText = cleanedText.replace(/`[^`]*`/g, ""); // 移除行内代码
+          //2. Remove all Markdown code blocks (e.g., `code` or `code`).
+          cleanedText = cleanedText.replace(/```[\s\S]*?```/g, ""); // Remove multi-line code blocks
+          cleanedText = cleanedText.replace(/`[^`]*`/g, ""); // Remove inline code
 
           // 3. 将HTML实体 (例如 &lt; &gt;) 转换回正常字符 (< >)
           const tempDiv = document.createElement("div");
@@ -17896,7 +17896,7 @@ window.showCustomConfirm = function (title, message, options = {}) {
           // 重新组合
           const correctPassword = chars.join("");
 
-          // console.log("正确密码应为:", correctPassword); // 调试用，上线可注释
+          // console.log("The correct password should be:", correctPassword); // For debugging purposes, you can comment it out for production deployment.
           return pwd.trim() === correctPassword;
         }
 
@@ -18001,7 +18001,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             // 如果是收起的，就执行展开流程
 
             // 1. 先显示一个“正在转写”的提示，给用户即时反馈
-            transcriptEl.textContent = "正在转文字...";
+            transcriptEl.textContent = "Converting to text...";
             transcriptEl.style.display = "block";
 
             // 2. 模拟一个短暂的“识别”过程
@@ -18009,7 +18009,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               // 再次检查元素是否还在页面上，防止用户切换聊天导致错误
               if (document.body.contains(transcriptEl)) {
                 // 获取并显示真正的转写文字
-                const voiceText = bubble.dataset.voiceText || "(无法识别)";
+                const voiceText = bubble.dataset.voiceText || "(Unrecognized)";
                 transcriptEl.textContent = voiceText;
               }
             }, 300); // 300毫秒的延迟，感觉更灵敏
@@ -18073,14 +18073,14 @@ console.log(`[System] Database for user ${userId} has been loaded`);
          * 【全新】在应用启动时，预加载所有已保存的字体预设
          */
         async function loadAllFontPresetsOnStartup() {
-          console.log("正在预加载所有字体预设...");
+          console.log("Preloading all font presets...");
           const presets = await db.fontPresets.toArray();
           if (presets && presets.length > 0) {
             presets.forEach((preset) => {
               // 我们复用已有的 loadFontForPreview 函数来加载每个字体
               loadFontForPreview(preset);
             });
-            console.log(`成功预加载了 ${presets.length} 个字体。`);
+            console.log(`Successfully preloaded ${presets.length} font presets.`);
           }
         }
 
@@ -18106,9 +18106,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               // 如果这个卡槽有数据，就渲染成“已填充”的样式
               slot.innerHTML = `
 			                <div class="font-preview-text" data-preset-id="${preset.id}">Abc 你好</div>
-			                <div class="font-preset-info">名称: ${preset.name}</div>
+			                <div class="font-preset-info">Name: ${preset.name}</div>
 			                <div class="font-preset-actions">
-			                    <button class="preset-btn apply-btn" data-preset-id="${preset.id}">应用</button>
+			                    <button class="preset-btn apply-btn" data-preset-id="${preset.id}">Apply</button>
 			                    <button class="preset-btn delete-btn delete" data-preset-id="${preset.id}">Delete</button>
 			                </div>
 			            `;
@@ -18116,10 +18116,10 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               // 如果这个卡槽在数据库中没有对应的数据，就渲染成“空卡槽”的样式
               slot.classList.add("empty");
               slot.innerHTML = `
-			                <div class="font-preset-info">卡槽 ${i + 1} 为空</div>
+			                <div class="font-preset-info">Slot ${i + 1} is empty</div>
 			                <div class="font-preset-actions">
-			                    <button class="preset-btn secondary upload-url-btn" data-slot-index="${i}">URL上传</button>
-			                    <button class="preset-btn secondary upload-local-btn" data-slot-index="${i}">本地上传</button>
+			                    <button class="preset-btn secondary upload-url-btn" data-slot-index="${i}">Upload via URL</button>
+			                    <button class="preset-btn secondary upload-local-btn" data-slot-index="${i}">Upload from Local</button>
 			                </div>
 			            `;
             }
@@ -18190,19 +18190,19 @@ console.log(`[System] Database for user ${userId} has been loaded`);
          */
         async function handleUploadFontUrl(slotIndex) {
           const url = await showCustomPrompt(
-            "字体URL",
-            "请输入字体的网络链接(.ttf, .otf等)",
+            "Font URL",
+            "Please enter the font's web link (.ttf, .otf, etc.)",
           );
           if (!url || !url.trim().startsWith("http")) {
-            if (url !== null) alert("请输入一个有效的URL！");
+            if (url !== null) alert("Please enter a valid URL!");
             return;
           }
           const name = await showCustomPrompt(
-            "字体命名",
-            "请为这个字体起个名字",
+            "Font Name",
+            "Please enter a name for this font",
           );
           if (!name || !name.trim()) {
-            if (name !== null) alert("名字不能为空！");
+            if (name !== null) alert("Name cannot be empty!");
             return;
           }
           await saveFontPreset(slotIndex, name.trim(), url.trim());
@@ -18219,12 +18219,12 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             if (!file) return;
 
             const name = await showCustomPrompt(
-              "字体命名",
-              "请为这个字体起个名字",
+              "Font Name",
+              "Please enter a name for this font",
               file.name.replace(/\.[^/.]+$/, ""),
             );
             if (!name || !name.trim()) {
-              if (name !== null) alert("名字不能为空！");
+              if (name !== null) alert("Name cannot be empty!");
               return;
             }
 
@@ -18253,11 +18253,11 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             });
 
             await renderFontPresets();
-            alert(`Font "${name}" 已成功保存到卡槽 ${slotIndex + 1}！`);
+            alert(`Font "${name}" has been successfully saved to slot ${slotIndex + 1}!`);
           } catch (error) {
-            console.error("保存字体预设失败:", error);
+            console.error("Failed to save font preset:", error);
             alert(
-              `保存字体失败，数据已自动回滚，你之前的字体数据是安全的。错误: ${error.message}`,
+              `Failed to save font, data has been automatically rolled back, your previous font data is safe. Error: ${error.message}`,
             );
             await renderFontPresets();
           }
@@ -18271,8 +18271,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           const preset = await db.fontPresets.get(presetId);
           if (!preset) return;
           const confirmed = await showCustomConfirm(
-            "确认删除",
-            `确定要删除字体 "${preset.name}" 吗？`,
+            "Confirm Deletion",
+            `Are you sure you want to delete the font "${preset.name}"?`,
             {
               confirmButtonClass: "btn-danger",
             },
@@ -18280,7 +18280,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           if (confirmed) {
             await db.fontPresets.delete(presetId);
 
-            // 从DOM中移除对应的预览样式
+            // Remove the corresponding preview style from the DOM
             const styleTag = document.getElementById(`font-style-${presetId}`);
             if (styleTag) styleTag.remove();
 
@@ -18289,24 +18289,24 @@ console.log(`[System] Database for user ${userId} has been loaded`);
         }
 
         /**
-         * 应用一个字体预设为全局字体
-         * @param {string} presetId - 要应用的预设的ID
+         * Apply a font preset as the global font
+         * @param {string} presetId - The ID of the preset to apply
          */
         async function applyFontPreset(presetId) {
           const preset = await db.fontPresets.get(presetId);
           if (preset) {
-            // 调用你已有的全局字体应用函数
+            // Call your existing global font application function
             applyCustomFont(preset.url, false);
-            // 保存到全局设置
+            // Save to global settings
             state.globalSettings.fontUrl = preset.url;
             await db.globalSettings.put(state.globalSettings);
-            alert(`已将全局字体更换为 "${preset.name}"！`);
+            alert(`The global font has been changed to "${preset.name}"!`);
           }
         }
 
         /**
-         * 处理用户选择的角色卡文件
-         * @param {File} file - 用户选择的文件对象
+         * Handle user-selected character card files
+         * @param {File} file - The file object selected by the user
          */
         async function handleCharacterImport(file) {
           if (!file) return;
@@ -18316,33 +18316,33 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             let avatarBase64;
 
             if (file.name.toLowerCase().endsWith(".png")) {
-              // 如果是PNG文件，调用PNG解析函数
+              // If it's a PNG file, call the PNG parsing function
               const result = await parseCharPng(file);
               characterData = result.characterData;
               avatarBase64 = result.avatarBase64;
             } else if (file.name.toLowerCase().endsWith(".json")) {
-              // 如果是JSON文件，调用JSON解析函数
+              // If it's a JSON file, call the JSON parsing function
               characterData = await parseCharJson(file);
-              // JSON卡通常不包含图片，我们给一个默认头像
+              // JSON cards usually don't contain images, so we provide a default avatar
               avatarBase64 = defaultAvatar;
             } else {
-              alert("不支持的文件格式，请选择 .png 或 .json 文件。");
+              alert("Unsupported file format. Please select a .png or .json file.");
               return;
             }
 
             if (characterData) {
-              // 成功解析出数据后，调用创建函数
+              // After successfully parsing the data, call the creation function
               await createCharacterFromData(characterData, avatarBase64);
             }
           } catch (error) {
-            console.error("导入角色卡失败:", error);
-            alert(`导入失败: ${error.message}`);
+            console.error("Failed to import character card:", error);
+            alert(`Failed to import character card: ${error.message}`);
           }
         }
 
         /**
-         * 解析SillyTavern的PNG角色卡，通过字节级操作彻底解决中文乱码问题。
-         * @param {File} file - PNG文件
+         * Parse SillyTavern's PNG character card, completely solving Chinese garbled characters through byte-level operations.
+         * @param {File} file - PNG file
          * @returns {Promise<{characterData: object, avatarBase64: string}>}
          */
         async function parseCharPng(file) {
@@ -18356,7 +18356,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 dataView.getUint32(0) !== 0x89504e47 ||
                 dataView.getUint32(4) !== 0x0d0a1a0a
               ) {
-                return reject(new Error("文件不是一个有效的PNG图片。"));
+                return reject(new Error("The file is not a valid PNG image."));
               }
 
               let offset = 8;
@@ -18410,7 +18410,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                     } catch (e) {
                       return reject(
                         new Error(
-                          "解析图片内嵌的角色数据失败，可能是数据损坏。",
+                          "Failed to parse the character data embedded in the image. The data may be corrupted.",
                         ),
                       );
                     }
@@ -18430,22 +18430,22 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   });
                 };
                 imageReader.onerror = () =>
-                  reject(new Error("读取图片作为头像失败。"));
+                  reject(new Error("Failed to read image as avatar."));
                 imageReader.readAsDataURL(file);
               } else {
                 reject(
-                  new Error("在这张PNG图片中没有找到SillyTavern角色数据。"),
+                  new Error("No SillyTavern character data found in this PNG image."),
                 );
               }
             };
-            reader.onerror = () => reject(new Error("读取PNG文件失败。"));
+            reader.onerror = () => reject(new Error("Failed to read PNG file."));
             reader.readAsArrayBuffer(file);
           });
         }
 
         /**
          * 【修正版】解析JSON角色卡，强制使用UTF-8编码
-         * @param {File} file - JSON文件
+         * @param {File} file - JSON file
          * @returns {Promise<object>}
          */
         async function parseCharJson(file) {
@@ -18461,10 +18461,10 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 // 兼容两种可能的格式
                 resolve(data.data || data);
               } catch (error) {
-                reject(new Error("解析JSON文件失败，请检查文件格式或编码。"));
+                reject(new Error("Failed to parse JSON file. Please check the file format or encoding."));
               }
             };
-            reader.onerror = () => reject(new Error("读取JSON文件失败。"));
+            reader.onerror = () => reject(new Error("Failed to read JSON file."));
             // 读取为ArrayBuffer而不是Text
             reader.readAsArrayBuffer(file);
           });
@@ -18481,7 +18481,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           const charData = data.data || data;
           const characterName = charData.name
             ? charData.name.trim()
-            : "未命名角色";
+            : "Unnamed Character";
 
           // 步骤 2: 创建新的聊天对象 (不变)
           const newChatId = "chat_" + Date.now();
@@ -18504,8 +18504,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             weiboDms: [],
             loversSpaceData: null,
             settings: {
-              aiPersona: charData.description || "该角色没有描述。",
-              myPersona: "我是谁呀。",
+              aiPersona: charData.description || "This character has no description.",
+              myPersona: "Who am I?",
               maxMemory: 10,
               aiAvatar: avatarBase64,
               myAvatar: defaultAvatar,
@@ -18521,7 +18521,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 mode: "auto",
                 count: 20,
                 prompt:
-                  "请你以第三人称的视角，客观、冷静、不带任何感情色彩地总结以下对话的核心事件和信息。禁止进行任何角色扮演或添加主观评论。",
+                  "Using Vietnamese language to summarize the core events and information of the following conversation from a third-person perspective, objectively, calmly, and without any emotional bias. Do not engage in any role-playing or add any subjective comments.",
                 lastSummaryIndex: -1,
               },
               linkedMemories: [],
@@ -18563,7 +18563,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           state.chats[newChatId] = newChat;
 
           // 重构世界书查找逻辑
-          console.log("开始检测世界书数据...");
+          console.log("Checking World Book data...");
           let worldBookFound = false;
 
           // 策略一：【最高优先级】查找提供的 character_book 标准格式
@@ -18574,7 +18574,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             charData.character_book.entries.length > 0
           ) {
             console.log(
-              `检测到最新的 character_book 格式 (${charData.character_book.entries.length}条)，开始导入...`,
+              `Detected the latest character_book format (${charData.character_book.entries.length} entries), starting import...`,
             );
             const newCategory = { name: characterName };
             const newCategoryId = await db.worldBookCategories.add(newCategory);
@@ -18593,7 +18593,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             charData.world_entries.length > 0
           ) {
             console.log(
-              `检测到旧版 world_entries 格式 (${charData.world_entries.length}条)，开始导入...`,
+              `Detected the old world_entries format (${charData.world_entries.length} entries), starting import...`,
             );
             const newCategory = { name: characterName };
             const newCategoryId = await db.worldBookCategories.add(newCategory);
@@ -18610,7 +18610,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             typeof data.world === "string" &&
             data.world.trim()
           ) {
-            console.log("检测到外层 world 字段格式，开始导入...");
+            console.log("Detected outer world field format, starting import...");
             const newCategory = { name: characterName };
             const newCategoryId = await db.worldBookCategories.add(newCategory);
             await parseAndSaveWorldBooks(data.world, newCategoryId);
@@ -18623,7 +18623,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             typeof charData.world_info === "string" &&
             charData.world_info.trim()
           ) {
-            console.log("检测到旧版 world_info 字段格式，开始导入...");
+            console.log("Detected old world_info field format, starting import...");
             const newCategory = { name: characterName };
             const newCategoryId = await db.worldBookCategories.add(newCategory);
             await parseAndSaveWorldBooks(charData.world_info, newCategoryId);
@@ -18631,14 +18631,14 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           }
 
           if (!worldBookFound) {
-            console.log("诊断：在此角色卡中未找到任何可识别的世界书字段。");
+            console.log("Diagnosis: No recognizable World Book fields found in this character card.");
           }
 
-          // 步骤 4: 刷新UI (不变)
+          // Step 4: Refresh UI (unchanged)
           await renderChatList();
           await showCustomAlert(
-            "导入成功！",
-            `角色“${characterName}”已成功创建！`,
+            "Import Successful!",
+            `Character "${characterName}" has been successfully created!`,
           );
         }
 
@@ -18659,12 +18659,12 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 ? entry.comment.trim()
                 : entry.keys && entry.keys.length > 0
                   ? entry.keys.join(", ")
-                  : "未命名条目";
+                  : "Unnamed Entry";
 
             // 检查条目是否有效 (有名字、有内容，并且是启用的)
             // (typeof entry.enabled === 'undefined' || entry.enabled) 是为了兼容没有 enabled 字段的卡片
             if (
-              entryName !== "未命名条目" &&
+              entryName !== "Unnamed Entry" &&
               entry.content &&
               (typeof entry.enabled === "undefined" || entry.enabled)
             ) {
@@ -18683,7 +18683,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             const allBooks = await db.worldBooks.toArray();
             state.worldBooks = allBooks;
             console.log(
-              `成功导入 ${newBooks.length} 个世界书条目到分类ID: ${categoryId}`,
+              `Successfully imported ${newBooks.length} World Book entries into category ID: ${categoryId}`,
             );
           }
         }
@@ -18828,9 +18828,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           const diffSeconds = Math.floor((now - date) / 1000);
           const diffMinutes = Math.floor(diffSeconds / 60);
           const diffHours = Math.floor(diffMinutes / 60);
-          if (diffMinutes < 1) return "刚刚";
-          if (diffMinutes < 60) return `${diffMinutes}分钟前`;
-          if (diffHours < 24) return `${diffHours}小时前`;
+          if (diffMinutes < 1) return "Just now";
+          if (diffMinutes < 60) return `${diffMinutes} minutes ago`;
+          if (diffHours < 24) return `${diffHours} hours ago`;
           const year = date.getFullYear();
           const month = String(date.getMonth() + 1).padStart(2, "0");
           const day = String(date.getDate()).padStart(2, "0");
@@ -18860,13 +18860,13 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
           if (posts.length === 0) {
             postsListEl.innerHTML =
-              '<p style="text-align:center; color: var(--text-secondary); padding: 30px 0;">这里空空如也，快来发布第一条说说吧！</p>';
+              '<p style="text-align:center; color: var(--text-secondary); padding: 30px 0;">It\'s empty here, be the first to post a status!</p>';
             return;
           }
 
           const userSettings = state.qzoneSettings;
 
-          // 1. 在渲染所有帖子之前，我们先创建一个包含所有AI角色名字的集合(Set)，方便快速查找。
+          // 1. Before rendering all posts, we first create a set of all AI character names for quick lookup.
           const allAiCharacterNames = new Set(
             Object.values(state.chats)
               .filter((chat) => !chat.isGroup)
@@ -18927,9 +18927,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 // 使用统一的多图布局（包括单张图片）
                 imagesHtml = `<div class="post-images-grid grid-${imageCount}">`;
                 imageUrls.forEach((url, index) => {
-                  imagesHtml += `<img src="${url}" class="realimag-image" alt="图片${
+                  imagesHtml += `<img src="${url}" class="realimag-image" alt="Image ${
                     index + 1
-                  }" loading="lazy" onerror="this.src='https://i.postimg.cc/KYr2qRCK/1.jpg'; this.alt='图片加载失败';">`;
+                  }" loading="lazy" onerror="this.src='https://i.postimg.cc/KYr2qRCK/1.jpg'; this.alt='Image failed to load.';">`;
                 });
                 imagesHtml += "</div>";
 
@@ -18949,9 +18949,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 // 使用统一的多图布局（包括单张图片）
                 imagesHtml = `<div class="post-images-grid grid-${imageCount}">`;
                 imageUrls.forEach((url, index) => {
-                  imagesHtml += `<img src="${url}" class="naiimag-image" alt="图片${
+                  imagesHtml += `<img src="${url}" class="naiimag-image" alt="Image ${
                     index + 1
-                  }" loading="lazy" onerror="this.src='https://i.postimg.cc/KYr2qRCK/1.jpg'; this.alt='图片加载失败';">`;
+                  }" loading="lazy" onerror="this.src='https://i.postimg.cc/KYr2qRCK/1.jpg'; this.alt='Image failed to load.';">`;
                 });
                 imagesHtml += "</div>";
 
@@ -18988,7 +18988,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   const originalIndex = post.comments.indexOf(comment);
                   let replyHtml = "";
                   if (comment.replyTo) {
-                    replyHtml = `<span class="reply-text">回复</span> <span class="reply-target-name">${comment.replyTo}</span>`;
+                    replyHtml = `<span class="reply-text">Reply</span> <span class="reply-target-name">${comment.replyTo}</span>`;
                   }
                   commentsHtml += `
                                         <div class="comment-item" data-commenter-name="${comment.commenterName}">
@@ -19006,10 +19006,10 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                             <div class="post-footer">
                                 <div class="comment-section">
                                     <img src="${commentAvatar}" class="comment-avatar">
-                                    <input type="text" class="comment-input" placeholder="友善的评论是交流的起点">
+                                    <input type="text" class="comment-input" placeholder="Friendly comments are the starting point of communication">
                                     <div class="at-mention-popup"></div>
                                 </div>
-                                <button class="comment-send-btn">发送</button>
+                                <button class="comment-send-btn">Send</button>
                             </div>
                         `;
 
@@ -19034,7 +19034,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                                 }"><svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg></span>
                                 <span class="action-icon summon-npc" data-post-id="${post.id}" data-author-id="${
                                   post.authorId
-                                }" title="召唤NPC评论"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+                                }" title="Summon NPC Comment"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
                                 </div>
                             ${likesHtml}
                             ${commentsAndFooterHtml}
@@ -19152,8 +19152,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               "favorites-search-input",
             ).value;
             const message = searchTerm
-              ? "未找到相关收藏"
-              : "你的收藏夹是空的，<br>快去动态或聊天中收藏喜欢的内容吧！";
+              ? "No related collections found."
+              : "Your favorites list is empty, <br>go to posts or chats to favorite content you like!";
             listEl.innerHTML = `<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">${message}</p>`;
             return;
           }
@@ -19170,9 +19170,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
             if (item.type === "qzone_post") {
               const post = item.content;
-              sourceText = "来自动态";
+              sourceText = "From Post";
               let authorAvatar = defaultAvatar,
-                authorNickname = "未知用户";
+                authorNickname = "Unknown User";
 
               if (post.authorId === "user") {
                 authorAvatar = state.qzoneSettings.avatar;
@@ -19209,9 +19209,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   // 使用统一的多图布局（包括单张图片）
                   imagesHtml = `<div class="post-images-grid grid-${imageCount}">`;
                   imageUrls.forEach((url, index) => {
-                    imagesHtml += `<img src="${url}" class="realimag-image" alt="图片${
+                    imagesHtml += `<img src="${url}" class="realimag-image" alt="Image${
                       index + 1
-                    }" loading="lazy" onerror="this.src='https://i.postimg.cc/KYr2qRCK/1.jpg'; this.alt='图片加载失败';">`;
+                    }" loading="lazy" onerror="this.src='https://i.postimg.cc/KYr2qRCK/1.jpg'; this.alt='Image failed to load.';">`;
                   });
                   imagesHtml += "</div>";
 
@@ -19231,9 +19231,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   // 使用统一的多图布局（包括单张图片）
                   imagesHtml = `<div class="post-images-grid grid-${imageCount}">`;
                   imageUrls.forEach((url, index) => {
-                    imagesHtml += `<img src="${url}" class="naiimag-image" alt="图片${
+                    imagesHtml += `<img src="${url}" class="naiimag-image" alt="Image ${
                       index + 1
-                    }" loading="lazy" onerror="this.src='https://i.postimg.cc/KYr2qRCK/1.jpg'; this.alt='图片加载失败';">`;
+                    }" loading="lazy" onerror="this.src='https://i.postimg.cc/KYr2qRCK/1.jpg'; this.alt='Image failed to load.';">`;
                   });
                   imagesHtml += "</div>";
 
@@ -19278,15 +19278,15 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               const chat = state.chats[item.chatId];
               if (!chat) continue;
 
-              sourceText = `来自与 ${chat.name} 的聊天`;
+              sourceText = `From chat with ${chat.name}`;
               const isUser = msg.role === "user";
               let senderName, senderAvatar;
 
               if (isUser) {
                 // 用户消息的逻辑保持不变
                 senderName = chat.isGroup
-                  ? chat.settings.myNickname || "我"
-                  : "我";
+                  ? chat.settings.myNickname || "Me"
+                  : "Me";
                 senderAvatar =
                   chat.settings.myAvatar ||
                   (chat.isGroup ? defaultMyGroupAvatar : defaultAvatar);
@@ -19301,7 +19301,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   // 如果找到了成员信息，就用他的“群昵称”；如果没找到（比如成员被踢了），就还是用消息里的名字作为备用。
                   senderDisplayName = member
                     ? member.groupNickname
-                    : msg.senderName || "未知成员";
+                    : msg.senderName || "Unknown member";
 
                   senderAvatar = member
                     ? member.avatar
@@ -19797,7 +19797,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
           // 1. 基础检查
           if (!githubToken || !githubUsername || !githubRepo) {
-            if (!isAuto) alert("请先在 API 设置中填写 GitHub 配置！");
+            if (!isAuto) alert("Please fill in the GitHub configuration in the API settings!");
             return;
           }
           githubToken = githubToken.trim();
@@ -19811,25 +19811,25 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           githubPath = (githubPath || "ephone_backup.json").trim();
 
           if (!isAuto)
-            await showCustomAlert("准备中...", "正在打包并计算文件大小...");
+            await showCustomAlert("Preparing...", "Packing and calculating file size...");
 
           try {
-            // 2. 获取原始 JSON 数据字符串
+            // 2. Get the raw JSON data string
             const rawJsonContent = await getFullBackupData();
 
-            // GitHub 会拒绝包含 API Key 的文件上传，所以必须在上传前清空它们
+            // GitHub will reject files containing API keys, so they must be cleared before uploading
             const backupObj = JSON.parse(rawJsonContent);
 
             if (backupObj.apiConfig) {
-              // 清空 OpenAI/API Key
+              // Clear OpenAI/API Key
               backupObj.apiConfig.apiKey = "";
-              // 清空 GitHub Token (最关键，不删这个必报 secret detected)
+              // Clear GitHub Token (most important, must be cleared to avoid secret detected error)
               backupObj.apiConfig.githubToken = "";
-              // 清空 Minimax Key
+              // Clear Minimax Key
               backupObj.apiConfig.minimaxApiKey = "";
             }
 
-            // 重新转换回 JSON 字符串
+            // Convert back to JSON string
             const jsonContent = JSON.stringify(backupObj, null, 2);
 
             // 3. 转成 Base64 (解决中文乱码)
@@ -19843,10 +19843,10 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             const totalChunks = Math.ceil(totalSize / CHUNK_SIZE);
 
             console.log(
-              `[GitHub] 文件大小: ${(totalSize / 1024 / 1024).toFixed(2)} MB, 分片数: ${totalChunks}`,
+              `[GitHub] File size: ${(totalSize / 1024 / 1024).toFixed(2)} MB, Chunks: ${totalChunks}`,
             );
 
-            // 如果只有1片，走普通上传；如果多片，走分片上传
+            // If there's only 1 chunk, use regular upload; if multiple, use chunked upload
             if (totalChunks === 1) {
               await uploadSingleFile(
                 githubUsername,
@@ -19859,8 +19859,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             } else {
               if (!isAuto)
                 await showCustomAlert(
-                  "文件较大",
-                  `将分为 ${totalChunks} 个部分上传，请耐心等待...`,
+                  "Large file",
+                  `The file will be uploaded in ${totalChunks} parts, please be patient...`,
                 );
 
               for (let i = 0; i < totalChunks; i++) {
@@ -19871,7 +19871,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 const partName = `${githubPath}.${String(i + 1).padStart(3, "0")}`;
 
                 if (!isAuto) {
-                  console.log(`正在上传分片 ${i + 1}/${totalChunks} ...`);
+                  console.log(`Uploading chunk ${i + 1}/${totalChunks} ...`);
                 }
 
                 await uploadSingleFile(
@@ -19899,24 +19899,24 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               );
             }
 
-            console.log("GitHub 备份全部完成！");
+            console.log("GitHub backup completed!");
             if (!isAuto) {
               await showCustomAlert(
-                "上传成功",
-                `备份已上传。(为了安全，云端备份已自动移除API Key，恢复时请记得重新填写)`,
+                "Upload successful",
+                `The backup has been uploaded. (For security, the API keys have been automatically removed from the cloud backup. Please remember to re-enter them when restoring.)`,
               );
             }
           } catch (error) {
-            console.error("GitHub 备份失败:", error);
-            // 如果还是报 Bad credentials，提示用户检查 Token
+            console.error("GitHub backup failed:", error);
+            // If still reporting Bad credentials, prompt the user to check the Token
             if (error.message.includes("Bad credentials")) {
               if (!isAuto)
                 await showCustomAlert(
-                  "认证失败",
-                  'GitHub Token 无效或过期。请重新生成 Token 并确保勾选了 "repo" 权限。',
+                  "Authentication failed",
+                  'GitHub Token is invalid or expired. Please regenerate the Token and ensure the "repo" permission is checked.',
                 );
             } else {
-              if (!isAuto) await showCustomAlert("上传失败", error.message);
+              if (!isAuto) await showCustomAlert("Upload failed", error.message);
             }
           }
         }
@@ -19925,9 +19925,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           let { githubToken, githubUsername, githubRepo, githubPath } =
             state.apiConfig;
 
-          // 1. 基础检查
+          // 1. Basic check
           if (!githubToken || !githubUsername || !githubRepo) {
-            alert("请先在 API 设置中填写 GitHub 配置！");
+            alert("Please fill in the GitHub configuration in the API settings first!");
             return;
           }
 
@@ -20035,10 +20035,10 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               } else if (json.sha) {
                 // 文件较大 (>1MB)，API 没有 content，但有 sha
                 // 使用 Blob API 获取内容（它支持 CORS 和 Token）
-                console.log("文件大于1MB，正在通过 Blob API 下载...");
+                console.log("File exceeds 1MB, downloading via Blob API...");
                 if (document.getElementById("custom-modal-title")) {
                   document.getElementById("custom-modal-title").textContent =
-                    "正在通过 Blob API 下载大文件...";
+                    "Downloading large file via Blob API...";
                 }
 
                 const blobUrl = `https://api.github.com/repos/${githubUsername}/${githubRepo}/git/blobs/${json.sha}`;
@@ -20047,28 +20047,28 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 });
 
                 if (!blobRes.ok)
-                  throw new Error(`Blob API 请求失败: ${blobRes.status}`);
+                  throw new Error(`Blob API request failed: ${blobRes.status}`);
 
                 const blobJson = await blobRes.json();
                 finalBase64String = blobJson.content.replace(/\s/g, "");
               } else {
                 throw new Error(
-                  "无法获取文件内容: GitHub API 未返回 content 或 sha",
+                  "Unable to retrieve file content: GitHub API did not return content or sha",
                 );
               }
             }
 
-            // 5. 解码与恢复
+            // 5. Decoding and restoration
             if (document.getElementById("custom-modal-title")) {
               document.getElementById("custom-modal-title").textContent =
-                "正在解析数据(可能需要几秒)...";
+                "Parsing data (this may take a few seconds)...";
             }
 
-            // a. Base64 -> 二进制字符串
+            // a. Base64 -> binary string
             const binaryString = atob(finalBase64String);
 
-            // b. 二进制字符串 -> Uint8Array -> UTF-8 字符串
-            // (这一步是为了解决中文乱码问题)
+            // b. binary string -> Uint8Array -> UTF-8 string
+            // (This step is to solve the Chinese garbled problem)
             const bytes = new Uint8Array(binaryString.length);
             for (let i = 0; i < binaryString.length; i++) {
               bytes[i] = binaryString.charCodeAt(i);
@@ -20076,12 +20076,12 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             const decoder = new TextDecoder("utf-8");
             const jsonString = decoder.decode(bytes);
 
-            // c. 预检 JSON
+            // c. Pre-check JSON
             try {
               JSON.parse(jsonString);
             } catch (parseErr) {
               throw new Error(
-                `JSON解析失败(文件可能不完整): ${parseErr.message}`,
+                `JSON parsing failed (file may be incomplete): ${parseErr.message}`,
               );
             }
 
@@ -20092,7 +20092,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             hideCustomModal();
             await importBackup(virtualFile);
           } catch (error) {
-            console.error("恢复失败:", error);
+            console.error("Restore failed:", error);
             // 如果是 403 错误，通常是 Token 权限问题
             let extraMsg = "";
             if (
@@ -20100,18 +20100,18 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               error.message.includes("Failed to fetch")
             ) {
               extraMsg =
-                "\n\n(提示：这可能是网络问题，或者您的 GitHub Token 没有足够的权限访问该私有仓库。)";
+                "\n\n(Tip: This may be a network issue, or your GitHub Token does not have sufficient permissions to access the private repository.)";
             }
             await showCustomAlert(
-              "恢复失败",
-              `错误信息: ${error.message}${extraMsg}`,
+              "Restore failed",
+              `Error message: ${error.message}${extraMsg}`,
             );
           }
         }
 
         /**
-         * 辅助函数：上传单个文件到 GitHub
-         * 增强版：支持获取SHA以覆盖文件，处理404情况
+         * Helper function: Upload a single file to GitHub
+         * Enhanced version: Supports obtaining SHA for overwriting files and handling 404 cases
          */
         async function uploadSingleFile(
           user,
@@ -20123,10 +20123,10 @@ console.log(`[System] Database for user ${userId} has been loaded`);
         ) {
           const apiUrl = `https://api.github.com/repos/${user}/${repo}/contents/${path}`;
 
-          // 1. 尝试获取现有的 SHA (用于覆盖)
+          // 1. Try to get the existing SHA (for overwriting)
           let sha = null;
           try {
-            // 这里的 fetch 可能会因为网络问题失败，所以加 try-catch
+            // This fetch may fail due to network issues, so we add try-catch
             const getRes = await fetch(apiUrl, {
               method: "GET",
               headers: { Authorization: `token ${token}` },
@@ -20137,20 +20137,20 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             }
           } catch (e) {
             console.warn(
-              `[Github] 获取文件 SHA 失败 (可能是新文件): ${path}`,
+              `[Github] Failed to get file SHA (might be a new file): ${path}`,
               e,
             );
-            // 忽略获取SHA的错误，假设是新文件继续尝试上传
+            // Ignore errors when getting SHA, assume it's a new file and continue to upload
           }
 
-          // 2. 准备上传请求体
+          // 2. Prepare upload request body
           const body = {
             message: `Backup ${new Date().toLocaleString()}`,
             content: contentBase64,
           };
           if (sha) body.sha = sha;
 
-          // 3. 执行上传 (PUT)
+          // 3. Execute upload (PUT)
           const res = await fetch(apiUrl, {
             method: "PUT",
             headers: {
@@ -20172,28 +20172,28 @@ console.log(`[System] Database for user ${userId} has been loaded`);
         }
 
         /**
-         * 管理自动备份定时器 (已修改：支持自定义时间和模式)
+         * Manage auto backup timer (modified: supports custom time and mode)
          */
         function handleAutoBackupTimer() {
-          // 清除旧定时器
+          // Clear old timer
           if (githubBackupTimer) {
             clearInterval(githubBackupTimer);
             githubBackupTimer = null;
           }
 
-          // 如果开启了自动备份
+          // If auto backup is enabled
           if (state.apiConfig && state.apiConfig.githubAutoBackup) {
-            // 获取间隔时间，默认为 30 分钟
+            // Get interval time, default is 30 minutes
             const intervalMinutes = state.apiConfig.githubBackupInterval || 30;
-            console.log(`已开启 GitHub 自动备份 (每 ${intervalMinutes} 分钟)`);
+            console.log(`GitHub auto backup enabled (every ${intervalMinutes} minutes)`);
 
             githubBackupTimer = setInterval(
               () => {
-                // 获取备份模式，默认为全量
+                // Get backup mode, default is full
                 const mode = state.apiConfig.githubBackupMode || "full";
 
                 if (mode === "stream") {
-                  // 传入 true 表示这是自动备份
+                  // Pass true to indicate this is an auto backup
                   uploadBackupToGitHubStream(true);
                 } else {
                   uploadBackupToGitHub(true);
@@ -20208,8 +20208,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           if (!file) return;
 
           const confirmed = await showCustomConfirm(
-            "严重警告！",
-            "导入备份将完全覆盖您当前的所有数据，包括聊天、设置等。此操作不可撤销！您确定要继续吗？",
+            "Severe Warning!",
+            "Importing a backup will completely overwrite all your current data, including chats, settings, etc. This action is irreversible! Are you sure you want to continue?",
             { confirmButtonClass: "btn-danger" },
           );
 
@@ -20220,14 +20220,14 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             const data = JSON.parse(text);
 
             await db.transaction("rw", db.tables, async () => {
-              // 1. 清空所有现有表格
+              // 1. Clear all existing tables
               for (const table of db.tables) {
                 await table.clear();
               }
 
-              // 检查备份文件中的每一项数据，只有当当前代码的数据库里也存在对应的表格时，才进行导入
+              // Check each item in the backup file, only import if the corresponding table exists in the current database
 
-              // 导入数组类型的数据
+              // Import array-type data
               const arrayTables = [
                 "chats",
                 "worldBooks",
@@ -20257,27 +20257,27 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
                   // 当处理世界书表格时，执行特别的转换操作
                   if (tableName === "worldBooks") {
-                    console.log("正在检查并转换世界书数据格式以兼容...");
+                    console.log("Checking and converting world book data format for compatibility...");
                     itemsToPut.forEach((book) => {
                       // 如果 content 是数组 (别人的格式)，则将其转换为字符串 (我的格式)
                       if (Array.isArray(book.content)) {
                         console.log(
-                          `检测到数组格式的世界书: "${book.name}"，正在转换为字符串...`,
+                          `Detected array format world book: "${book.name}", converting to string...`,
                         );
 
-                        // 将数组中的每个条目对象转换为格式化的字符串
+                        // Convert each entry object in the array to a formatted string
                         const convertedEntries = book.content.map((entry) => {
                           const stringParts = [];
                           if (entry.comment) {
-                            stringParts.push(`[备注: ${entry.comment}]`);
+                            stringParts.push(`[Comment: ${entry.comment}]`);
                           }
                           if (entry.keys && entry.keys.length > 0) {
                             stringParts.push(
-                              `[关键词: ${entry.keys.join(", ")}]`,
+                              `[Keywords: ${entry.keys.join(", ")}]`,
                             );
                           }
-                          stringParts.push(entry.content); // 条目主要内容
-                          return stringParts.join("\n"); // 每个条目的内部用换行分隔
+                          stringParts.push(entry.content); // Main content of the entry
+                          return stringParts.join("\n"); // Separate each entry internally with a newline
                         });
 
                         // 将所有转换后的条目字符串用一个明显的分隔符连接起来
@@ -20296,18 +20296,18 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   );
                   if (validItems.length > 0) {
                     console.log(
-                      `正在导入 ${validItems.length} 条数据到表格: ${tableName}...`,
+                      `Importing ${validItems.length} items into table: ${tableName}...`,
                     );
                     await db[tableName].bulkPut(validItems);
                   }
                 } else {
                   console.log(
-                    `跳过导入: ${tableName} (在备份文件或当前数据库中不存在)`,
+                    `Skipping import: ${tableName} (does not exist in backup file or current database)`,
                   );
                 }
               }
 
-              // 导入对象类型的数据（通常是设置）
+              // Import object-type data (usually settings)
               const objectTables = [
                 "apiConfig",
                 "globalSettings",
@@ -20316,13 +20316,13 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               ];
               for (const tableName of objectTables) {
                 if (data[tableName] && db[tableName]) {
-                  console.log(`正在导入设置: ${tableName}...`);
+                  console.log(`Importing settings: ${tableName}...`);
                   await db[tableName].put(data[tableName]);
                 }
               }
             });
 
-            // 导入主屏幕样式的逻辑保持不变，因为它不直接操作数据库的多个表
+            // The logic for importing home screen styles remains unchanged, as it does not directly operate on multiple database tables
             if (data.homeScreenState) {
               const settings = (await db.globalSettings.get("main")) || {
                 id: "main",
@@ -20336,38 +20336,38 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               if (data.homeScreenState.appIcons)
                 settings.appIcons = data.homeScreenState.appIcons;
               await db.globalSettings.put(settings);
-              console.log("已成功导入主屏幕样式数据。");
+              console.log("Successfully imported home screen style data.");
             }
 
             await showCustomAlert(
-              "导入成功",
-              "所有数据已成功恢复！应用即将刷新以应用所有更改。",
+              "Import Successful",
+              "All data has been successfully restored! The app will refresh to apply all changes.",
             );
 
             setTimeout(() => {
               window.location.reload();
             }, 1500);
           } catch (error) {
-            console.error("导入数据时出错:", error);
+            console.error("Error importing data:", error);
             await showCustomAlert(
-              "导入失败",
-              `文件格式不正确或数据已损坏: ${error.message}`,
+              "Import Failed",
+              `The file format is incorrect or the data is corrupted: ${error.message}`,
             );
           }
         }
 
         function applyCustomFont(fontUrl, isPreviewOnly = false) {
           if (!fontUrl) {
-            // 如果没有提供字体链接（比如恢复默认），就清空样式
+            // If no font URL is provided (e.g., restoring default), clear the styles
             dynamicFontStyle.innerHTML = "";
             document.getElementById("font-preview").style.fontFamily = "";
             return;
           }
 
-          // 这是一个统一的内部名字
+          // This is a unified internal name
           const fontName = "custom-user-font";
 
-          // 这是定义字体的样式规则
+          // This defines the font style rules
           const newStyle = `
 			        @font-face {
 			          font-family: '${fontName}';
@@ -20376,7 +20376,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 			        }`;
 
           if (isPreviewOnly) {
-            // 如果只是预览，这个逻辑保持不变
+            // If it's just a preview, this logic remains unchanged
             const previewStyle =
               document.getElementById("preview-font-style") ||
               document.createElement("style");
@@ -20387,7 +20387,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             document.getElementById("font-preview").style.fontFamily =
               `'${fontName}', 'bulangni', sans-serif`;
           } else {
-            // 如果是全局应用，就同时定义字体并告诉整个 body 去使用它
+            // If it's a global application, define the font and tell the entire body to use it
             dynamicFontStyle.innerHTML = `
 			            ${newStyle}
 			            body {
@@ -20397,21 +20397,21 @@ console.log(`[System] Database for user ${userId} has been loaded`);
         }
 
         async function resetToDefaultFont() {
-          // 1. 清除全局字体样式
+          // 1. Clear global font styles
           dynamicFontStyle.innerHTML = "";
 
-          // 2. 更新并保存设置
+          // 2. Update and save settings
           state.globalSettings.fontUrl = "";
           await db.globalSettings.put(state.globalSettings);
 
-          // 3. 明确地将全局预览区的字体也恢复为默认
+          // 3. Explicitly restore the global preview area's font to default
           const globalPreview = document.getElementById("font-preview");
-          globalPreview.style.fontFamily = ""; // 移除内联样式
+          globalPreview.style.fontFamily = ""; // Remove inline styles
 
-          // 4. 应用一下空的字体设置，确保所有地方都恢复
+          // 4. Apply an empty font setting to ensure all areas are restored
           applyCustomFont("", true);
 
-          alert("已恢复默认字体。");
+          alert("Default font has been restored.");
         }
 
         async function loadAllDataFromDB() {
@@ -20428,7 +20428,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             initialFavorites,
             apiPresets,
             bubbleStylePresets,
-            datingScenes, // <--- 在这里新增
+            datingScenes, // <--- Newly added here
             localUserStickerCategories,
             offlinePresetsFromDB,
           ] = await Promise.all([
@@ -20444,7 +20444,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             db.favorites.orderBy("timestamp").reverse().toArray(),
             db.apiPresets.toArray(),
             db.bubbleStylePresets.toArray(),
-            db.datingScenes.toArray(), // <--- 在这里新增
+            db.datingScenes.toArray(), // <--- Newly added here
             db.userStickerCategories.toArray(),
             db.offlinePresets.toArray(),
           ]);
@@ -20454,48 +20454,48 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               chat.checkpoints = [];
             }
 
-            // 为旧的群聊数据兼容专属表情库
+            // For old group chat data, ensure the sticker library is present
             if (
               chat.isGroup &&
               (!chat.settings || !chat.settings.stickerLibrary)
             ) {
-              if (!chat.settings) chat.settings = {}; // 以防万一连settings都没有
+              if (!chat.settings) chat.settings = {}; // Just in case settings is missing
               chat.settings.stickerLibrary = [];
               console.log(
-                `为旧群聊 "${chat.name}" 补全了专属表情库(stickerLibrary)属性。`,
+                `For old group chat "${chat.name}", the sticker library (stickerLibrary) property has been added.`,
               );
             }
-            // 兼容旧数据：为没有专属表情库的角色添加一个空的表情库
+            // For old single chat data, ensure the sticker library is present
             if (
               !chat.isGroup &&
               (!chat.settings || !chat.settings.stickerLibrary)
             ) {
-              if (!chat.settings) chat.settings = {}; // 以防万一连settings都没有
+              if (!chat.settings) chat.settings = {}; // Just in case settings is missing
               chat.settings.stickerLibrary = [];
               console.log(
-                `为旧角色 "${chat.name}" 补全了专属表情库(stickerLibrary)属性。`,
+                `For old single chat "${chat.name}", the sticker library (stickerLibrary) property has been added.`,
               );
             }
 
             if (typeof chat.unreadCount === "undefined") {
-              chat.unreadCount = 0; // 如果这个聊天对象没有 unreadCount 属性，就给它初始化为 0
+              chat.unreadCount = 0; // If this chat object doesn't have an unreadCount property, initialize it to 0
             }
 
-            // 兼容旧数据：为没有心声背景的角色添加一个空字符串
+            // For old data: add an empty string for innerVoiceBackground if it's missing
             if (typeof chat.innerVoiceBackground === "undefined") {
               chat.innerVoiceBackground = "";
             }
 
-            // ★★★ 这就是本次新增的兼容性代码！ ★★★
+            // ★★★ This is the newly added compatibility code! ★★★
             if (
               chat.settings &&
               typeof chat.settings.innerVoiceAdopterLabelFormat === "undefined"
             ) {
-              chat.settings.innerVoiceAdopterLabelFormat = "领养人: {{user}}";
+              chat.settings.innerVoiceAdopterLabelFormat = "Adopter: {{user}}";
             }
-            // ★★★ 新增结束 ★★★
+            // ★★★ Newly added compatibility code ends ★★★
 
-            // 检查是否是群聊，并且其成员对象使用的是旧的 `name` 结构
+            // Check if it's a group chat and its member objects use the old `name` structure
             if (
               chat.isGroup &&
               chat.members &&
@@ -20503,18 +20503,18 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               chat.members[0].name
             ) {
               console.log(
-                `检测到旧版群聊数据 for "${chat.name}"，正在执行迁移...`,
+                `Detected old group chat data for "${chat.name}", migrating...`,
               );
               chat.members.forEach((member) => {
-                // 如果这个成员对象没有 originalName，说明是旧数据
+                // If this member object doesn't have originalName, it's old data
                 if (typeof member.originalName === "undefined") {
-                  member.originalName = member.name; // 将旧的 name 作为 originalName
-                  member.groupNickname = member.name; // 同时创建一个初始的 groupNickname
-                  delete member.name; // 删除旧的、有歧义的 name 字段
-                  needsUpdate = true; // 标记需要存回数据库
+                  member.originalName = member.name; // Use the old name as originalName
+                  member.groupNickname = member.name; // Also create an initial groupNickname
+                  delete member.name; // Remove the old, ambiguous name field
+                  needsUpdate = true; // Mark for database update
                 }
               });
-              console.log(`迁移完成 for "${chat.name}"`);
+              console.log(`Migration completed for "${chat.name}"`);
             }
 
             // 检查1：如果是一个单聊，并且没有 status 属性
@@ -20525,50 +20525,50 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 lastUpdate: Date.now(),
                 isBusy: false,
               };
-              console.log(`为旧角色 "${chat.name}" 补全了status属性。`);
+              console.log(`This adds the status attribute to the old character "${chat.name}".`);
             }
 
-            // 检查2：兼容最新的“关系”功能
+            // Check 2: Compatibility with the latest "relationship" feature
             if (!chat.isGroup && !chat.relationship) {
-              // 如果是单聊，且没有 relationship 对象，就补上一个默认的
+              // If it's a single chat and doesn't have a relationship object, add a default one
               chat.relationship = {
                 status: "friend",
                 blockedTimestamp: null,
                 applicationReason: "",
               };
-              console.log(`为旧角色 "${chat.name}" 补全了 relationship 属性。`);
+              console.log(`This adds the relationship attribute to the old character "${chat.name}".`);
             }
 
             if (
               !chat.isGroup &&
               (!chat.settings || !chat.settings.aiAvatarLibrary)
             ) {
-              if (!chat.settings) chat.settings = {}; // 以防万一连settings都没有
+              if (!chat.settings) chat.settings = {}; // Just in case settings is missing
               chat.settings.aiAvatarLibrary = [];
               console.log(
-                `为旧角色 "${chat.name}" 补全了aiAvatarLibrary属性。`,
+                `This adds the aiAvatarLibrary attribute to the old character "${chat.name}".`,
               );
             }
 
-            // 兼容旧数据：为没有总结设置的聊天添加默认值
+            // Compatibility with old data: add default summary settings for chats without them
             if (!chat.settings.summary) {
               chat.settings.summary = {
                 enabled: false,
                 mode: "auto",
                 count: 20,
                 prompt:
-                  "请你以第三人称的视角，客观、冷静、不带任何感情色彩地总结以下对话的核心事件和信息。禁止进行任何角色扮演或添加主观评论。",
-                lastSummaryIndex: -1, // -1表示从未总结过
+                  "Using Vietnamese language to summarize the core events and information of the following conversation from a third-person perspective, objectively and calmly, without any emotional bias. Do not engage in any role-playing or add subjective comments.",
+                lastSummaryIndex: -1, // -1 indicates never summarized
               };
             }
 
             // 兼容旧数据：为没有NPC库的单聊角色添加空的NPC库
             if (!chat.isGroup && !chat.npcLibrary) {
               chat.npcLibrary = [];
-              console.log(`为旧角色 "${chat.name}" 补全了 npcLibrary 属性。`);
+              console.log(`Completed the npcLibrary property for legacy character "${chat.name}".`);
             }
 
-            // 兼容旧数据：为没有微博设置的单聊角色添加空的微博设置
+            // Compatibility with old data: add default Weibo settings for single chat characters without them
             if (
               !chat.isGroup &&
               (!chat.settings.weiboProfession ||
@@ -20576,7 +20576,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             ) {
               chat.settings.weiboProfession = "";
               chat.settings.weiboInstruction = "";
-              console.log(`为旧角色 "${chat.name}" 补全了微博设置属性。`);
+              console.log(`This adds the Weibo settings attribute to the old character "${chat.name}".`);
             }
 
             if (!chat.musicData) chat.musicData = { totalTime: 0 };
@@ -20591,12 +20591,12 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               delete chat.settings.linkedWorldBookId;
             }
 
-            // 兼容旧数据，为没有 isPinned 属性的聊天添加默认值
+            // Compatibility with old data: add default value for chats without isPinned attribute
             if (typeof chat.isPinned === "undefined") {
               chat.isPinned = false;
             }
 
-            // 统一修复并初始化所有角色的手机数据
+            // Ensure all characters' phone data is initialized and fixed
             if (!chat.isGroup) {
               // 第一步：确保最外层的 characterPhoneData 对象存在
               if (!chat.characterPhoneData) {
@@ -20658,7 +20658,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               typeof chat.settings.petAdopted === "undefined"
             ) {
               // 如果 pet 对象已存在，说明是老用户，默认已领养
-              if (chat.settings.pet && chat.settings.pet.type !== "无") {
+              if (chat.settings.pet && chat.settings.pet.type !== "None") {
                 chat.settings.petAdopted = true;
               } else {
                 // 如果没有 pet 对象，说明是新用户或之前就没用宠物，默认未领养
@@ -20673,7 +20673,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             if (!chat.isGroup && chat.settings.pet) {
               if (typeof chat.settings.pet.persona === "undefined") {
                 chat.settings.pet.persona =
-                  "一只可爱的小宠物，对世界充满好奇。";
+                  "A cute little pet, full of curiosity about the world.";
               }
               if (!chat.settings.pet.petChatHistory) {
                 chat.settings.pet.petChatHistory = [];
@@ -20914,7 +20914,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
           state.globalSettings = globalSettings || {
             id: "main",
-            quickReplies: ["你好", "继续", "有趣"],
+            quickReplies: ["Hello", "Continue", "Interesting"],
             ringtoneUrl: "https://files.catbox.moe/3w7gla.mp3",
             notificationSoundUrl: "https://files.catbox.moe/k369mf.mp3", // <-- 在这里新增这一行
             widgetData: {},
@@ -21004,20 +21004,21 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
           // 创建保活专用对象
           const keepAliveTrack = {
-            name: "【后台保活模式】(静音)",
-            artist: "点击播放以保持后台运行",
+            name: "【Background Keep-Alive Mode】(Silent)",
+            artist: "Tap to play to keep running in background",
             src: keepAliveUrl,
-            // 使用 API Settings 的图标作为封面
+            // Use the API Settings icon as cover
             cover:
               "https://i.postimg.cc/y8YfDNNr/D9FD94FC0A3523D02D9EE3A7B0F57396.png",
             isLocal: false,
             lrcContent:
-              "[00:00.00]⚠️ 后台保活运行中...\n[00:02.00]此音频无声\n[00:05.00]用于防止API请求中断\n[99:99.99]End",
+              "[00:00.00]⚠️ Background keep-alive running...\n[00:02.00]This audio is silent\n[00:05.00]Used to prevent API request interruption\n[99:99.99]End",
             isTemporary: false,
             addedTimestamp: Date.now(),
-            // ★★★ 核心标记：这是一个保活音轨 ★★★
+            // ★★★ Core flag: this is a keep-alive track ★★★
             isKeepAlive: true,
           };
+
 
           // 强制插到播放列表的第 0 位
           window.state.musicState.playlist.unshift(keepAliveTrack);
@@ -21032,13 +21033,13 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             avatar: "https://files.catbox.moe/q6z5fc.jpeg",
             banner: "https://files.catbox.moe/r5heyt.gif",
             weiboAvatar: "https://files.catbox.moe/q6z5fc.jpeg",
-            weiboNickname: "你的昵称",
+            weiboNickname: "Your nickname",
             weiboFansCount: "0",
             weiboBackground:
               "https://i.postimg.cc/mk93Y3j1/weibo-bg-default.jpg",
 
-            weiboUserProfession: "点击设置职业",
-            weiboUserPersona: "一个普通的微博用户。",
+            weiboUserProfession: "Tap to set profession",
+            weiboUserPersona: "An ordinary Weibo user.",
             weiboUserPersonaPresets: [],
           };
           // 兼容旧数据，如果加载进来的数据没有这些新字段，就补上默认值
@@ -21048,7 +21049,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               "https://files.catbox.moe/q6z5fc.jpeg";
           if (!state.qzoneSettings.weiboNickname)
             state.qzoneSettings.weiboNickname =
-              state.qzoneSettings.nickname || "你的昵称";
+              state.qzoneSettings.nickname || "Your nickname";
           if (!state.qzoneSettings.weiboFansCount)
             state.qzoneSettings.weiboFansCount = "0";
           if (!state.qzoneSettings.weiboBackground)
@@ -21056,9 +21057,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               "https://i.postimg.cc/mk93Y3j1/weibo-bg-default.jpg";
 
           if (!state.qzoneSettings.weiboUserProfession)
-            state.qzoneSettings.weiboUserProfession = "点击设置职业";
+            state.qzoneSettings.weiboUserProfession = "Tap to set profession";
           if (!state.qzoneSettings.weiboUserPersona)
-            state.qzoneSettings.weiboUserPersona = "一个普通的微博用户。";
+            state.qzoneSettings.weiboUserPersona = "An ordinary Weibo user.";
           if (!state.qzoneSettings.weiboUserPersonaPresets)
             state.qzoneSettings.weiboUserPersonaPresets = [];
 
@@ -21086,7 +21087,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             id: "main",
             playlist: permanentPlaylist,
           });
-          console.log("已将永久播放列表保存到数据库。");
+          console.log("Permanent playlist has been saved to the database.");
         }
 
         function formatTimestamp(timestamp) {
@@ -21168,16 +21169,16 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   new Notification(notifName, options);
                 }
               } catch (e) {
-                console.error("系统通知发送失败:", e.message);
+                console.error("System notification failed:", e.message);
               }
             }
           }
 
-          // 3. 应用内顶部横幅 (网页内弹窗)
+          // 3. In-app top banner (web popup)
           const bar = document.getElementById("notification-bar");
           const avatarImg = document.getElementById("notification-avatar");
 
-          // 这里设置图片
+          // Set the image
           if (avatarImg) avatarImg.src = avatarUrl;
 
           const contentDiv = document.getElementById("notification-content");
@@ -23552,7 +23553,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
             if (isUser) {
               // 如果是用户自己
-              senderDisplayName = chat.settings.myNickname || "我";
+              senderDisplayName = chat.settings.myNickname || "Me";
 
               // 检查用户是否是群主
               if (chat.ownerId === "user") {
@@ -23918,7 +23919,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               Object.values(state.chats).find((c) =>
                 c.history.some((h) => h.timestamp === msg.timestamp),
               );
-            const myNickname = currentChat.settings.myNickname || "我";
+            const myNickname = currentChat.settings.myNickname || "Me";
             const aiNickname = currentChat.name;
 
             // --- SVG 动态生成 ---
@@ -24053,8 +24054,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
             let titleText, noteText;
             const myNickname = chat.isGroup
-              ? chat.settings.myNickname || "我"
-              : "我";
+              ? chat.settings.myNickname || "Me"
+              : "Me";
 
             if (isUser) {
               // 消息是用户发出的
@@ -24202,7 +24203,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             }, 0);
           } else if (msg.type === "red_packet") {
             bubble.classList.add("is-red-packet");
-            const myNickname = chat.settings.myNickname || "我";
+            const myNickname = chat.settings.myNickname || "Me";
 
             // 从最新的 msg 对象中获取状态
             const hasClaimed = msg.claimedBy && msg.claimedBy[myNickname];
@@ -24273,11 +24274,11 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             bubble.classList.add("is-waimai-request"); // 复用外卖卡片的样式，很方便！
             const isUserSender = msg.role === "user";
             const senderName = isUserSender
-              ? chat.settings.myNickname || "我"
+              ? chat.settings.myNickname || "Me"
               : chat.name;
             const receiverName = isUserSender
               ? chat.name
-              : chat.settings.myNickname || "我";
+              : chat.settings.myNickname || "Me";
 
             let cardContent = "";
 
@@ -24340,8 +24341,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             }
 
             const myNickname = chat.isGroup
-              ? chat.settings.myNickname || "我"
-              : "我";
+              ? chat.settings.myNickname || "Me"
+              : "Me";
             let myVote = null;
             for (const option in msg.votes) {
               if (msg.votes[option].includes(myNickname)) {
@@ -24458,7 +24459,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             // b. 构建引用块的HTML
             quoteHtml = `
 			        <div class="quoted-message">
-			            <div class="quoted-sender">回复 ${msg.quote.senderName}:</div>
+			            <div class="quoted-sender">Reply ${msg.quote.senderName}:</div>
 			            <div class="quoted-content">${fullQuotedContent}</div>
 			        </div>
 			    `;
@@ -24589,7 +24590,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
         function formatMessageForContext(msg, chat) {
           let senderName = "";
           if (msg.role === "user") {
-            senderName = chat.isGroup ? chat.settings.myNickname || "我" : "我";
+            senderName = chat.isGroup ? chat.settings.myNickname || "Me" : "Me";
           } else {
             // assistant
             senderName = msg.senderName || chat.name;
@@ -25274,7 +25275,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               recentWeiboPosts.forEach((post) => {
                 const authorName =
                   post.authorId === "user"
-                    ? state.qzoneSettings.weiboNickname || "我"
+                    ? state.qzoneSettings.weiboNickname || "Me"
                     : post.authorNickname;
                 const contentPreview = (
                   post.content ||
@@ -25781,7 +25782,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   const sender =
                     msg.senderName ||
                     (msg.role === "user"
-                      ? chat.settings.myNickname || "我"
+                      ? chat.settings.myNickname || "Me"
                       : "未知发送者");
                   let contentText = "";
                   if (msg.type === "voice_message")
@@ -25853,7 +25854,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 })
                 .join("\n");
 
-              const myNickname = chat.settings.myNickname || "我";
+              const myNickname = chat.settings.myNickname || "Me";
               // 1. 获取群公告内容
               const announcement = chat.settings.groupAnnouncement || "";
               let announcementContext = "";
@@ -26022,8 +26023,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
                   // --- 用户消息处理 ---
                   const myNickname = chat.isGroup
-                    ? chat.settings.myNickname || "我"
-                    : "我";
+                    ? chat.settings.myNickname || "Me"
+                    : "Me";
                   let contentStr = "";
 
                   // 1. 在处理所有用户消息前，优先检查它是不是一个投票
@@ -26047,7 +26048,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                     // 2. 获取完整的被引用内容 (移除了截断)
                     const fullQuotedContent = String(msg.quote.content || "");
                     // 3. 构造成AI能理解的、清晰的上下文
-                    contentStr += `(回复 ${quotedSender} 的消息: "${fullQuotedContent}"): ${msg.content}`;
+                    contentStr += `(Reply ${quotedSender} 的消息: "${fullQuotedContent}"): ${msg.content}`;
                   } else {
                     contentStr += msg.content;
                   }
@@ -26619,11 +26620,11 @@ ${libraryList}
 
                   if (msg.quote) {
                     // 1. 获取被引用者的名字
-                    const quotedSender = msg.quote.senderName || "未知用户";
+                    const quotedSender = msg.quote.senderName || "Unknown User";
                     // 2. 获取完整的被引用内容 (移除了截断)
                     const fullQuotedContent = String(msg.quote.content || "");
                     // 3. 构造成AI能理解的、清晰的上下文
-                    contentStr += `(回复 ${quotedSender} 的消息: "${fullQuotedContent}"): ${msg.content}`;
+                    contentStr += `(Reply ${quotedSender}'s message: "${fullQuotedContent}"): ${msg.content}`;
                   } else {
                     contentStr += msg.content;
                   }
@@ -26631,7 +26632,7 @@ ${libraryList}
                   if (msg.type === "user_photo")
                     return {
                       role: "user",
-                      content: `(Timestamp: ${msg.timestamp}) [你收到了一张用户描述的照片，内容是：'${msg.content}']`,
+                      content: `(Timestamp: ${msg.timestamp}) [You received a photo described by the user, content: '${msg.content}']`,
                     };
                   if (msg.type === "voice_message")
                     return {
@@ -26755,7 +26756,7 @@ ${libraryList}
             const myNickname =
               state.qzoneSettings.weiboNickname ||
               state.qzoneSettings.nickname ||
-              "我";
+              "Me";
 
             charLatestPosts.forEach((post) => {
               if (
@@ -26906,7 +26907,7 @@ ${libraryList}
               const myNickname =
                 state.qzoneSettings.weiboNickname ||
                 state.qzoneSettings.nickname ||
-                "我";
+                "Me";
 
               charLatestPosts.forEach((post) => {
                 if (post.comments && post.comments.length > 0) {
@@ -27477,7 +27478,7 @@ ${libraryList}
                   const actorName = msgData.name;
                   const targetName = msgData.targetName;
                   const newTitle = msgData.title || "";
-                  const myNickname = chat.settings.myNickname || "我";
+                  const myNickname = chat.settings.myNickname || "Me";
 
                   // 权限检查：群主或管理员可以设置头衔
                   const actorMember = chat.members.find(
@@ -27596,7 +27597,7 @@ ${libraryList}
                   const actorName = msgData.name;
                   const targetName = msgData.targetName;
                   const isAdmin = msgData.isAdmin;
-                  const myNickname = chat.settings.myNickname || "我"; // 获取你自己的昵称
+                  const myNickname = chat.settings.myNickname || "Me"; // 获取你自己的昵称
 
                   // 权限检查：确认操作者是群主
                   const actorMember = chat.members.find(
@@ -28483,7 +28484,7 @@ ${libraryList}
                       senderId: chat.id,
                       senderName: chat.name,
                       senderAvatar: chat.settings.aiAvatar,
-                      recipientName: chat.settings.myNickname || "我",
+                      recipientName: chat.settings.myNickname || "Me",
                       recipientAvatar: chat.settings.myAvatar,
                       content: msgData.content,
                       timestamp: Date.now(),
@@ -29717,8 +29718,8 @@ ${libraryList}
                   // 判断这条投票消息是谁发的
                   if (msg.role === "user") {
                     const myNickname = chat.isGroup
-                      ? chat.settings.myNickname || "我"
-                      : "我";
+                      ? chat.settings.myNickname || "Me"
+                      : "Me";
                     pollInfoText = `[系统提示：用户 (${myNickname}) 发起了一个投票。问题：“${
                       msg.question
                     }”, 选项：“${msg.options.join('", "')}”。你可以使用 'vote' 指令参与投票。]`;
@@ -30046,7 +30047,7 @@ ${libraryList}
                       senderName:
                         originalMessage.senderName ||
                         (originalMessage.role === "user"
-                          ? chat.settings.myNickname || "我"
+                          ? chat.settings.myNickname || "Me"
                           : chat.name),
                       content: String(originalMessage.content || ""),
                     };
@@ -30448,11 +30449,11 @@ ${libraryList}
                     type: "transfer",
                     amount: msgData.amount,
                     note: msgData.note,
-                    receiverName: msgData.receiver || "我",
+                    receiverName: msgData.receiver || "Me",
                   };
 
                   // 【全新】同步到角色钱包（支出）
-                  const transferDescription = `转账给 ${msgData.receiver || "我"}`;
+                  const transferDescription = `转账给 ${msgData.receiver || "Me"}`;
                   await updateCharacterBankBalance(
                     chatId,
                     -msgData.amount,
@@ -30660,8 +30661,8 @@ ${libraryList}
 
           const chat = state.chats[state.activeChatId];
           const senderName = chat.isGroup
-            ? chat.settings.myNickname || "我"
-            : "我";
+            ? chat.settings.myNickname || "Me"
+            : "Me";
           const receiverName = chat.isGroup ? "群聊" : chat.name;
 
           // 调用新函数扣款并记录
@@ -32177,7 +32178,7 @@ ${libraryList}
                 c.replyTo === userNickname
                   ? `用户 (${userNickname})`
                   : c.replyTo;
-              context += `    - ${displayName} 回复 ${replyToDisplayName}: ${c.text}\n`;
+              context += `    - ${displayName} Reply ${replyToDisplayName}: ${c.text}\n`;
             } else {
               context += `    - ${displayName}: ${c.text}\n`;
             }
@@ -32257,8 +32258,8 @@ ${libraryList}
               const sender =
                 msg.role === "user"
                   ? chat.isGroup
-                    ? chat.settings.myNickname || "我"
-                    : "我"
+                    ? chat.settings.myNickname || "Me"
+                    : "Me"
                   : msg.senderName || chat.name;
 
               // 处理不同类型的消息内容
@@ -32413,7 +32414,7 @@ ${libraryList}
               recentWeiboPosts.forEach((post) => {
                 const authorName =
                   post.authorId === "user"
-                    ? state.qzoneSettings.weiboNickname || "我"
+                    ? state.qzoneSettings.weiboNickname || "Me"
                     : post.authorNickname;
                 const contentPreview = (
                   post.content ||
@@ -33956,7 +33957,7 @@ const ivTags = {
             members: members,
             settings: {
               myPersona: "我是谁呀。",
-              myNickname: "我",
+              myNickname: "Me",
               maxMemory: 10,
               groupAvatar: defaultGroupAvatar,
               myAvatar: defaultMyGroupAvatar,
@@ -34021,7 +34022,7 @@ const ivTags = {
             {
               id: "user",
               avatar: chat.settings.myAvatar || defaultMyGroupAvatar,
-              groupNickname: chat.settings.myNickname || "我",
+              groupNickname: chat.settings.myNickname || "Me",
               // 修复Bug 1：在这里正确地读取你自己的群头衔
               groupTitle: chat.settings.myGroupTitle || "",
             },
@@ -34213,10 +34214,10 @@ const ivTags = {
           renderMemberManagementList();
 
           // 发送系统通知
-          const myNickname = chat.settings.myNickname || "我";
+          const myNickname = chat.settings.myNickname || "Me";
           const targetNickname =
             memberId === "user"
-              ? chat.settings.myNickname || "我"
+              ? chat.settings.myNickname || "Me"
               : targetMember.groupNickname;
           const actionText = (
             memberId === "user"
@@ -34248,7 +34249,7 @@ const ivTags = {
 
             await logSystemMessage(
               chat.id,
-              `“${chat.settings.myNickname || "我"}”为自己解除了禁言。`,
+              `“${chat.settings.myNickname || "Me"}”为自己解除了禁言。`,
             );
 
             renderMemberManagementList(); // 刷新列表
@@ -34313,7 +34314,7 @@ const ivTags = {
           await db.chats.put(chat);
 
           // 发送一条系统消息通知
-          const myNickname = chat.settings.myNickname || "我";
+          const myNickname = chat.settings.myNickname || "Me";
           await logSystemMessage(
             chat.id,
             `“${myNickname}”邀请 ${addedNames.join("、")} 加入了群聊。`,
@@ -34329,7 +34330,7 @@ const ivTags = {
          */
         async function handleSetUserNickname() {
           const chat = state.chats[state.activeChatId];
-          const oldNickname = chat.settings.myNickname || "我";
+          const oldNickname = chat.settings.myNickname || "Me";
 
           const newNickname = await showCustomPrompt(
             "修改我的群昵称",
@@ -34367,7 +34368,7 @@ const ivTags = {
             await db.chats.put(chat);
 
             // 调用你已有的函数来发送系统通知
-            const myNickname = chat.settings.myNickname || "我";
+            const myNickname = chat.settings.myNickname || "Me";
             await logTitleChange(
               chat.id,
               myNickname,
@@ -34418,7 +34419,7 @@ const ivTags = {
             chat.members.splice(memberIndex, 1);
             await db.chats.put(chat);
 
-            const myNickname = chat.settings.myNickname || "我";
+            const myNickname = chat.settings.myNickname || "Me";
             await logSystemMessage(
               chat.id,
               `“${myNickname}”将“${memberName}”移出了群聊。`,
@@ -34602,8 +34603,8 @@ const ivTags = {
           // 记录支付者，并构建对AI更清晰的系统消息
           let systemContent;
           const myNickname = chat.isGroup
-            ? chat.settings.myNickname || "我"
-            : "我";
+            ? chat.settings.myNickname || "Me"
+            : "Me";
 
           if (choice === "paid") {
             originalMessage.paidBy = myNickname; // 记录是用户付的钱
@@ -34665,7 +34666,7 @@ const ivTags = {
             document.getElementById("outgoing-call-avatar").src =
               chat.settings.myAvatar || defaultMyGroupAvatar;
             document.getElementById("outgoing-call-name").textContent =
-              chat.settings.myNickname || "我";
+              chat.settings.myNickname || "Me";
           } else {
             document.getElementById("outgoing-call-avatar").src =
               chat.settings.aiAvatar || defaultAvatar;
@@ -34684,7 +34685,7 @@ const ivTags = {
               (msg) =>
                 `${
                   msg.role === "user"
-                    ? chat.settings.myNickname || "我"
+                    ? chat.settings.myNickname || "Me"
                     : msg.senderName || chat.name
                 }: ${String(msg.content).substring(0, 50)}...`,
             )
@@ -34704,7 +34705,7 @@ const ivTags = {
 
 			# 你的任务
 			你是一个群聊AI，负责扮演【除了用户以外】的所有角色。
-			用户 (${chat.settings.myNickname || "我"}) 刚刚发起了群视频通话。
+			用户 (${chat.settings.myNickname || "Me"}) 刚刚发起了群视频通话。
 			你的任务是根据每个角色的性格和最近的聊天内容，决定他们是否要加入通话。
 
 			# 核心规则
@@ -34723,7 +34724,7 @@ const ivTags = {
 			**【LANGUAGE RULE - HIGHEST PRIORITY】: You MUST reply in Vietnamese (Tiếng Việt) for ALL messages. Never use Chinese or any other language.**
 
 			# 你的任务
-			你正在扮演角色 "${chat.name}"。用户 (${chat.settings.myNickname || "我"}) 刚刚向你发起了视频通话请求。
+			你正在扮演角色 "${chat.name}"。用户 (${chat.settings.myNickname || "Me"}) 刚刚向你发起了视频通话请求。
 			你的任务是根据你的人设和我们最近的聊天内容，决定是否接受。
 
 			# 核心规则
@@ -34832,7 +34833,7 @@ const ivTags = {
               (msg) =>
                 `${
                   msg.role === "user"
-                    ? chat.settings.myNickname || "我"
+                    ? chat.settings.myNickname || "Me"
                     : msg.senderName || chat.name
                 }: ${String(msg.content).substring(0, 50)}...`,
             )
@@ -35020,7 +35021,7 @@ const ivTags = {
               );
               if (videoCallState.isUserParticipating) {
                 participantsData.unshift({
-                  name: chat.settings.myNickname || "我",
+                  name: chat.settings.myNickname || "Me",
                   avatar: chat.settings.myAvatar || defaultMyGroupAvatar,
                 });
               }
@@ -35030,7 +35031,7 @@ const ivTags = {
                 avatar: chat.settings.aiAvatar || defaultAvatar,
               });
               participantsData.unshift({
-                name: "我",
+                name: "Me",
                 avatar: chat.settings.myAvatar || defaultAvatar,
               });
             }
@@ -35064,7 +35065,7 @@ const ivTags = {
             const callTranscriptForAI = videoCallState.callHistory
               .map(
                 (h) =>
-                  `${h.role === "user" ? chat.settings.myNickname || "我" : h.role}: ${h.content}`,
+                  `${h.role === "user" ? chat.settings.myNickname || "Me" : h.role}: ${h.content}`,
               )
               .join("\n");
 
@@ -35257,7 +35258,7 @@ const ivTags = {
             if (videoCallState.isUserParticipating) {
               participantsToRender.unshift({
                 id: "user",
-                name: chat.settings.myNickname || "我",
+                name: chat.settings.myNickname || "Me",
                 avatar: chat.settings.myAvatar || defaultMyGroupAvatar,
               });
             }
@@ -35374,7 +35375,7 @@ const ivTags = {
             ? document.getElementById("video-call-messages-visual")
             : document.getElementById("video-call-main");
 
-          const userNickname = chat.settings.myNickname || "我";
+          const userNickname = chat.settings.myNickname || "Me";
 
           let worldBookContent = "";
           if (
@@ -35666,8 +35667,8 @@ const ivTags = {
           // 2. 获取当前用户的昵称，并构建对AI更清晰的系统消息
           let systemContent;
           const myNickname = chat.isGroup
-            ? chat.settings.myNickname || "我"
-            : "我";
+            ? chat.settings.myNickname || "Me"
+            : "Me";
 
           if (choice === "paid") {
             originalMessage.paidBy = myNickname; // 记录是“我”付的钱
@@ -35724,8 +35725,8 @@ const ivTags = {
 
           // 3. 创建对用户可见的“拍一-拍”消息
           const myNickname = chat.isGroup
-            ? chat.settings.myNickname || "我"
-            : "我";
+            ? chat.settings.myNickname || "Me"
+            : "Me";
           // 将后缀拼接到消息内容中
           const visibleMessageContent = `${myNickname} 拍了拍 “${characterName}” ${suffix.trim()}`;
           const visibleMessage = {
@@ -35957,7 +35958,7 @@ const ivTags = {
             .map((msg) => {
               const sender =
                 msg.role === "user"
-                  ? chat.settings.myNickname || "我"
+                  ? chat.settings.myNickname || "Me"
                   : msg.senderName || chat.name;
               return `${sender}: ${String(msg.content).substring(0, 50)}...`;
             })
@@ -36160,7 +36161,7 @@ const ivTags = {
             return;
           }
 
-          const myNickname = chat.settings.myNickname || "我";
+          const myNickname = chat.settings.myNickname || "Me";
 
           const newPacket = {
             role: "user",
@@ -36208,7 +36209,7 @@ const ivTags = {
             return;
           }
 
-          const myNickname = chat.settings.myNickname || "我";
+          const myNickname = chat.settings.myNickname || "Me";
 
           const newPacket = {
             role: "user",
@@ -36249,7 +36250,7 @@ const ivTags = {
           );
           if (!packet) return;
 
-          const myNickname = freshChat.settings.myNickname || "我";
+          const myNickname = freshChat.settings.myNickname || "Me";
           const hasClaimed = packet.claimedBy && packet.claimedBy[myNickname];
 
           // 如果是专属红包且不是给我的，或已领完，或已领过，都只显示详情
@@ -36290,7 +36291,7 @@ const ivTags = {
          */
         async function handleOpenRedPacket(packet) {
           const chat = state.chats[state.activeChatId];
-          const myNickname = chat.settings.myNickname || "我";
+          const myNickname = chat.settings.myNickname || "Me";
 
           // 1. 检查红包是否还能领
           const remainingCount =
@@ -36396,7 +36397,7 @@ const ivTags = {
           if (!chat) return;
 
           const modal = document.getElementById("red-packet-details-modal");
-          const myNickname = chat.settings.myNickname || "我";
+          const myNickname = chat.settings.myNickname || "Me";
 
           // 2. 后续所有逻辑保持不变，直接使用传入的packet对象
           document.getElementById("rp-details-sender").textContent =
@@ -36553,8 +36554,8 @@ const ivTags = {
 
           const chat = state.chats[state.activeChatId];
           const myNickname = chat.isGroup
-            ? chat.settings.myNickname || "我"
-            : "我";
+            ? chat.settings.myNickname || "Me"
+            : "Me";
 
           const newPollMessage = {
             role: "user",
@@ -36587,8 +36588,8 @@ const ivTags = {
           const chat = state.chats[state.activeChatId];
           const poll = chat.history.find((m) => m.timestamp === timestamp);
           const myNickname = chat.isGroup
-            ? chat.settings.myNickname || "我"
-            : "我";
+            ? chat.settings.myNickname || "Me"
+            : "Me";
 
           // 1. 如果投票不存在或已关闭，直接返回
           if (!poll || poll.isClosed) {
@@ -36948,8 +36949,8 @@ const ivTags = {
               const sender =
                 msg.role === "user"
                   ? chat.isGroup
-                    ? chat.settings.myNickname || "我"
-                    : "我"
+                    ? chat.settings.myNickname || "Me"
+                    : "Me"
                   : msg.senderName || chat.name;
 
               // 处理不同类型的消息内容
@@ -37022,7 +37023,7 @@ const ivTags = {
             const membersList = chat.members
               .map((m) => `- ${m.groupNickname} (人设: ${m.persona})`)
               .join("\n");
-            const myNickname = chat.settings.myNickname || "我";
+            const myNickname = chat.settings.myNickname || "Me";
 
             let worldBookContent = "";
             if (
@@ -37076,7 +37077,7 @@ const ivTags = {
 			# 任务
 			你是一个群聊后台模拟器。当前时间是${currentTime}，群聊 "${chat.name}" 已经沉寂了 ${Math.round(
         timeSinceLastMessage,
-      )} 分钟，用户(昵称: "${chat.settings.myNickname || "我"}")不在线。
+      )} 分钟，用户(昵称: "${chat.settings.myNickname || "Me"}")不在线。
 			你的任务是根据下方每个角色的人设，在他们之间【自发地】生成一段自然的对话。
 			# 【对话节奏铁律 (至关重要！)】
 			你的回复【必须】模拟真人的打字和思考习惯。你应该将你想说的话，拆分成${replyCountInstruction}条消息气泡来发送，**绝对不要一次性发送一大段文字！** 每条消息最好不要超过30个字，这会让对话看起来更自然、更真实。
@@ -37542,7 +37543,7 @@ const ivTags = {
                   : c.replyTo === userNickname
                     ? "用户"
                     : c.replyTo;
-              replyPart = ` 回复 ${replyToLabel}`;
+              replyPart = ` Reply ${replyToLabel}`;
             }
 
             // c. 拼接成最终的、无歧义的字符串
@@ -37658,7 +37659,7 @@ const ivTags = {
             senderName:
               message.senderName ||
               (message.role === "user"
-                ? chat.settings.myNickname || "我"
+                ? chat.settings.myNickname || "Me"
                 : chat.name),
             content: fullContent, // <--- 这里存的是完整的原文！
           };
@@ -37666,7 +37667,7 @@ const ivTags = {
           // 3. 仅在更新“回复预览栏”时，才使用“预览片段”
           const previewBar = document.getElementById("reply-preview-bar");
           previewBar.querySelector(".sender").textContent =
-            `回复 ${currentReplyContext.senderName}:`;
+            `Reply ${currentReplyContext.senderName}:`;
           previewBar.querySelector(".text").textContent = previewSnippet; // <--- 这里用的是缩略版！
           previewBar.style.display = "block";
 
@@ -39722,7 +39723,7 @@ const ivTags = {
           // 判断是和“我”的聊天还是和NPC的聊天
           if (
             contactName ===
-            (chat.characterPhoneData.chats["我"]?.remarkName || "我")
+            (chat.characterPhoneData.chats["Me"]?.remarkName || "Me")
           ) {
             historyArray = chat.history;
           } else {
@@ -40713,7 +40714,7 @@ const ivTags = {
           showGenerationOverlay("正在同步Ta的手机数据...");
 
           try {
-            const userNickname = state.qzoneSettings.nickname || "我";
+            const userNickname = state.qzoneSettings.nickname || "Me";
             const persona = (chat.settings.aiPersona || "").substring(0, 4000);
             // updated by lrq 251028 修改最大记忆条数
             const maxMemory = chat.settings.maxMemory || 20;
@@ -41127,7 +41128,7 @@ const ivTags = {
           showGenerationOverlay("正在同步Ta的手机数据...");
 
           try {
-            const userNickname = state.qzoneSettings.nickname || "我";
+            const userNickname = state.qzoneSettings.nickname || "Me";
 
             // 限制人设长度，这是防止503错误的根本方法！
             // 只取人设的前4000个字符，避免整个人设过长导致请求失败。
@@ -41374,7 +41375,7 @@ const ivTags = {
             if (newData.chats) {
               newData.chats.forEach((newChat) => {
                 if (!newChat.messages) {
-                  const myNickname = userNickname || "我";
+                  const myNickname = userNickname || "Me";
                   if (!phoneData.chats[myNickname]) {
                     phoneData.chats[myNickname] = { avatar: "", history: [] };
                   }
@@ -41544,7 +41545,7 @@ const ivTags = {
           const npcContainer = document.createElement("div");
           npcContainer.className = "npc-chat-group"; // 给它一个专属的class名
 
-          // 获取 "我" 的备注名
+          // 获取 "Me" 的备注名
           const userContactInData = characterChatData.chats
             ? Object.values(characterChatData.chats).find(
                 (c) => !c.history || c.history.length === 0,
@@ -41552,9 +41553,9 @@ const ivTags = {
             : null;
           const remarkNameForMe = userContactInData
             ? userContactInData.remarkName
-            : "我";
+            : "Me";
 
-          // 渲染与 "我" 的聊天
+          // 渲染与 "Me" 的聊天
           const lastMsg = realChatHistory
             .filter((m) => !m.isHidden)
             .slice(-1)[0] || { content: "..." };
@@ -41646,7 +41647,7 @@ const ivTags = {
             messagesEl.innerHTML = ""; // 首次加载才清空
             let finalContactName = contactName;
             if (isUserChat) {
-              const myChatData = characterChat.characterPhoneData.chats["我"];
+              const myChatData = characterChat.characterPhoneData.chats["Me"];
               // 尝试从手机数据里找AI给用户的备注名
               const userContactInData = characterChat.characterPhoneData.chats
                 ? Object.values(characterChat.characterPhoneData.chats).find(
@@ -41655,7 +41656,7 @@ const ivTags = {
                 : null;
               finalContactName = userContactInData
                 ? userContactInData.remarkName
-                : "我";
+                : "Me";
             }
             document.getElementById("character-chat-with-name").textContent =
               finalContactName;
@@ -41699,7 +41700,7 @@ const ivTags = {
             const container = document.createElement("div");
             let sender;
             if (isUserChat) {
-              sender = msg.role === "user" ? "我" : characterName;
+              sender = msg.role === "user" ? "Me" : characterName;
             } else {
               sender = msg.sender;
             }
@@ -41949,7 +41950,7 @@ const ivTags = {
             : null;
           const remarkNameForMe = userContactInData
             ? userContactInData.remarkName
-            : "我";
+            : "Me";
 
           const balanceCard = document.createElement("div");
           balanceCard.className = "character-bank-balance-card";
@@ -41975,9 +41976,9 @@ const ivTags = {
               ? `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M7 10h10v4H7z" opacity=".3"/><path d="M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>`
               : `<svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-1 14H5c-.55 0-1-.45-1-1v-5h16v5c0 .55-.45 1-1 1zm1-10H4V7c0-.55.45-1 1-1h14c.55 0 1 .45 1 1v2z"/></svg>`;
 
-            // 用正则表达式 /我/g 全局替换所有“我”字
+            // 用正则表达式 /Me/g 全局替换所有“我”字
             const displayDescription = item.description.replace(
-              /我/g,
+              /Me/g,
               remarkNameForMe,
             );
 
@@ -42113,7 +42114,7 @@ const ivTags = {
          * 【日记】独立刷新，生成新的日记条目
          */
         async function generateNewDiaryEntry() {
-          const userNickname = state.qzoneSettings.nickname || "我";
+          const userNickname = state.qzoneSettings.nickname || "Me";
           if (!activeCharacterPhoneId) return;
           const chat = state.chats[activeCharacterPhoneId];
           if (!chat) return;
@@ -42350,7 +42351,7 @@ const ivTags = {
           };
 
           if (videoCallState.isUserMain) {
-            // === 状态 A：用户(我)在主大屏，角色(Ta)在小屏 ===
+            // === 状态 A：用户(Me)在主大屏，角色(Ta)在小屏 ===
 
             // 1. 设置小屏 (显示对方 - 始终是图片)
             if (pipVideo) {
@@ -42380,7 +42381,7 @@ const ivTags = {
               }
             }
           } else {
-            // === 状态 B (默认)：角色(Ta)在主大屏，用户(我)在小屏 ===
+            // === 状态 B (默认)：角色(Ta)在主大屏，用户(Me)在小屏 ===
 
             // 1. 设置大屏 (显示对方 - 始终是图片)
             if (mainVideo) {
@@ -43321,8 +43322,8 @@ const ivTags = {
           senderSelect.innerHTML = '<option value="">所有人</option>'; // 默认选项
 
           const myNickname = chat.isGroup
-            ? chat.settings.myNickname || "我"
-            : "我";
+            ? chat.settings.myNickname || "Me"
+            : "Me";
           const myOption = document.createElement("option");
           myOption.value = myNickname;
           myOption.textContent = myNickname;
@@ -43405,8 +43406,8 @@ const ivTags = {
             // b. 筛选发言人
             if (senderValue) {
               const myNickname = chat.isGroup
-                ? chat.settings.myNickname || "我"
-                : "我";
+                ? chat.settings.myNickname || "Me"
+                : "Me";
               let msgSenderName = "";
 
               if (msg.role === "user") {
@@ -43466,8 +43467,8 @@ const ivTags = {
 
           const chat = state.chats[state.activeChatId];
           const myNickname = chat.isGroup
-            ? chat.settings.myNickname || "我"
-            : "我";
+            ? chat.settings.myNickname || "Me"
+            : "Me";
 
           // 为了性能，只渲染最新的100条结果
           results
@@ -45145,7 +45146,7 @@ const ivTags = {
 
           const pet = chat.settings.pet;
           let actionText = "";
-          const myNickname = chat.settings.myNickname || "我";
+          const myNickname = chat.settings.myNickname || "Me";
 
           switch (action) {
             case "feed":
@@ -45804,8 +45805,8 @@ const ivTags = {
               const sender =
                 msg.role === "user"
                   ? chat.isGroup
-                    ? chat.settings.myNickname || "我"
-                    : "我"
+                    ? chat.settings.myNickname || "Me"
+                    : "Me"
                   : msg.senderName || chat.name;
               let content = "";
               if (typeof msg.content === "string") {
@@ -47297,7 +47298,7 @@ const ivTags = {
             const membersList = chat.members
               .map((m) => `- **${m.originalName}**: ${m.persona}`)
               .join("\n");
-            const myNickname = chat.settings.myNickname || "我";
+            const myNickname = chat.settings.myNickname || "Me";
             combinedText += `你是一个群聊AI... # 群成员列表及人设\n${membersList}\n# 用户的角色\n- **${myNickname}**: ${chat.settings.myPersona}`;
           } else {
             combinedText += chat.settings.aiPersona || "";
@@ -47726,7 +47727,7 @@ const ivTags = {
             // 如果是用户，就修改 chat.settings 里的专属标志
             // 我们使用 isUserAdmin 属性来记录用户是否是管理员
             chat.settings.isUserAdmin = !chat.settings.isUserAdmin;
-            targetNickname = chat.settings.myNickname || "我";
+            targetNickname = chat.settings.myNickname || "Me";
             isAdminNow = chat.settings.isUserAdmin;
           } else {
             // 如果是其他成员，保持原有逻辑不变
@@ -47748,7 +47749,7 @@ const ivTags = {
 
           // 准备并发送系统通知消息
           const actionText = isAdminNow ? "设为管理员" : "取消了管理员身份";
-          const myNickname = chat.settings.myNickname || "我";
+          const myNickname = chat.settings.myNickname || "Me";
           // 这里我们用 logSystemMessage 函数来发送通知，它会自动刷新UI
           await logSystemMessage(
             chat.id,
@@ -47777,7 +47778,7 @@ const ivTags = {
           let oldTitle;
 
           if (memberId === "user") {
-            targetNickname = chat.settings.myNickname || "我";
+            targetNickname = chat.settings.myNickname || "Me";
             oldTitle = chat.settings.myGroupTitle || "";
           } else {
             const member = chat.members.find((m) => m.id === memberId);
@@ -47804,7 +47805,7 @@ const ivTags = {
 
             await db.chats.put(chat);
 
-            const myNickname = chat.settings.myNickname || "我";
+            const myNickname = chat.settings.myNickname || "Me";
             await logTitleChange(
               chat.id,
               myNickname,
@@ -47825,7 +47826,7 @@ const ivTags = {
           if (!newOwner) return;
 
           // 获取旧群主的昵称，也就是你自己的昵称
-          const oldOwnerNickname = chat.settings.myNickname || "我";
+          const oldOwnerNickname = chat.settings.myNickname || "Me";
 
           const confirmed = await showCustomConfirm(
             "转让群主",
@@ -47996,7 +47997,7 @@ const ivTags = {
           chat.settings.groupAnnouncement = newContent;
           await db.chats.put(chat);
 
-          const myNickname = chat.settings.myNickname || "我";
+          const myNickname = chat.settings.myNickname || "Me";
           await logSystemMessage(chat.id, `“${myNickname}”修改了群公告。`);
 
           closeGroupAnnouncementModal();
@@ -49436,7 +49437,7 @@ const ivTags = {
 
             const transformedQzoneSettings = {
               id: "main",
-              nickname: qzoneSettingsFromDB?.nickname || "你的昵称",
+              nickname: qzoneSettingsFromDB?.nickname || "Your nickname",
               avatar:
                 qzoneSettingsFromDB?.avatar ||
                 "https://files.catbox.moe/q6z5fc.jpeg",
@@ -50976,8 +50977,8 @@ const ivTags = {
           // 这样可以避开输入框，直接生成对应的富文本卡片
 
           const myNickname = chat.isGroup
-            ? chat.settings.myNickname || "我"
-            : "我";
+            ? chat.settings.myNickname || "Me"
+            : "Me";
           const msg = {
             role: "user",
             timestamp: Date.now(),
@@ -53032,7 +53033,7 @@ const ivTags = {
             if (!qzoneSettings) {
               await db.qzoneSettings.put({
                 id: "main",
-                nickname: "我",
+                nickname: "Me",
                 avatar: "https://files.catbox.moe/q6z5fc.jpeg",
               });
               fixCount++;
@@ -55620,7 +55621,7 @@ const ivTags = {
                   outliers.forEach((msg) => {
                     const roleTag =
                       msg.role === "user"
-                        ? '<span style="color:#007bff">[我]</span>'
+                        ? '<span style="color:#007bff">[Me]</span>'
                         : '<span style="color:#28a745">[AI]</span>';
                     // 添加 onclick 调用我们刚刚暴露的 window.jumpToMessage
                     htmlContent += `
@@ -57073,8 +57074,8 @@ const ivTags = {
               const now = Date.now();
 
               const myNickname = chat.isGroup
-                ? chat.settings.myNickname || "我"
-                : "我";
+                ? chat.settings.myNickname || "Me"
+                : "Me";
 
               const msg = {
                 role: "user",
@@ -57881,7 +57882,7 @@ const ivTags = {
                 if (commenterName !== myNickname) {
                   const commentInput =
                     postContainer.querySelector(".comment-input");
-                  commentInput.placeholder = `回复 ${commenterName}:`;
+                  commentInput.placeholder = `Reply ${commenterName}:`;
                   commentInput.dataset.replyTo = commenterName; // 把要回复的人的名字，临时存起来
                   commentInput.focus(); // 自动聚焦到输入框
                 }
@@ -58124,8 +58125,8 @@ const ivTags = {
                 if (chat) {
                   if (msg.role === "user") {
                     authorToSearch = chat.isGroup
-                      ? chat.settings.myNickname || "我"
-                      : "我";
+                      ? chat.settings.myNickname || "Me"
+                      : "Me";
                   } else {
                     authorToSearch = chat.isGroup ? msg.senderName : chat.name;
                   }
@@ -58707,7 +58708,7 @@ const ivTags = {
 
               const newCountdown = {
                 chatId: null, // 用户创建的，不属于任何特定AI
-                authorName: "我",
+                authorName: "Me",
                 description: title,
                 timestamp: Date.now(),
                 type: "countdown",
@@ -59188,7 +59189,7 @@ const ivTags = {
                 setTimeout(() => {
                   // 检查此时元素是否还存在（可能用户已经切换了聊天）
                   if (document.body.contains(bubble)) {
-                    const voiceText = bubble.dataset.voiceText || "(无法识别)";
+                    const voiceText = bubble.dataset.voiceText || "(Unrecognized)";
                     transcriptEl.textContent = voiceText; // 填充文字
 
                     spinner.style.display = "none"; // 隐藏加载动画
@@ -59244,8 +59245,8 @@ const ivTags = {
               const shareCardMessage = {
                 role: "user",
                 senderName: sourceChat.isGroup
-                  ? sourceChat.settings.myNickname || "我"
-                  : "我",
+                  ? sourceChat.settings.myNickname || "Me"
+                  : "Me",
                 type: "share_card",
                 timestamp: Date.now(),
                 payload: {
@@ -62660,7 +62661,7 @@ const ivTags = {
             <div style="display:flex; justify-content:center; gap: 15px; align-items:center;">
                 <div style="text-align:center;">
                     <img src="${pair.userAvatar}" style="width:50px; height:50px; border-radius:50%; object-fit:cover; border:2px solid #eee;">
-                    <div style="font-size:10px; color:#666; margin-top:2px;">我</div>
+                    <div style="font-size:10px; color:#666; margin-top:2px;">Me</div>
                 </div>
                 <div style="font-size:20px;">❤️</div>
                 <div style="text-align:center;">
