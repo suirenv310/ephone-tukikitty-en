@@ -16690,10 +16690,10 @@ Hide the fact that you accidentally poisoned Wang Qiang with sleeping pills. You
       };
       document.addEventListener("DOMContentLoaded", () => {
         // ===================================================================
-        // 1. 所有变量和常量定义
+        // 1. All variables and constants definition
         // ===================================================================
-        // 宠物数值衰减相关的全局变量和常量
-        const PET_DECAY_INTERVAL = 60 * 60 * 1000; // 每60分钟衰减一次
+        // Global variables and constants related to pet value decay
+        const PET_DECAY_INTERVAL = 60 * 60 * 1000; // Decay every 60 minutes
         const PET_DECAY_AMOUNT = {
           // 每次衰减的数值
           hunger: 5,
@@ -18018,7 +18018,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
         /**
          * 【V2智能版】应用指定的主题，并智能刷新当前打开的任何界面
-         * @param {string} theme - 'light' 或 'dark'
+         * @param {string} theme - 'light' or 'dark'
          */
         function applyTheme(theme) {
           const phoneScreen = document.getElementById("phone-screen");
@@ -19139,7 +19139,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
           // 3. 遍历筛选后的动态，并渲染它们
           //    【提示】这里创建单个动态HTML的逻辑，可以完全复制 `renderQzonePosts` 函数里的 forEach 循环内部的代码。
-          //    你只需要把目标容器从 `postsListEl` 改为 `feedListEl` 即可。
+          //    你只需要把目标容器从 `postsListEl` change to `feedListEl` 即可。
           followingPosts.forEach((post) => {});
         }
 
@@ -21207,7 +21207,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
          * 显示一个包含多个选项的操作菜单模态框
          * 这是让图片编辑时能够选择“本地上传”或“URL”的关键函数！
          * @param {string} title - 模态框的标题
-         * @param {Array<object>} options - 按钮选项数组, e.g., [{ text: '按钮文字', value: '返回值' }]
+         * @param {Array<object>} options -  An array of button options, e.g., [{ text: 'Button text', value: 'Return value' }]
          * @returns {Promise<string|null>} - 返回用户点击按钮的value，如果取消则返回null
          */
         function showChoiceModal(title, options) {
@@ -21231,7 +21231,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
             // 添加一个标准的取消按钮
             const cancelButton = document.createElement("button");
-            cancelButton.textContent = "取消";
+            cancelButton.textContent = "Cancel";
             cancelButton.style.marginTop = "8px";
             cancelButton.style.borderRadius = "8px";
             cancelButton.style.backgroundColor = "#f0f0f0";
@@ -21252,7 +21252,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
         async function deleteExpiredSearchedSongs() {
           await showCustomAlert(
             "Please wait...",
-            "正在检查播放列表中所有在线歌曲的有效性...",
+            "Checking the validity of all online songs in the playlist...",
           );
 
           // 1. 不再寻找 isTemporary 标签
@@ -21263,7 +21263,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           );
 
           if (songsToCheck.length === 0) {
-            await showCustomAlert("提示", "播放列表中没有需要检查的在线歌曲。");
+            await showCustomAlert("Notice", "There are no online songs in the playlist that need to be checked.");
             return;
           }
 
@@ -21282,28 +21282,27 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 track.addedTimestamp < twentyFourHoursAgo;
 
               if (isUrlInvalid || isOlderThan24h) {
-                songsToDelete.push(track);
-                console.log(
-                  `标记删除: ${track.name} (原因: ${
-                    isUrlInvalid ? "链接失效" : ""
-                  } ${isOlderThan24h ? "超过24小时" : ""})`,
-                );
-              }
+    songsToDelete.push(track);
+    console.log(
+        `Marked for deletion: ${track.name} (Reason: ${isUrlInvalid ? "Invalid link" : ""} ${isOlderThan24h ? "Exceeds 24 hours" : ""})`
+    );
+}
+
             }),
           );
 
           // 3. 根据检查结果进行反馈和操作 (这部分逻辑不变)
           if (songsToDelete.length === 0) {
             await showCustomAlert(
-              "检查完成",
-              "播放列表中的所有在线歌曲当前均有效。",
+              "Check Complete",
+              "All online songs in the playlist are currently valid.",
             );
             return;
           }
 
           const confirmed = await showCustomConfirm(
-            "确认清理",
-            `检测到 ${songsToDelete.length} 首已失效的在线歌曲。确定要将它们从列表中移除吗？`,
+            "Confirm Cleanup",
+            `Detected ${songsToDelete.length} expired online songs. Are you sure you want to remove them from the playlist?`,
             { confirmButtonClass: "btn-danger" },
           );
 
@@ -21344,8 +21343,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           await saveGlobalPlaylist();
           updatePlaylistUI();
           await showCustomAlert(
-            "清理完成",
-            `${songsToDelete.length} 首歌曲已从列表中移除。`,
+            "Cleanup Complete",
+            `${songsToDelete.length} expired online songs have been removed from the playlist.`,
           );
         }
 
@@ -21395,13 +21394,13 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             try {
               const parsed = JSON.parse(trimmedContent);
               if (Array.isArray(parsed)) {
-                console.log("解析成功：标准JSON数组格式。");
+                console.log("Parsing successful: Standard JSON array format.");
                 return parsed;
               }
             } catch (e) {
               // 如果解析失败，说明它虽然看起来像个数组，但内部格式有问题。
               // 此时我们不报错，而是继续尝试下面的“强力解析”方案。
-              console.warn("标准JSON数组解析失败，将尝试强力解析...");
+              console.warn("Standard JSON array parsing failed, attempting strong parsing...");
             }
           }
 
@@ -21418,20 +21417,20 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 results.push(parsedObject);
               } catch (e) {
                 // 如果某个片段不是有效的JSON，就忽略它，继续处理下一个
-                console.warn("跳过一个无效的JSON片段:", match);
+                console.warn("Skip an invalid JSON fragment:", match);
               }
             }
 
             // 如果我们成功提取出了至少一个有效的JSON对象，就返回这个结果
             if (results.length > 0) {
-              console.log("解析成功：通过强力提取模式。");
+              console.log("Parsing successful: Strong extraction mode.");
               return results;
             }
           }
 
           // 方案3：【最终备用】如果以上所有方法都失败了，说明AI返回的可能就是纯文本
           // 我们将原始的、未处理的内容，包装成一个标准的文本消息对象返回，确保程序不会崩溃
-          console.error("所有解析方案均失败！将返回原始文本。");
+          console.error("All parsing methods failed! Returning raw text.");
           return [{ type: "text", content: content }];
         }
         /**
@@ -21442,9 +21441,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             "minimax-speech-model-select",
           );
           if (!modelSelect) return;
-          modelSelect.innerHTML = ""; // 清空旧选项
+          modelSelect.innerHTML = ""; // Clear old options
 
-          // 从文档中获取的完整模型列表
+          // Full list of models obtained from the document
           const models = [
             "speech-2.6-hd",
             "speech-2.6-turbo",
@@ -21461,14 +21460,14 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             modelSelect.appendChild(option);
           });
 
-          // 自动选中当前已保存的模型，如果没有则使用一个推荐的默认值
+          // Automatically select the currently saved model, or use a recommended default if none is set
           modelSelect.value =
             state.apiConfig.minimaxSpeechModel || "speech-01-turbo";
 
-          alert("Minimax 语音模型列表已更新！");
+          alert("Minimax speech model list has been updated!");
         }
-        // NovelAI设置相关函数（加载、保存、重置）
-        // NovelAI设置相关函数
+        // NovelAI settings related functions (load, save, reset)
+        // NovelAI settings related functions
         function loadNovelAISettings() {
           const settings = getNovelAISettings();
           document.getElementById("nai-resolution").value = settings.resolution;
@@ -21489,7 +21488,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           document.getElementById("nai-custom-proxy-url").value =
             settings.custom_proxy_url || "";
 
-          // 显示/隐藏自定义代理输入框
+          // Show/hide custom proxy input field
           const customProxyGroup = document.getElementById(
             "nai-custom-proxy-group",
           );
@@ -21498,7 +21497,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
         }
 
         function saveNovelAISettings() {
-          // 保存API Key和模型等基础配置
+          // Save API Key and model settings
           const novelaiEnabled =
             document.getElementById("novelai-switch").checked;
           const novelaiModel = document.getElementById("novelai-model").value;
@@ -21510,7 +21509,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           localStorage.setItem("novelai-model", novelaiModel);
           localStorage.setItem("novelai-api-key", novelaiApiKey);
 
-          // 保存高级参数配置
+          // Save advanced parameter settings
           const settings = {
             resolution: document.getElementById("nai-resolution").value,
             steps: parseInt(document.getElementById("nai-steps").value),
@@ -21539,7 +21538,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
         function resetNovelAISettings() {
           localStorage.removeItem("novelai-settings");
           loadNovelAISettings();
-          alert("已恢复默认设置！");
+          alert("Default settings have been restored!");
         }
 
         function getNovelAISettings() {
@@ -21573,17 +21572,17 @@ console.log(`[System] Database for user ${userId} has been loaded`);
         }
 
         /**
-         * 根据角色ID获取对应的NAI提示词配置
-         * @param {string} chatId - 聊天/角色ID
-         * @returns {Object} 包含正面和负面提示词的对象
+         * Get the NAI prompt configuration for a given character ID
+         * @param {string} chatId - Chat/Character ID
+         * @returns {Object} Object containing positive and negative prompts
          */
         function getCharacterNAIPrompts(chatId) {
-          // 获取系统默认配置
+          // Get system default settings
           const systemSettings = getNovelAISettings();
 
-          // 如果没有指定角色ID或角色不存在，返回系统配置
+          // If no character ID is specified or the character does not exist, return system settings
           if (!chatId || !state.chats[chatId]) {
-            console.log("⚠️ NAI提示词：没有角色，使用系统配置");
+            console.log("⚠️ NAI prompts: No character, using system settings");
             return {
               positive: systemSettings.default_positive,
               negative: systemSettings.default_negative,
@@ -21594,16 +21593,16 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           const chat = state.chats[chatId];
           const naiSettings = chat.settings.naiSettings || {};
 
-          // 选角色就用角色的，选系统就用系统的，就这么简单！
+          // If the character is selected, use the character's settings; if the system is selected, use the system's settings
           if (naiSettings.promptSource === "character") {
-            console.log("✅ NAI提示词：使用角色配置");
+            console.log("✅ NAI prompts: Using character settings");
             console.log(
-              "   正面:",
-              naiSettings.characterPositivePrompt || "(空)",
+              "Positive:",
+              naiSettings.characterPositivePrompt || "(empty)",
             );
             console.log(
-              "   负面:",
-              naiSettings.characterNegativePrompt || "(空)",
+              "   Negative:",
+              naiSettings.characterNegativePrompt || "(empty)",
             );
 
             return {
@@ -21612,9 +21611,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               source: "character",
             };
           } else {
-            console.log("✅ NAI提示词：使用系统配置");
-            console.log("   正面:", systemSettings.default_positive || "(空)");
-            console.log("   负面:", systemSettings.default_negative || "(空)");
+            console.log("✅ NAI prompts: Using system settings");
+            console.log("   Positive:", systemSettings.default_positive || "(empty)");
+            console.log("   Negative:", systemSettings.default_negative || "(empty)");
 
             return {
               positive: systemSettings.default_positive,
@@ -21640,13 +21639,13 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           const model = document.getElementById("novelai-model").value;
 
           if (!apiKey) {
-            throw new Error("请先配置NovelAI API Key！");
+            throw new Error("Please configure NovelAI API Key first！");
           }
 
-          // 获取角色的提示词配置
+          // Get the character's prompt configuration
           const prompts = getCharacterNAIPrompts(chatId);
 
-          // 构建最终的提示词（如果有自定义提示词则追加）
+          // Construct the final prompt (append custom prompt if provided)
           let finalPrompt = prompts.positive;
           if (customPrompt) {
             finalPrompt = customPrompt + ", " + prompts.positive;
@@ -21655,19 +21654,19 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           const negativePrompt = prompts.negative;
 
           console.log(
-            `📝 使用${prompts.source === "character" ? "角色专属" : "系统"}提示词配置`,
+            `📝 Using ${prompts.source === "character" ? "character-specific" : "system"} prompt configuration`,
           );
-          console.log("正面提示词:", finalPrompt);
-          console.log("负面提示词:", negativePrompt);
+          console.log("Positive:", finalPrompt);
+          console.log("Negative:", negativePrompt);
 
           const settings = getNovelAISettings();
 
-          // 后续的图像生成逻辑将在这里实现
-          // 这个函数预留给将来聊天中调用NAI出图功能使用
+          // The image generation logic will be implemented here
+          // This function is reserved for future use when calling NAI image generation in chat
           return null;
         }
 
-        // 生成NovelAI图片的主函数（完整版）
+        // Generate NovelAI image main function (full version)
         async function generateNovelAIImage() {
           const apiKey = document
             .getElementById("novelai-api-key")
@@ -21678,12 +21677,12 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             .value.trim();
 
           if (!apiKey) {
-            alert("请先配置NovelAI API Key！");
+            alert("Please configure NovelAI API Key first！");
             return;
           }
 
           if (!prompt) {
-            alert("请输入提示词！");
+            alert("Please enter a prompt！");
             return;
           }
 
@@ -21701,22 +21700,22 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           resultDiv.style.display = "none";
           errorDiv.style.display = "none";
           generateBtn.disabled = true;
-          generateBtn.textContent = "生成中...";
+          generateBtn.textContent = "Generating...";
 
           try {
             const [width, height] = settings.resolution.split("x").map(Number);
 
-            // V4/V4.5 和 V3 使用不同的请求体格式
+            // V4/V4.5 and V3 use different request body formats
             let requestBody;
 
             if (model.includes("nai-diffusion-4")) {
-              // V4/V4.5 使用新格式 (params_version: 3)
+              // V4/V4.5 use new format (params_version: 3)
               requestBody = {
                 input: prompt,
                 model: model,
                 action: "generate",
                 parameters: {
-                  params_version: 3, // V4必须使用版本3
+                  params_version: 3, // V4 must use version 3
                   width: width,
                   height: height,
                   scale: settings.cfg_scale,
@@ -21735,7 +21734,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   legacy: false,
                   add_original_image: true,
                   cfg_rescale: 0,
-                  noise_schedule: "karras", // V4使用karras
+                  noise_schedule: "karras", // V4 uses karras
                   legacy_v3_extend: false,
                   skip_cfg_above_sigma: null,
                   use_coords: false,
@@ -21743,7 +21742,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   normalize_reference_strength_multiple: true,
                   inpaintImg2ImgStrength: 1,
                   characterPrompts: [],
-                  // V4专用提示词格式
+                  // V4 specific prompt format
                   v4_prompt: {
                     caption: {
                       base_caption: prompt,
@@ -21752,7 +21751,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                     use_coords: false,
                     use_order: true,
                   },
-                  // V4专用负面提示词格式
+                  // V4 specific negative prompt format
                   v4_negative_prompt: {
                     caption: {
                       base_caption: negativePrompt,
@@ -21763,11 +21762,11 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   negative_prompt: negativePrompt,
                   deliberate_euler_ancestral_bug: false,
                   prefer_brownian: true,
-                  // 注意：不包含 stream 参数，使用标准ZIP响应而非msgpack流
+                  // Note: Does not include the stream parameter, uses standard ZIP response instead of msgpack stream
                 },
               };
             } else {
-              // V3 及更早版本使用旧格式
+              // V3 and earlier versions use old format
               requestBody = {
                 input: prompt,
                 model: model,
@@ -21798,35 +21797,35 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               };
             }
 
-            console.log("📤 发送请求到 NovelAI API");
-            console.log("📊 使用模型:", model);
-            console.log("📋 请求体:", JSON.stringify(requestBody, null, 2));
+            console.log("📤 Sending request to NovelAI API");
+            console.log("📊 Using model:", model);
+            console.log("📋 Request body:", JSON.stringify(requestBody, null, 2));
 
-            // 根据模型选择不同的API端点
+            // Select different API endpoints based on the model
             let apiUrl;
 
-            // V4/V4.5 模型使用流式端点
+            // V4/V4.5 models use streaming endpoint
             if (model.includes("nai-diffusion-4")) {
-              // V4/V4.5 默认使用流式端点
+              // V4/V4.5 default to streaming endpoint
               apiUrl = "https://image.novelai.net/ai/generate-image-stream";
             } else {
-              // V3 及更早版本使用标准端点
+              // V3 and earlier versions use standard endpoint
               apiUrl = "https://image.novelai.net/ai/generate-image";
             }
 
             let corsProxy = settings.cors_proxy;
 
-            // 如果选择了自定义代理，使用自定义URL
+            // If a custom proxy is selected, use the custom URL
             if (corsProxy === "custom") {
               corsProxy = settings.custom_proxy_url || "";
             }
 
-            // 如果有代理，添加到URL前面
+            // If a proxy is set, prepend it to the API URL
             if (corsProxy && corsProxy !== "") {
               apiUrl = corsProxy + encodeURIComponent(apiUrl);
             }
 
-            // Chrome浏览器专用处理：避免headers中包含非ISO-8859-1字符
+            // Chrome-specific handling: avoid non-ISO-8859-1 characters in headers
             const isChrome =
               /Chrome/.test(navigator.userAgent) &&
               !/Edg/.test(navigator.userAgent);
@@ -21841,7 +21840,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
             // 针对Chrome浏览器：确保所有header值都是纯ASCII
             if (isChrome) {
-              console.log("🔧 检测到Chrome浏览器，启用headers兼容性处理");
+              console.log("🔧 Chrome browser detected; headers compatibility handling enabled.");
               const cleanHeaders = {};
               for (const [key, value] of Object.entries(fetchOptions.headers)) {
                 // 确保header值只包含ASCII字符（ISO-8859-1兼容）
@@ -21855,11 +21854,12 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             console.log("Response status:", response.status);
             console.log("Response headers:", [...response.headers.entries()]);
 
-            if (!response.ok) {
-              const errorText = await response.text();
-              console.error("API错误响应:", errorText);
-              throw new Error(`API请求失败 (${response.status}): ${errorText}`);
-            }
+           if (!response.ok) {
+    const errorText = await response.text();
+    console.error("API error response:", errorText);
+    throw new Error(`API request failed (${response.status}): ${errorText}`);
+}
+
 
             // NovelAI API返回的是ZIP文件，需要解压
             const contentType = response.headers.get("content-type");
@@ -21868,65 +21868,65 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             // 检查是否为 SSE 流式响应
             let zipBlob;
             if (contentType && contentType.includes("text/event-stream")) {
-              console.log("检测到 SSE 流式响应，开始解析...");
-              statusDiv.textContent = "正在接收流式数据...";
+              console.log("Detected SSE streaming response, starting to parse...");
+              statusDiv.textContent = "Receiving streaming data...";
 
-              // 读取整个流
+              // Read the entire stream
               const text = await response.text();
-              console.log("收到 SSE 数据，大小:", text.length);
+              console.log("Received SSE data, size:", text.length);
 
-              // 解析 SSE 格式，提取最后的 data: 行
+              // Parse SSE format, extract the last data: line
               const lines = text.trim().split("\n");
               let base64Data = null;
 
               for (let i = lines.length - 1; i >= 0; i--) {
                 const line = lines[i].trim();
                 if (line.startsWith("data: ") && line !== "data: [DONE]") {
-                  const dataContent = line.substring(6); // 移除 'data: ' 前缀
+                  const dataContent = line.substring(6); // Remove 'data: ' prefix
 
-                  // 尝试解析 JSON
+                  // Try to parse JSON
                   try {
                     const jsonData = JSON.parse(dataContent);
 
-                    // V4.5 流式端点：event_type 为 "final" 时包含最终图片
+                    // V4.5 streaming endpoint: event_type "final" contains the final image
                     if (jsonData.event_type === "final" && jsonData.image) {
                       base64Data = jsonData.image;
-                      console.log("✅ 找到 final 事件的图片数据");
+                      console.log("✅ Found final event image data");
                       break;
                     }
 
-                    // 兼容其他格式
+                    // Compatibility with other formats
                     if (jsonData.data) {
                       base64Data = jsonData.data;
-                      console.log("从 JSON.data 中提取图片数据");
+                      console.log("Extracted image data from JSON.data");
                       break;
                     }
                     if (jsonData.image) {
                       base64Data = jsonData.image;
-                      console.log("从 JSON.image 中提取图片数据");
+                      console.log("Extracted image data from JSON.image");
                       break;
                     }
                   } catch (e) {
-                    // 如果不是 JSON，直接作为 base64 数据
+                    // If not JSON, treat as base64 data
                     base64Data = dataContent;
-                    console.log("直接使用 base64 数据");
+                    console.log("Directly using base64 data");
                     break;
                   }
                 }
               }
 
               if (!base64Data) {
-                throw new Error("无法从 SSE 响应中提取图片数据");
+                throw new Error("Unable to extract image data from SSE response");
               }
 
-              // V4.5 流式端点返回的是 PNG base64，不是 ZIP
-              // 检查是否为 PNG (以 iVBORw0KGgo 开头) 或 JPEG (以 /9j/ 开头)
+              // V4.5 streaming endpoint returns PNG base64, not ZIP
+              // Check if it's PNG (starts with iVBORw0KGgo) or JPEG (starts with /9j/)
               const isPNG = base64Data.startsWith("iVBORw0KGgo");
               const isJPEG = base64Data.startsWith("/9j/");
 
               if (isPNG || isJPEG) {
-                console.log("✅ 检测到直接的图片 base64 数据 (PNG/JPEG)");
-                // 将 base64 转为 Blob
+                console.log("✅ Detected direct image base64 data (PNG/JPEG)");
+                // Convert base64 to Blob
                 const binaryString = atob(base64Data);
                 const bytes = new Uint8Array(binaryString.length);
                 for (let i = 0; i < binaryString.length; i++) {
@@ -21935,79 +21935,79 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 const imageBlob = new Blob([bytes], {
                   type: isPNG ? "image/png" : "image/jpeg",
                 });
-                console.log("图片 Blob 创建成功，大小:", imageBlob.size);
+                console.log("✅ Image Blob created successfully, size:", imageBlob.size);
 
-                // 直接显示图片
+                // Directly display the image
                 const imageUrl = URL.createObjectURL(imageBlob);
                 document.getElementById("nai-result-image").src = imageUrl;
                 statusDiv.style.display = "none";
                 resultDiv.style.display = "block";
-                console.log("✅ 图片显示成功！🎨");
+                console.log("✅ Image displayed successfully! 🎨");
                 return;
               }
 
-              // 否则当作 ZIP 处理
-              console.log("当作 ZIP 文件处理...");
+              // Otherwise, treat as ZIP
+              console.log("Treating as ZIP file...");
               const binaryString = atob(base64Data);
               const bytes = new Uint8Array(binaryString.length);
               for (let i = 0; i < binaryString.length; i++) {
                 bytes[i] = binaryString.charCodeAt(i);
               }
               zipBlob = new Blob([bytes]);
-              console.log("ZIP Blob 大小:", zipBlob.size);
+              console.log("ZIP Blob size:", zipBlob.size);
             } else {
-              // 非流式响应，直接读取
+              // Non-streaming response, read directly
               zipBlob = await response.blob();
               console.log(
-                "收到数据，类型:",
+                "Received data, type:",
                 zipBlob.type,
-                "大小:",
+                "size:",
                 zipBlob.size,
               );
             }
 
-            // NovelAI始终返回ZIP格式，需要解压
+            // NovelAI always returns ZIP format, needs to be extracted
             try {
-              // 检查JSZip是否已加载
+              // Check if JSZip is loaded
               if (typeof JSZip === "undefined") {
-                throw new Error("JSZip库未加载，请刷新页面重试");
+                throw new Error("JSZip library not loaded, please refresh the page and try again");
               }
 
-              statusDiv.textContent = "正在解压图片...";
+              statusDiv.textContent = "Extracting image...";
 
-              // 解压ZIP文件
+              // Extract ZIP file
               const zip = await JSZip.loadAsync(zipBlob);
-              console.log("ZIP文件内容:", Object.keys(zip.files));
+              console.log("ZIP file contents:", Object.keys(zip.files));
 
-              // 查找第一个图片文件（通常是image_0.png）
+              // Find the first image file (usually image_0.png)
               let imageFile = null;
               for (let filename in zip.files) {
                 if (filename.match(/\.(png|jpg|jpeg|webp)$/i)) {
                   imageFile = zip.files[filename];
-                  console.log("找到图片文件:", filename);
+                  console.log("Found image file:", filename);
                   break;
                 }
               }
 
               if (!imageFile) {
-                throw new Error("ZIP文件中未找到图片");
+                throw new Error("No image found in ZIP file");
               }
 
-              // 提取图片数据
+              // Extract image data
               const imageBlob = await imageFile.async("blob");
-              console.log("提取的图片大小:", imageBlob.size);
+              console.log("Extracted image size:", imageBlob.size);
 
-              // 创建图片URL并显示
+              // Create image URL and display
               const imageUrl = URL.createObjectURL(imageBlob);
-              console.log("生成的图片URL:", imageUrl);
+              console.log("Generated image URL:", imageUrl);
 
               document.getElementById("nai-result-image").src = imageUrl;
               statusDiv.style.display = "none";
               resultDiv.style.display = "block";
             } catch (zipError) {
-              console.error("ZIP解压失败:", zipError);
-              // 如果解压失败，尝试直接作为图片显示
-              console.log("尝试直接作为图片显示...");
+              console.error("ZIP extraction failed:", zipError);
+              // If extraction fails, try to display as image directly
+              console.log("Attempting to display as image directly...");
 
               if (zipBlob.type.startsWith("image/")) {
                 const imageUrl = URL.createObjectURL(zipBlob);
@@ -22015,28 +22015,28 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                 statusDiv.style.display = "none";
                 resultDiv.style.display = "block";
               } else {
-                throw new Error("图片格式处理失败: " + zipError.message);
+                throw new Error("Failed to process image format: " + zipError.message);
               }
             }
           } catch (error) {
-            console.error("NovelAI生成失败:", error);
+            console.error("NovelAI generation failed:", error);
             statusDiv.style.display = "none";
             errorDiv.style.display = "block";
-            errorDiv.textContent = "生成失败: " + error.message;
+            errorDiv.textContent = "Generation failed: " + error.message;
           } finally {
             generateBtn.disabled = false;
-            generateBtn.textContent = "生成图像";
+            generateBtn.textContent = "Generate Image";
           }
         }
 
         function renderApiSettings() {
-          // 1. 更新 API 相关的输入框
+          // 1. Update API related input fields
           document.getElementById("proxy-url").value =
             state.apiConfig.proxyUrl || "";
           document.getElementById("api-key").value =
             state.apiConfig.apiKey || "";
 
-          // --- Minimax 设置 ---
+          // --- Minimax settings ---
           document.getElementById("minimax-group-id").value =
             state.apiConfig.minimaxGroupId || "";
           document.getElementById("minimax-api-key").value =
@@ -22044,21 +22044,21 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           document.getElementById("minimax-provider-select").value =
             state.apiConfig.minimaxProvider || "cn";
 
-          // 2：Minimax 语音模型下拉框回显
+          // 2: Minimax speech model dropdown echo
           const speechModelSelect = document.getElementById(
             "minimax-speech-model-select",
           );
           if (speechModelSelect) {
-            // 获取保存的模型，如果没有则默认为 speech-01-turbo
+            // Get the saved model, default to speech-01-turbo if not available
             const savedSpeechModel =
               state.apiConfig.minimaxSpeechModel || "speech-01-turbo";
 
-            // 检查下拉框里有没有这个选项
+            // Check if the option exists in the dropdown
             let optionExists = Array.from(speechModelSelect.options).some(
               (opt) => opt.value === savedSpeechModel,
             );
 
-            // 如果没有（比如刚刷新完页面），就手动创建一个选项加进去
+            // If not, create a new option and add it
             if (!optionExists && savedSpeechModel) {
               const option = document.createElement("option");
               option.value = savedSpeechModel;
@@ -22066,15 +22066,15 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               speechModelSelect.appendChild(option);
             }
 
-            // 选中它
+            // Select it
             speechModelSelect.value = savedSpeechModel;
           }
-          // 主对话模型回显 (新版：直接给输入框赋值)
+          // Main conversation model echo (new version: directly assign to input)
           const modelInput = document.getElementById("model-select");
           if (modelInput) {
             modelInput.value = state.apiConfig.model || "gpt-4";
           }
-          // 重置辅助下拉框为隐藏状态（因为刷新页面后拉取的列表已清空）
+          // Reset auxiliary dropdown to hidden state (because the list fetched after page refresh is cleared)
           const modelPicker = document.getElementById("fetched-model-list");
           if (modelPicker) {
             modelPicker.style.display = "none";
@@ -22082,7 +22082,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
           // --------------------------------
 
-          // 加载NovelAI配置
+          // Load NovelAI configuration
           const novelaiEnabled =
             localStorage.getItem("novelai-enabled") === "true";
           const novelaiModel =
@@ -22186,29 +22186,30 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               if (e.target.checked) {
                 // --- 用户想开启 ---
                 if (!("Notification" in window)) {
-                  alert("抱歉，设备不支持系统通知。");
+                  alert("Sorry, this device does not support system notifications.");
                   e.target.checked = false;
                 } else if (Notification.permission === "granted") {
                   // 已有权限，直接开启成功
                   new Notification("EPhone", {
-                    body: "系统通知已开启！别忘了点击底部的【保存】按钮哦。",
+                    body: "System notifications are enabled! Don't forget to click the 【Save】 button at the bottom.",
+
                   });
                 } else if (Notification.permission !== "denied") {
                   // 请求权限
                   const permission = await Notification.requestPermission();
                   if (permission === "granted") {
                     new Notification("EPhone", {
-                      body: "权限获取成功！请点击【保存】。",
+                      body: "Permission granted! Please click 【Save】.",
                     });
                   } else {
                     e.target.checked = false;
-                    alert("权限被拒绝，无法开启。");
+                    alert("Permission denied, unable to enable.");
                   }
                 } else {
                   // 之前被永久拒绝
                   e.target.checked = false;
                   alert(
-                    "权限已被拒绝。请去手机/浏览器设置中手动开启通知权限。",
+                    "Permission has been denied. Please go to your phone/browser settings to manually enable notification permissions.",
                   );
                 }
               } else {
@@ -22225,7 +22226,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             newBtn.addEventListener("click", async () => {
               if (!("Notification" in window)) {
                 alert(
-                  '❌ 你的浏览器/环境完全不支持系统通知 API。\n(如果是iOS，必须点击"添加到主屏幕"作为PWA运行才支持)',
+                  '❌ Your browser/environment does not support the Notification API.\n(If you are on iOS, you must click "Add to Home Screen" to run as a PWA for support)',
                 );
                 return;
               }
@@ -22234,8 +22235,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
               if (permission === "granted") {
                 try {
-                  const title = "权限测试";
-                  const options = { body: "恭喜！系统通知功能正常工作。" };
+                  const title = "Permission Test";
+                  const options = { body: "Congratulations! System notifications are working correctly." };
 
                   // --- 核心修复：优先使用 ServiceWorker ---
                   if ("serviceWorker" in navigator) {
@@ -22267,20 +22268,20 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   }
 
                   alert(
-                    "✅ 权限状态: 已授权 (granted)\n\n系统尝试发送了一条测试通知，请查看手机通知栏。\n如果没收到，请检查手机系统的“通知管理”是否屏蔽了浏览器/本应用。",
+                    "✅ Permission Status: Granted (granted)\n\nThe system attempted to send a test notification. Please check your phone's notification bar.\nIf you didn't receive it, please check if your phone's system 'Notification Management' has blocked the browser/app.",
                   );
                 } catch (e) {
                   alert(
-                    `⚠️ 权限显示已授权，但发送失败。\n错误信息: ${e.message}`,
+                    `⚠️ Permission shows as granted, but sending failed.\nError message: ${e.message}`,
                   );
                 }
               } else if (permission === "denied") {
                 alert(
-                  "🚫 权限状态: 已拒绝 (denied)\n\n原因：你之前点击了“禁止”或系统默认禁止。\n\n解决方法：\n1. 请在浏览器地址栏点击锁图标或设置。\n2. 找到“通知”权限并重置为“询问”或“允许”。\n3. 刷新页面重试。",
+                  "🚫 Permission Status: Denied (denied)\n\nReason: You previously clicked 'Deny' or the system default is deny.\n\nSolution:\n1. Please click the lock icon or settings in the browser address bar.\n2. Find the 'Notifications' permission and reset it to 'Ask' or 'Allow'.\n3. Refresh the page and try again.",
                 );
               } else if (permission === "default") {
                 alert(
-                  "❓ 权限状态: 未询问 (default)\n\n请点击右侧开关，并在弹出的浏览器窗口中点击“允许”。",
+                  "❓ Permission Status: Not Asked (default)\n\nPlease click the switch on the right and click 'Allow' in the browser popup.",
                 );
               }
             });
@@ -22291,18 +22292,18 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             "test-system-notification-btn",
           );
           if (testNotifBtn) {
-            // 移除旧监听器 (通过克隆)
+            // Remove old listener (by cloning)
             const newBtn = testNotifBtn.cloneNode(true);
             testNotifBtn.parentNode.replaceChild(newBtn, testNotifBtn);
 
             newBtn.addEventListener("click", async () => {
-              if (!("Notification" in window)) return alert("设备不支持通知");
+              if (!("Notification" in window)) return alert("Device does not support notifications");
               if (Notification.permission !== "granted")
-                return alert("请先点击左侧按钮授权通知！");
+                return alert("Please click the button on the left to grant notification permission first!");
 
-              const title = "测试消息";
+              const title = "Test Message";
               const options = {
-                body: "如果你看到这条消息，说明安卓弹窗修复成功！",
+                body: "If you see this message, it means the Android popup fix is successful!",
                 icon: "https://i.postimg.cc/Kj8JnRcp/267611-CC01-F8-A3-B4910-A2-C2-FFDE479-DC.jpg",
               };
 
@@ -22311,19 +22312,19 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   const reg = await navigator.serviceWorker.getRegistration();
                   if (reg) {
                     await reg.showNotification(title, options);
-                    console.log("测试：通过 SW 发送成功");
+                    console.log("Test: Sent successfully via SW");
                   } else {
                     alert(
-                      "错误：ServiceWorker 未注册，无法在安卓发送通知。请刷新页面重试。",
+                      "Error: ServiceWorker not registered, unable to send notifications on Android. Please refresh the page and try again.",
                     );
-                    // 仅作为调试，尝试直接发送看看报错
+                    // For debugging purposes, try sending directly to see the error
                     // new Notification(title, options);
                   }
                 } else {
                   new Notification(title, options);
                 }
               } catch (e) {
-                alert("测试发送失败: " + e.message);
+                alert("Test sending failed: " + e.message);
               }
             });
           }
@@ -22332,7 +22333,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
         }
 
         /**
-         * 渲染后台活动的角色选择和频率设置UI
+         * Render the background activity role selection and frequency settings UI
          */
         function renderBackgroundFrequencySelector() {
           const container = document.getElementById(
@@ -22345,29 +22346,29 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             "background-activity-switch",
           );
 
-          // 根据总开关的状态，决定是否显示详细设置
+          // Based on the master switch state, decide whether to show detailed settings
           detailsContainer.style.display = masterSwitch.checked
             ? "block"
             : "none";
 
-          container.innerHTML = ""; // 清空旧列表
+          container.innerHTML = ""; // Clear old list
           const singleChats = Object.values(state.chats).filter(
             (chat) => !chat.isGroup,
           );
 
           if (singleChats.length === 0) {
             container.innerHTML =
-              '<p style="text-align:center; color: var(--text-secondary);">还没有可以设置的角色</p>';
+              '<p style="text-align:center; color: var(--text-secondary);">No roles available for configuration</p>';
             return;
           }
 
           const config = state.globalSettings.backgroundActivityConfig || {};
 
           singleChats.forEach((chat) => {
-            const freq = config[chat.id] || "none"; // 获取当前角色的频率设置
+            const freq = config[chat.id] || "none"; // Get the current role's frequency setting
             let badgeHtml = "";
             if (freq !== "none") {
-              const freqText = { low: "低", medium: "中", high: "高" }[freq];
+              const freqText = { low: "Low", medium: "Medium", high: "High" }[freq];
               badgeHtml = `<span class="char-freq-badge ${freq}">${freqText}</span>`;
             }
 
@@ -22388,7 +22389,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           const chatListEl = document.getElementById("chat-list");
           chatListEl.innerHTML = "";
 
-          // 1. 获取所有聊天和分组数据
+          // 1. Get all chats and group data
           const allChats = Object.values(state.chats);
           const allGroups = await db.qzoneGroups.toArray();
 
@@ -22398,11 +22399,11 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             return;
           }
 
-          // 2. 将聊天明确地分为“置顶”和“未置顶”两组
+          // 2. Clearly separate chats into "pinned" and "unpinned" groups
           const pinnedChats = allChats.filter((chat) => chat.isPinned);
           const unpinnedChats = allChats.filter((chat) => !chat.isPinned);
 
-          // 3. 对置顶的聊天，仅按最新消息时间排序
+          // 3. For pinned chats, sort only by the latest message timestamp
           pinnedChats.sort(
             (a, b) =>
               (b.history.slice(-1)[0]?.timestamp || 0) -
@@ -22500,35 +22501,35 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             !chat.isGroup &&
             chat.relationship?.status === "pending_user_approval"
           ) {
-            lastMsgDisplay = `<span style="color: #ff8c00;">[好友申请] ${
-              chat.relationship.applicationReason || "请求添加你为好友"
+            lastMsgDisplay = `<span style="color: #ff8c00;">[Friend Request] ${
+              chat.relationship.applicationReason || "A request has been sent to add you as a friend."
             }</span>`;
           } else if (
             !chat.isGroup &&
             chat.relationship?.status === "blocked_by_ai"
           ) {
-            lastMsgDisplay = `<span style="color: #dc3545;">[你已被对方拉黑]</span>`;
+            lastMsgDisplay = `<span style="color: #dc3545;">[You have been blocked]</span>`;
           } else if (chat.isGroup) {
             if (lastMsgObj.type === "pat_message") {
-              lastMsgDisplay = `[系统消息] ${lastMsgObj.content}`;
+              lastMsgDisplay = `[System Message] ${lastMsgObj.content}`;
             } else if (lastMsgObj.type === "transfer") {
-              lastMsgDisplay = "[转账]";
+              lastMsgDisplay = "[Transfer]";
             } else if (
               lastMsgObj.type === "ai_image" ||
               lastMsgObj.type === "user_photo"
             ) {
-              lastMsgDisplay = "[照片]";
+              lastMsgDisplay = "[Photo]";
             } else if (lastMsgObj.type === "voice_message") {
-              lastMsgDisplay = "[语音]";
+              lastMsgDisplay = "[Voice]";
             } else if (
               typeof lastMsgObj.content === "string" &&
               STICKER_REGEX.test(lastMsgObj.content)
             ) {
               lastMsgDisplay = lastMsgObj.meaning
-                ? `[表情: ${lastMsgObj.meaning}]`
-                : "[表情]";
+                ? `[Sticker: ${lastMsgObj.meaning}]`
+                : "[Sticker]";
             } else if (Array.isArray(lastMsgObj.content)) {
-              lastMsgDisplay = `[图片]`;
+              lastMsgDisplay = `[Image]`;
             } else {
               lastMsgDisplay = String(lastMsgObj.content || "...").substring(
                 0,
@@ -23005,10 +23006,10 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             globalBgPreview.textContent = "";
           } else if (globalBg) {
             globalBgPreview.style.background = globalBg;
-            globalBgPreview.textContent = "当前为渐变色";
+            globalBgPreview.textContent = "Currently displaying gradient colors";
           } else {
             globalBgPreview.style.backgroundImage = "none";
-            globalBgPreview.textContent = "点击下方上传";
+            globalBgPreview.textContent = "Click below to upload";
           }
 
           // 铃声和提示音
@@ -23017,17 +23018,17 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           document.getElementById("notification-sound-url-input").value =
             state.globalSettings.notificationSoundUrl || "";
 
-          await loadThemesToDropdown(); // 确保主题列表已加载
+          await loadThemesToDropdown(); // Ensure the theme list is loaded
           const editor = document.getElementById("theme-css-editor");
           const selector = document.getElementById("theme-selector");
 
-          // 优先加载 activeCustomCss
+          // Prioritize loading activeCustomCss
           if (state.globalSettings.activeCustomCss) {
             editor.value = state.globalSettings.activeCustomCss;
-            // 如果自定义CSS存在，则将下拉框重置为“未选择”状态
+            // If custom CSS exists, reset the dropdown to "none selected"
             selector.value = "";
           }
-          // 如果没有自定义CSS，但有选中的主题ID
+          // If there is no custom CSS but a theme ID is selected
           else if (state.globalSettings.activeThemeId) {
             const theme = await db.themes.get(
               state.globalSettings.activeThemeId,
@@ -23158,13 +23159,13 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             item.className = "list-item";
             item.dataset.bookId = book.id;
             item.innerHTML = `<div class="item-title">${book.name}</div><div class="item-content">${(
-              book.content || "暂无内容..."
+              book.content || "No content available..."
             ).substring(0, 50)}</div>`;
             item.addEventListener("click", () => openWorldBookEditor(book.id));
             addLongPressListener(item, async () => {
               const confirmed = await showCustomConfirm(
-                "删除世界书",
-                `确定要删除《${book.name}》吗？此操作不可撤销。`,
+                "Delete World Book",
+                `Are you sure you want to delete "${book.name}"? This action cannot be undone.`,
                 { confirmButtonClass: "btn-danger" },
               );
               if (confirmed) {
@@ -23196,17 +23197,17 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           document.getElementById("world-book-content-input").value =
             book.content;
 
-          // 填充分类下拉菜单
+          // Fill the category dropdown
           const selectEl = document.getElementById(
             "world-book-category-select",
           );
-          selectEl.innerHTML = '<option value="">-- 未分类 --</option>'; // 默认选项
+          selectEl.innerHTML = '<option value="">-- Uncategorized --</option>'; // Default option
           categories.forEach((cat) => {
             const option = document.createElement("option");
             option.value = cat.id;
             option.textContent = cat.name;
             if (book.categoryId === cat.id) {
-              option.selected = true; // 选中当前分类
+              option.selected = true; // Select the current category
             }
             selectEl.appendChild(option);
           });
@@ -23237,15 +23238,15 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             let message;
             if (activeStickerCategoryId === "uncategorized") {
               // 如果所有表情都有分类了，这里也会是空的
-              message = "没有未分类的表情哦~";
+              message = "There are no uncategorized emojis.~";
             } else {
               // 如果是在某个具体分类下，但是里面没表情
-              message = "这个分类下还没有表情哦~";
+              message = "There are no emojis in this category.~";
             }
             // 如果整个表情库都是空的，给一个初始引导
             if (state.userStickers.length === 0) {
               message =
-                "大人请点击右上角“添加”或“上传”来添加你的第一个表情吧！";
+                "Please click 'Add' or 'Upload' in the top right corner to add your first emoji!";
             }
 
             grid.innerHTML = `<p style="text-align:center; color: var(--text-secondary); grid-column: 1 / -1;">${message}</p>`;
@@ -23279,7 +23280,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   const deleteBtn = document.getElementById(
                     "delete-selected-user-stickers-btn",
                   );
-                  deleteBtn.textContent = `删除已选 (${selectedUserStickers.size})`;
+                  deleteBtn.textContent = `Delete selected (${selectedUserStickers.size})`;
                   deleteBtn.disabled = selectedUserStickers.size === 0;
 
                   const moveBtn = document.getElementById(
@@ -23303,8 +23304,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   deleteBtn.onclick = async (e) => {
                     e.stopPropagation();
                     const confirmed = await showCustomConfirm(
-                      "删除表情",
-                      `确定要删除表情 "${sticker.name}" 吗？`,
+                      "Delete Emoji",
+                      `Are you sure you want to delete the emoji "${sticker.name}"?`,
                       {
                         confirmButtonClass: "btn-danger",
                       },
@@ -23343,30 +23344,30 @@ console.log(`[System] Database for user ${userId} has been loaded`);
          */
         async function handleDeleteStickerCategory(categoryId, categoryName) {
           if (isNaN(categoryId) || !categoryName) {
-            alert("执行删除失败：传入的分类ID或名称无效！");
+            alert("Failed to delete: Invalid category ID or name!");
             return;
           }
 
           // 弹窗让用户选择如何处理分类下的表情
-          const choice = await showChoiceModal(`删除分类 "${categoryName}"`, [
+          const choice = await showChoiceModal(`Delete Category "${categoryName}"`, [
             {
-              text: "仅删除分类 (表情移至“未分类”)",
+              text: "Delete category only (stickers moved to 'Uncategorized')",
               value: "delete_category_only",
             },
-            { text: "删除分类及所有表情 (不可恢复)", value: "delete_all" },
+            { text: "Delete category and all stickers (irreversible)", value: "delete_all" },
           ]);
 
-          if (!choice) return; // 如果用户点击了取消，则不执行任何操作
+          if (!choice) return; // If the user clicks cancel, do nothing
 
           try {
             if (choice === "delete_category_only") {
-              // 找到该分类下的所有表情
+              // Find all stickers under this category
               const stickersToUpdate = state.userStickers.filter(
                 (s) => s.categoryId === categoryId,
               );
 
               if (stickersToUpdate.length > 0) {
-                // 将它们的分类ID设为 null 或 undefined，表示未分类
+                // Set their category ID to null or undefined, indicating uncategorized
                 stickersToUpdate.forEach((sticker) => {
                   sticker.categoryId = null;
                 });
@@ -23400,12 +23401,12 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             renderStickerPanel();
 
             await showCustomAlert(
-              "操作成功",
-              `分类 "${categoryName}" 已成功删除。`,
+              "Operation successful",
+              `Category "${categoryName}" has been successfully deleted.`,
             );
           } catch (error) {
-            console.error("删除分类时出错:", error);
-            alert(`操作失败，发生数据库错误: ${error.message}`);
+            console.error("Error deleting category:", error);
+            alert(`Operation failed due to a database error: ${error.message}`);
           }
         }
 
@@ -23416,8 +23417,8 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           if (selectedUserStickers.size === 0) return;
 
           const confirmed = await showCustomConfirm(
-            "确认删除",
-            `确定要删除选中的 ${selectedUserStickers.size} 个表情吗？`,
+            "Confirm Deletion",
+            `Are you sure you want to delete the ${selectedUserStickers.size} selected stickers?`,
             { confirmButtonClass: "btn-danger" },
           );
 
@@ -23432,7 +23433,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             // 退出编辑模式
             toggleUserStickerSelectionMode();
 
-            alert("选中的表情已删除。");
+            alert("The selected stickers have been deleted.");
           }
         }
 
@@ -23559,14 +23560,14 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               if (chat.ownerId === "user") {
                 const roleTag = document.createElement("span");
                 roleTag.className = "group-role-tag owner";
-                roleTag.textContent = "群主";
+                roleTag.textContent = "Group owner";
                 tagsContainer.appendChild(roleTag);
               }
               // 检查用户是否被设为管理员
               else if (chat.settings.isUserAdmin) {
                 const roleTag = document.createElement("span");
                 roleTag.className = "group-role-tag admin";
-                roleTag.textContent = "管理员";
+                roleTag.textContent = "Administrator";
                 tagsContainer.appendChild(roleTag);
               }
 
@@ -23584,27 +23585,27 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               );
               senderDisplayName = member
                 ? member.groupNickname
-                : msg.senderName || "未知成员";
+                : msg.senderName || "Unknown member";
 
               // 如果该成员被禁言了，就添加一个禁言标签
               if (member && member.isMuted) {
                 const muteTag = document.createElement("span");
                 muteTag.className = "group-title-tag"; // 复用头衔标签的样式
-                muteTag.style.color = "#ff3b30"; // 让它变成红色
-                muteTag.style.backgroundColor = "#ffe5e5"; // 淡红色背景
-                muteTag.textContent = "🚫已禁言";
+                muteTag.style.color = "#ff3b30"; // Make it red
+                muteTag.style.backgroundColor = "#ffe5e5"; // Light red background
+                muteTag.textContent = "🚫Muted";
                 tagsContainer.appendChild(muteTag);
               }
 
               if (member && chat.ownerId === member.id) {
                 const roleTag = document.createElement("span");
                 roleTag.className = "group-role-tag owner";
-                roleTag.textContent = "群主";
+                roleTag.textContent = "Group owner";
                 tagsContainer.appendChild(roleTag);
               } else if (member && member.isAdmin) {
                 const roleTag = document.createElement("span");
                 roleTag.className = "group-role-tag admin";
-                roleTag.textContent = "管理员";
+                roleTag.textContent = "Administrator";
                 tagsContainer.appendChild(roleTag);
               }
 
@@ -23686,11 +23687,11 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             // onclick="openBrowser(...)" 移除，我们将在JS中动态绑定事件
             contentHtml = `
 			            <div class="link-share-card" data-timestamp="${msg.timestamp}">
-			                <div class="title">${msg.title || "无标题"}</div>
-			                <div class="description">${msg.description || "点击查看详情..."}</div>
+			                <div class="title">${msg.title || "Untitled"}</div>
+			                <div class="description">${msg.description || "Click to view details..."}</div>
 			                <div class="footer">
 			                    <svg class="footer-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-			                    <span>${msg.source_name || "链接分享"}</span>
+			                    <span>${msg.source_name || "Link Share"}</span>
 			                </div>
 			            </div>
 			        `;
@@ -23725,7 +23726,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 			            <div class="description">共 ${msg.payload.sharedHistory.length} 条消息</div>
 			            <div class="footer">
 			                <svg class="footer-icon" ...>...</svg> <!-- 复用链接分享的图标 -->
-			                <span>聊天记录</span>
+			                <span>Chat History</span>
 			            </div>
 			        </div>
 			    `;
@@ -23737,59 +23738,59 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             if (payload.remark && payload.remark.trim()) {
               remarkHtml = `
 			            <div class="waimai-remark">
-			                <span class="remark-label">备注:</span>
+			                <span class="remark-label">Remark:</span>
 			                <span class="remark-text">${payload.remark}</span>
 			            </div>
 			        `;
             }
 
-            // 1. 我们删除了写在HTML里的蓝色渐变样式。
-            // 2. 将卡片的 class 从 "gift-card" 改为 "waimai-meituan-card"，方便我们定制专属样式。
-            // 3. 将图标从面条 🍜 换成了外卖小摩托 🛵，更符合主题。
+            // 1. We removed the blue gradient style written in HTML.
+            // 2. Changed the card class from "gift-card" to "waimai-meituan-card" for custom styling.
+            // 3. Changed the icon from noodles 🍜 to a delivery scooter 🛵, more fitting the theme.
             contentHtml = `
 			        <div class="waimai-meituan-card">
 			            <div class="gift-card-header">
 			                <div class="icon">🛵</div>
-			                <div class="title">一份来自 ${payload.senderName} 的外卖</div>
+			                <div class="title">A delivery from ${payload.senderName}</div>
 			            </div>
 			            <div class="gift-card-body">
 			                <img src="${payload.foodImageUrl}" style="width: 100%; max-height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
 			                <p class="greeting" style="font-weight: bold; font-size: 16px;">${payload.foodName}</p>
-			                <p style="font-size: 13px; color: #888;">你的专属外卖已送达</p>
+			                <p style="font-size: 13px; color: #888;">Your exclusive delivery has arrived</p>
 			                ${remarkHtml}
 			            </div>
 			        </div>
 			    `;
           } else if (msg.type === "borrow_money_request") {
-            bubble.classList.add("is-borrow-request"); // 应用透明气泡样式
+            bubble.classList.add("is-borrow-request"); // Apply transparent bubble style
             const payload = msg.payload;
-            // 直接将卡片的HTML赋给contentHtml，不再拼接任何文本
+            // Directly assign the card's HTML to contentHtml, no longer concatenating any text
             contentHtml = `
 			        <div class="borrow-card">
 			            <div class="borrow-header">
-			                向 <span>${payload.lenderName}</span> 借钱
+			                Borrow from <span>${payload.lenderName}</span>
 			            </div>
 			            <div class="borrow-body">
-			                <p class="label">借款金额</p>
+			                <p class="label">Amount</p>
 			                <p class="amount">¥${payload.amount.toFixed(2)}</p>
 			                <p class="reason">
-			                    <strong>借款用途:</strong><br>
+			                    <strong>Purpose:</strong><br>
 			                    ${payload.reason}
 			                </p>
 			            </div>
 			        </div>
 			    `;
           } else if (msg.type === "repost_forum_post") {
-            bubble.classList.add("is-link-share"); // 复用链接分享的样式，省事！
+            bubble.classList.add("is-link-share"); // Reuse link share style for convenience
             const postPayload = msg.payload;
-            //把帖子的ID存到卡片的 data-post-id 属性里，方便以后点击跳转
+            // Store the post ID in the card's data-post-id attribute for easy navigation later
             contentHtml = `
         <div class="link-share-card" style="cursor: pointer;" data-post-id="${postPayload.postId}">
             <div class="title">【小组帖子】${postPayload.title}</div>
             <div class="description">${postPayload.content}</div>
             <div class="footer">
                 <svg class="footer-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 12c0-5.25-4.25-9.5-9.5-9.5S2.5 6.75 2.5 12s4.25 9.5 9.5 9.5c.35 0 .69-.02 1.03-.06"></path><path d="M18.5 12.5c0-1.66-1.34-3-3-3s-3 1.34-3 3 1.34 3 3 3c.83 0 1.58-.34 2.12-.88"></path></svg>
-                <span>来自小组的分享</span>
+                <span>From Group Share</span>
             </div>
         </div>
       `;
@@ -23799,28 +23800,28 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             const titleText =
               payload.seriesTitle ||
               (msg.content &&
-                msg.content.split("\n")[0].replace("【连载分享】", "")) ||
-              "连载";
-            const desc = payload.summary || "连载分享";
+                msg.content.split("\n")[0].replace("【Serialized Sharing】", "")) ||
+              "Serialized";
+            const desc = payload.summary || "Serialized Sharing";
             const latest = payload.latestChapterIndex
-              ? `第${payload.latestChapterIndex}章 ${payload.latestTitle || ""}`
-              : "最新章节";
-            const meta = `${payload.pairing || ""} · ${payload.statusText || ""} · 共${payload.chapterCount || "?"}章`;
+              ? `Chapter ${payload.latestChapterIndex} ${payload.latestTitle || ""}`
+              : "Latest Chapter";
+            const meta = `${payload.pairing || ""} · ${payload.statusText || ""} · ${payload.chapterCount || "?"} Chapters`;
             contentHtml = `
         <div class="book-share-card" style="cursor: pointer;" data-post-id="${payload.latestPostId || ""}">
           <div class="book-spine"></div>
           <div class="book-body">
-            <div class="book-tag">连载</div>
+            <div class="book-tag">Serialized</div>
             <div class="book-title">${titleText}</div>
             <div class="book-meta">${meta}</div>
             <div class="book-desc">${desc}</div>
-            <div class="book-latest">最新：${latest}</div>
+            <div class="book-latest">Latest: ${latest}</div>
           </div>
         </div>
       `;
           } else if (msg.type === "kk_item_share") {
-            bubble.classList.add("is-link-share"); // 复用透明背景样式(如果已定义)，或者不加这行让它有气泡背景
-            // 如果你没有 is-link-share 样式，可以忽略上一行，或者定义 bubble.style.background = 'transparent';
+            bubble.classList.add("is-link-share"); // Reuse transparent background style (if defined), or omit this line to keep bubble background
+            // If you don't have is-link-share style, you can ignore the previous line, or set bubble.style.background = 'transparent';
             bubble.style.background = "transparent";
             bubble.style.padding = "0";
 
@@ -23834,21 +23835,21 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                     </div>
                     <div class="content">${payload.content}</div>
                     <div class="footer">
-                        来源：${payload.areaName}
+                        Source: ${payload.areaName}
                     </div>
                 </div>
             `;
           } else if (msg.type === "cart_share_request") {
             bubble.classList.add("is-cart-share-request");
             const payload = msg.payload;
-            let statusText = "等待对方处理...";
+            let statusText = "Waiting for the other party to process...";
             let cardClass = "";
 
             if (payload.status === "paid") {
-              statusText = "对方已为你买单";
+              statusText = "The other party has paid for you";
               cardClass = "paid";
             } else if (payload.status === "rejected") {
-              statusText = "对方拒绝了你的请求";
+              statusText = "The other party has rejected your request";
               cardClass = "rejected";
             }
 
@@ -23856,10 +23857,10 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 			        <div class="cart-share-card ${cardClass}">
 			            <div class="cart-share-header">
 			                <div class="icon">🛒</div>
-			                <div class="title">购物车代付请求</div>
+			                <div class="title">Cart Share Request</div>
 			            </div>
 			            <div class="cart-share-body">
-			                <div class="label">共 ${payload.itemCount} 件商品，合计</div>
+			                <div class="label">There are a total of ${payload.itemCount} items, totaling [amount missing].</div>
 			                <div class="amount">¥${payload.totalPrice.toFixed(2)}</div>
 			                <div class="status-text">${statusText}</div>
 			            </div>
@@ -23873,12 +23874,12 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 			        <div class="waimai-meituan-card">
 			            <div class="gift-card-header">
 			                <div class="icon">🛵</div>
-			                <div class="title">你的专属外卖已送达</div>
+			                <div class="title">Your exclusive delivery has arrived</div>
 			            </div>
 			            <div class="gift-card-body">
 			                <img src="${payload.foodImageUrl}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 10px;">
 			                <p class="greeting" style="font-weight: bold; font-size: 16px;">${payload.foodName}</p>
-			                <p style="font-size: 13px; color: #888;">来自: ${payload.restaurant}</p>
+			                <p style="font-size: 13px; color: #888;">From: ${payload.restaurant}</p>
 			            </div>
 			            <div class="waimai-remark">
 			                ${payload.greeting}
@@ -23886,27 +23887,27 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 			        </div>
 			    `;
           } else if (msg.type === "gift_notification") {
-            bubble.classList.add("is-gift-notification"); // 应用透明气泡样式
+            bubble.classList.add("is-gift-notification"); // Apply transparent bubble style
             const payload = msg.payload;
 
-            // 在这里构建卡片的完整HTML内容
+            // Build the complete HTML content for the card
             contentHtml = `
 			        <div class="gift-card">
 			            <div class="gift-card-header">
 			                <div class="icon">🎁</div>
-			                <!-- 1. 清晰指明是谁送的礼物 -->
-			                <div class="title">一份来自 ${payload.senderName} 的礼物</div>
+			                <!-- 1. Clearly indicate who sent the gift -->
+			                <div class="title">A gift from ${payload.senderName}</div>
 			            </div>
 			            <div class="gift-card-body">
-			                <p class="greeting">这是我为你挑选的礼物，希望你喜欢！</p>
-			                <!-- 2. 清晰列出有什么商品 -->
+			                <p class="greeting">This is a gift I picked out for you, hope you like it!</p>
+			                <!-- 2. Clearly list the items -->
 			                <div class="gift-card-items">
-			                    <strong>商品列表:</strong><br>
-			                    ${payload.itemSummary.replace(/、/g, "<br>")} <!-- 将顿号替换为换行，让列表更清晰 -->
+			                    <strong>Item List:</strong><br>
+			                    ${payload.itemSummary.replace(/、/g, "<br>")} <!-- Replace commas with line breaks for clarity -->
 			                </div>
-			                <!-- 3. 清晰标明总金额 -->
+			                <!-- 3. Clearly indicate the total amount -->
 			                <div class="gift-card-footer">
-			                    共 ${payload.itemCount} 件，合计: <span class="total-price">¥${payload.totalPrice.toFixed(2)}</span>
+			                    Total ${payload.itemCount} items, totaling: <span class="total-price">¥${payload.totalPrice.toFixed(2)}</span>
 			                </div>
 			            </div>
 			        </div>
@@ -39269,7 +39270,7 @@ const ivTags = {
 			        <button id="preset-action-delete-current" class="btn-danger" ${
                 !selectedPreset ? "disabled" : ""
               }>删除当前配置</button>
-			        <button id="preset-action-cancel" style="margin-top: 8px; border-radius: 8px; background-color: #f0f0f0;">取消</button>
+			        <button id="preset-action-cancel" style="margin-top: 8px; border-radius: 8px; background-color: #f0f0f0;">Cancel</button>
 			    `;
 
           document
@@ -39302,7 +39303,7 @@ const ivTags = {
           const apiKey = document.getElementById("api-key").value.trim();
 
           if (!proxyUrl || !apiKey) {
-            alert("代理地址和密钥都不能为空！");
+            alert("代理地址和密钥都不能为空！ ");
             return;
           }
 
@@ -39451,7 +39452,7 @@ const ivTags = {
 			        <button id="preset-action-save-new">保存</button>
 			        <button id="preset-action-update-current" ${!selectedPreset ? "disabled" : ""}>更新</button>
 			        <button id="preset-action-delete-current" class="btn-danger" ${!selectedPreset ? "disabled" : ""}>Delete</button>
-			        <button id="preset-action-cancel" style="margin-top: 8px; border-radius: 8px; background-color: #f0f0f0;">取消</button>
+			        <button id="preset-action-cancel" style="margin-top: 8px; border-radius: 8px; background-color: #f0f0f0;">Cancel</button>
 			    `;
 
           // 重新绑定事件
@@ -47971,7 +47972,7 @@ const ivTags = {
 
           const cancelBtn = document.createElement("button");
           cancelBtn.className = "cancel";
-          cancelBtn.textContent = "取消";
+          cancelBtn.textContent = "Cancel";
           cancelBtn.addEventListener("click", closeGroupAnnouncementModal); // 直接调用函数
 
           const saveBtn = document.createElement("button");
