@@ -7406,11 +7406,11 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
             🎨 Regenerate Image
           </button>
           <!-- Added this -->
-          <button id="edit-message-btn">Edit Message</button>
-          <button id="copy-message-btn">Copy Text</button>
+          <button id="edit-message-btn">Edit</button>
+          <button id="copy-message-btn">Copy</button>
           <button id="recall-message-btn">Recall</button>
           <button id="quote-message-btn">Quote</button>
-          <button id="select-message-btn">Enter Multi-select</button>
+          <button id="select-message-btn">Multi-select</button>
           <!-- Cancel button -->
           <button
             id="cancel-message-action-btn"
@@ -33988,7 +33988,7 @@ const ivTags = {
           // 创建群聊后，发送一条系统通知
           await logSystemMessage(
             newChatId,
-            `你创建了群聊，并邀请了 ${members.map((m) => `“${m.groupNickname}”`).join("、")} 加入群聊。`,
+            `You created the group chat and invited ${members.map((m) => `"${m.groupNickname}"`).join(", ")} to join.`,
           );
 
           // 后续逻辑不变
@@ -34016,10 +34016,10 @@ const ivTags = {
           const listEl = document.getElementById("member-management-list");
           const chat = state.chats[state.activeChatId];
           if (!chat || !chat.isGroup) {
-            listEl.innerHTML = "<p>错误：非群聊无法管理成员。</p>";
+            listEl.innerHTML = "<p>Error: Only group chats can manage members.</p>";
             return;
           }
-          listEl.innerHTML = ""; // 清空
+          listEl.innerHTML = ""; // Clear
 
           // 1. 创建一个包含所有人的完整列表
           const allParticipants = [
@@ -38710,7 +38710,7 @@ const ivTags = {
         }
 
         /**
-         * 将时间戳格式化为 "X月X日 HH:mm" 的形式
+         * 将时间戳格式化为 "MM/DD HH:mm" 的形式
          * @param {number} timestamp - 时间戳
          * @returns {string} - 格式化后的日期字符串
          */
@@ -38720,7 +38720,7 @@ const ivTags = {
           const day = date.getDate();
           const hours = String(date.getHours()).padStart(2, "0");
           const minutes = String(date.getMinutes()).padStart(2, "0");
-          return `${month}月${day}日 ${hours}:${minutes}`;
+          return `${month}/${day} ${hours}:${minutes}`;
         }
 
         /**
@@ -38864,12 +38864,12 @@ const ivTags = {
          */
         async function saveCurrentTheme() {
           if (!activeThemeId) {
-            alert("请先选择一个方案，或使用“另存为”来创建新方案。");
+            alert("Please select a plan first, or use \"Save As\" to create a new plan.");
             return;
           }
           const cssCode = document.getElementById("theme-css-editor").value;
           await db.themes.update(activeThemeId, { css: cssCode });
-          alert("当前方案已保存！");
+          alert("The current plan has been saved!");
         }
 
         /**
@@ -38877,11 +38877,11 @@ const ivTags = {
          */
         async function saveAsNewTheme() {
           const themeName = await showCustomPrompt(
-            "保存新方案",
-            "请输入新方案的名称",
+            "Save New Plan",
+            "Please enter the name of the new plan",
           );
           if (!themeName || !themeName.trim()) {
-            if (themeName !== null) alert("方案名称不能为空！");
+            if (themeName !== null) alert("The plan name cannot be empty!");
             return;
           }
           const cssCode = document.getElementById("theme-css-editor").value;
@@ -38893,15 +38893,15 @@ const ivTags = {
           document.getElementById("theme-selector").value = newId;
           activeThemeId = newId;
 
-          alert(`方案 "${themeName}" 已成功保存！`);
+      alert(`The plan "${themeName}" has been successfully saved!`);
         }
         /**
          * 打开清除角色CSS的管理菜单
          */
         async function openCharCssManager() {
-          const choice = await showChoiceModal("清理角色气泡样式", [
-            { text: "🧹 一键清除所有角色的CSS", value: "clear_all" },
-            { text: "🔍 选择特定角色清除", value: "select_char" },
+          const choice = await showChoiceModal("Clear Character Bubble Styles", [
+            { text: "🧹 Clear CSS for All Characters", value: "clear_all" },
+            { text: "🔍 Select Specific Characters to Clear", value: "select_char" },
           ]);
 
           if (!choice) return;
@@ -38928,13 +38928,13 @@ const ivTags = {
           }
 
           if (!hasAny) {
-            alert("当前没有任何角色设置了自定义CSS，无需清理。");
+            alert("There are no characters with custom CSS to clear.");
             return;
           }
 
           const confirmed = await showCustomConfirm(
-            "确认全清",
-            "确定要清除【所有】角色的自定义气泡样式(CSS)吗？\n此操作将使所有角色恢复默认或全局样式，且不可恢复。",
+            "Confirm Clear All",
+            "Are you sure you want to clear the custom bubble styles (CSS) for ALL characters?\nThis action will revert all characters to default or global styles and cannot be undone.",
             { confirmButtonClass: "btn-danger" },
           );
 
@@ -38944,48 +38944,48 @@ const ivTags = {
           for (const chatId in state.chats) {
             const chat = state.chats[chatId];
             if (!chat.isGroup && chat.settings && chat.settings.customCss) {
-              chat.settings.customCss = ""; // 清空
+              chat.settings.customCss = ""; // Clear
               count++;
               await db.chats.put(chat);
             }
           }
 
-          // 如果当前正在聊天的角色被清除了，刷新一下界面
+          // If the currently active chat character was cleared, refresh the interface
           if (state.activeChatId && !state.chats[state.activeChatId].isGroup) {
             renderChatInterface(state.activeChatId);
           }
 
-          alert(`已清除 ${count} 个角色的自定义样式。`);
+          alert(`Cleared custom styles for ${count} characters.`);
         }
 
         /**
-         * 打开选择器，勾选要清除的角色
+         * Open the selector to choose characters to clear
          */
         async function openCharCssSelector() {
-          // 1. 筛选出所有设置了customCss的角色
+          // 1. Filter out all characters with customCss
           const chatsWithCss = Object.values(state.chats).filter(
             (c) => !c.isGroup && c.settings && c.settings.customCss,
           );
 
           if (chatsWithCss.length === 0) {
-            alert("当前没有任何角色设置了自定义CSS。");
+            alert("There are no characters with custom CSS.");
             return;
           }
 
-          // 2. 复用现有的自定义模态框来显示列表
+          // 2. Reuse the existing custom modal to display the list
           const modal = document.getElementById("custom-modal-overlay");
           const modalTitle = document.getElementById("custom-modal-title");
           const modalBody = document.getElementById("custom-modal-body");
           const confirmBtn = document.getElementById("custom-modal-confirm");
           const cancelBtn = document.getElementById("custom-modal-cancel");
 
-          modalTitle.textContent = "选择要清除样式的角色";
+          modalTitle.textContent = "Select Characters to Clear Styles";
           modalBody.innerHTML =
             '<div id="css-char-list" style="max-height: 300px; overflow-y: auto; text-align: left;"></div>';
 
           const listEl = document.getElementById("css-char-list");
 
-          // 3. 生成列表
+          // 3. Generate the list
           chatsWithCss.forEach((chat) => {
             const item = document.createElement("div");
             item.style.cssText =
@@ -39015,7 +39015,7 @@ const ivTags = {
           });
 
           // 4. 设置按钮样式和事件
-          confirmBtn.textContent = "清除选中";
+          confirmBtn.textContent = "Clear Selected";
           confirmBtn.classList.add("btn-danger");
           cancelBtn.style.display = "block";
 
@@ -39028,7 +39028,7 @@ const ivTags = {
               ".css-clear-checkbox:checked",
             );
             if (selectedCheckboxes.length === 0) {
-              alert("请至少选择一个角色。");
+              alert("Please select at least one character.");
               return;
             }
 
@@ -39049,7 +39049,7 @@ const ivTags = {
               renderChatInterface(state.activeChatId);
             }
 
-            alert(`已清除 ${ids.length} 个角色的样式。`);
+            alert(`Cleared custom styles for ${ids.length} characters.`);
           });
 
           // 显示模态框
@@ -43642,7 +43642,7 @@ const ivTags = {
             modal.querySelector("#text-image-mode-content").style.display =
               "none";
             modal.querySelector("#post-public-text").placeholder =
-              "分享新鲜事...";
+              "Share something new...";
           } else {
             modal.querySelector(".post-mode-switcher").style.display = "flex";
             modal.querySelector("#image-mode-content").classList.add("active");
@@ -43650,7 +43650,7 @@ const ivTags = {
               .querySelector("#text-image-mode-content")
               .classList.remove("active");
             modal.querySelector("#post-public-text").placeholder =
-              "分享新鲜事...（非必填的公开文字）";
+              "Share something new... (optional public text)";
           }
 
           document.getElementById("post-comments-toggle-group").style.display =
@@ -43679,7 +43679,7 @@ const ivTags = {
             });
           } else {
             groupsContainer.innerHTML =
-              '<p style="color: #8a8a8a; font-size: 13px;">还没有创建任何好友分组哦。</p>';
+              '<p style="color: #8a8a8a; font-size: 13px;">No friend groups have been created yet.</p>';
           }
 
           // 默认选中“所有人可见”并隐藏分组选择
@@ -47720,7 +47720,7 @@ const ivTags = {
           const chat = state.chats[state.activeChatId];
           // 权限检查：确保操作者是群主
           if (!chat || chat.ownerId !== "user") {
-            alert("你不是群主，没有权限执行此操作！");
+            alert("You are not the group owner and do not have permission to perform this action!");
             return;
           }
 
@@ -47741,7 +47741,7 @@ const ivTags = {
 
             // 不能将群主设为管理员或取消其管理员身份
             if (member.id === chat.ownerId) {
-              alert("不能对群主进行此操作。");
+              alert("Cannot perform this action on the group owner.");
               return;
             }
 
@@ -47753,12 +47753,12 @@ const ivTags = {
           await db.chats.put(chat);
 
           // 准备并发送系统通知消息
-          const actionText = isAdminNow ? "设为管理员" : "取消了管理员身份";
+          const actionText = isAdminNow ? "Promoted to admin" : "Removed admin privileges";
           const myNickname = chat.settings.myNickname || "Me";
           // 这里我们用 logSystemMessage 函数来发送通知，它会自动刷新UI
           await logSystemMessage(
             chat.id,
-            `“${myNickname}”将“${targetNickname}”${actionText}。`,
+            `“${myNickname}”${actionText}“${targetNickname}”。`,
           );
 
           // 刷新成员管理列表的显示
@@ -55683,7 +55683,7 @@ const ivTags = {
                 summarySettings.count || 20;
               document.getElementById("summary-prompt-input").value =
                 summarySettings.prompt ||
-                "请你以第三人称的视角，客观、冷静、不带任何感情色彩地总结以下对话的核心事件和信息。禁止进行任何角色扮演或添加主观评论。";
+                "Summarize a dialogue from a third-person perspective, emphasizing objectivity and a lack of emotional commentary. They explicitly instruct against any role-playing or subjective opinions in the summary.";
 
               // 为开关添加实时交互
               summaryToggle.onchange = () => {
