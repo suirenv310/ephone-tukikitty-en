@@ -60,7 +60,6 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
     <script src="https://phoebeboo.github.io/mewoooo/pp.js" defer></script>
-    <script src="main-app.js" defer></script>
     <script src="game-hall.js" defer></script>
     <script src="forum.js" defer></script>
     <script src="lovers-space.js" defer></script>
@@ -29916,10 +29915,10 @@ ${libraryList}
                         }
                         // 把手气王信息也加到“战报”里
                         if (luckyKing.name) {
-                          hiddenContentForAI += ` 手气王是 ${luckyKing.name}！`;
+                          hiddenContentForAI += ` The luckiest player is ${luckyKing.name}！`;
                         }
                       }
-                      hiddenContentForAI += " 请根据这个结果发表你的评论。]";
+                      hiddenContentForAI += " Please comment on this result.]";
 
                       // 6. 创建并添加给AI看的隐藏消息
                       const hiddenMessageForAI = {
@@ -29954,7 +29953,7 @@ ${libraryList}
                     const systemNotice = {
                       role: "system",
                       type: "pat_message", // 复用居中样式
-                      content: `[${chat.name} 更换了头像]`,
+                      content: `[${chat.name} changed the profile picture]`,
                       timestamp: Date.now(),
                     };
                     chat.history.push(systemNotice);
@@ -29979,7 +29978,7 @@ ${libraryList}
                     originalMsg.status = "accepted";
 
                     // 【全新】同步到角色钱包（收入）
-                    const acceptDescription = `收到来自 ${originalMsg.senderName} 的转账`;
+                    const acceptDescription = `Received a transfer from ${originalMsg.senderName}`;
                     await updateCharacterBankBalance(
                       chatId,
                       originalMsg.amount,
@@ -30005,7 +30004,7 @@ ${libraryList}
                       type: "transfer",
                       isRefund: true, // 标记这是一条退款消息
                       amount: originalMsg.amount,
-                      note: "转账已被拒收",
+                      note: "Transfer has been declined",
                       timestamp: messageTimestamp++, // 使用递增的时间戳
                     };
 
@@ -30107,7 +30106,7 @@ ${libraryList}
                     role: "assistant",
                     senderName: msgData.name || chat.name,
                     type: "recalled_message",
-                    content: "对方撤回了一条消息",
+                    content: "The message has been recalled",
                     timestamp: tempMessageData.timestamp,
                     recalledData: {
                       originalType: "text",
@@ -30118,7 +30117,7 @@ ${libraryList}
                   // 2. 创建一条对用户隐藏、但对AI可见的“记忆”消息
                   const hiddenMemoryMessage = {
                     role: "system", // 必须是 system，这样AI才知道这是上下文信息
-                    content: `[系统提示：你刚刚说了一句“${msgData.content}”，但立刻就撤回了它。]`,
+                    content: `[System Notice: You just said "${msgData.content}", but immediately recalled it.]`,
                     timestamp: tempMessageData.timestamp + 1, // 确保在撤回消息之后
                     isHidden: true, // 这个标记让它不在UI上显示
                   };
@@ -30146,10 +30145,10 @@ ${libraryList}
                   const stickerName = msgData.sticker_name; // 关键修改：统一使用 sticker_name
                   if (!stickerName) {
                     console.warn(
-                      "AI返回了sticker类型但没有sticker_name，已拦截:",
+                      "AI returned a sticker type but did not provide sticker_name, intercepted:",
                       msgData,
                     );
-                    continue; // 跳过这条无效指令
+                    continue; // Skip this invalid instruction
                   }
 
                   // 在所有可用表情库中查找
@@ -30245,25 +30244,25 @@ ${libraryList}
                       await updateCharacterPhoneBankBalance(
                         chat.id,
                         -cost,
-                        `约会支出: 为用户买单`,
+                        `Dating expense: Paying for the user`,
                       );
                       aiMessage = {
                         ...baseMessage,
                         content:
-                          msgData.responseText || "好呀，这次我来请客吧！",
+                          msgData.responseText || "Sure, I'll treat this time!",
                       };
                     } else {
                       aiMessage = {
                         ...baseMessage,
                         content:
                           msgData.responseText ||
-                          "呜呜，我也想请客，但是钱包好像不太够呢...",
+                          "Aww, I also want to treat, but it seems my wallet is not enough...",
                       };
                     }
                   } else {
                     aiMessage = {
                       ...baseMessage,
-                      content: msgData.responseText || "这次还是算了吧...",
+                      content: msgData.responseText || "I guess we'll skip it this time...",
                     };
                   }
                   break;
@@ -30280,7 +30279,7 @@ ${libraryList}
                   if (!originalRequest) continue;
 
                   const costMatch = originalRequest.content.match(
-                    /各自支付 (\d+(\.\d+)?) 金币/,
+                    /Each person pays (\d+(\.\d+)?) gold coins./,
                   );
                   const splitCost = costMatch ? parseFloat(costMatch[1]) : 0;
 
@@ -30290,24 +30289,24 @@ ${libraryList}
                     if (charBalance >= splitCost) {
                       await updateUserBalanceAndLogTransaction(
                         -splitCost,
-                        `约会AA支出`,
+                        `Dating split expense`,
                       );
                       await updateCharacterPhoneBankBalance(
                         chat.id,
                         -splitCost,
-                        `约会AA支出`,
+                        `Dating split expense`,
                       );
                       aiMessage = {
                         ...baseMessage,
                         content:
-                          msgData.responseText || "好啊，AA制完全没问题！",
+                          msgData.responseText || "Sure, split bill is totally fine!",
                       };
                     } else {
                       aiMessage = {
                         ...baseMessage,
                         content:
                           msgData.responseText ||
-                          "这个...我的钱好像不太够付我自己的那份呢。",
+                          "Aww, it seems my wallet is not enough to cover my share.",
                       };
                     }
                   } else {
@@ -30315,7 +30314,7 @@ ${libraryList}
                       ...baseMessage,
                       content:
                         msgData.responseText ||
-                        "我觉得AA制有点太见外了，还是我来请吧？或者你请？",
+                        "I feel split bill is a bit too formal, should I treat? Or you?",
                     };
                   }
                   break;
@@ -30332,10 +30331,10 @@ ${libraryList}
                   if (!originalRequest) continue;
 
                   const amountMatch =
-                    originalRequest.content.match(/借 (\d+(\.\d+)?) 金币/);
+                    originalRequest.content.match(/Borrow (\d+(\.\d+)?) gold coins/);
                   const amount = amountMatch ? parseFloat(amountMatch[1]) : 0;
 
-                  // 只处理接受借款时的金钱逻辑
+                  // Only handle the financial logic when accepting a loan
                   if (msgData.decision === "accept") {
                     const lenderBalance =
                       chat.characterPhoneData.bank.balance || 0;
@@ -30343,17 +30342,17 @@ ${libraryList}
                       await updateCharacterPhoneBankBalance(
                         chat.id,
                         -amount,
-                        `借钱给用户`,
+                        `Lend money to user`,
                       );
                       await updateUserBalanceAndLogTransaction(
                         amount,
-                        `从 ${chat.name} 处借款`,
+                        `Borrowed from ${chat.name}`,
                       );
                     } else {
-                      // 如果AI决定同意但钱不够，我们信任AI会在下一条消息中解释。
-                      // 这里的金融逻辑可以做得更复杂，但目前保持简单，相信AI的判断。
+                      // If AI decides to accept but doesn't have enough money, we trust AI to explain in the next message.
+                      // The financial logic here can be more complex, but for now, keep it simple and trust AI's judgment.
                       console.warn(
-                        `AI "${chat.name}" 同意借钱，但余额不足，交易未执行。`,
+                        `AI "${chat.name}" agreed to lend money, but doesn't have enough balance. Transaction not executed.`,
                       );
                     }
                   }
@@ -30377,7 +30376,7 @@ ${libraryList}
                     // 检查转换后的ID是否有效
                     if (isNaN(numericPostId)) {
                       console.warn(
-                        `[圈子评论失败] 收到的 postId "${postIdToComment}" 不是一个有效的数字ID，已跳过。`,
+                        `[Circle comment failed] The received postId "${postIdToComment}" is not a valid numeric ID and has been skipped.`,
                       );
                       // 提示：如果频繁看到此警告，请检查你给AI的system prompt，确保你要求它返回数字ID。
                       continue; // 跳过此指令
@@ -30399,7 +30398,7 @@ ${libraryList}
                       // 将新评论保存到数据库
                       await db.forumComments.add(newComment);
                       console.log(
-                        `AI "${chat.name}" 评论了帖子 #${numericPostId}: "${commentText}"`,
+                        `AI "${chat.name}" commented on post #${numericPostId}: "${commentText}"`,
                       );
 
                       // 3. 同时检查帖子列表页和帖子详情页
@@ -30426,7 +30425,7 @@ ${libraryList}
                       }
                     } else {
                       console.warn(
-                        `[圈子评论失败] 未能在数据库中找到 postId 为 ${numericPostId} 的帖子。`,
+                        `[Circle comment failed] Could not find a post with postId ${numericPostId} in the database.`,
                       );
                     }
                   }
@@ -30480,7 +30479,7 @@ ${libraryList}
                   break;
 
                 default:
-                  console.warn("收到了未知的AI指令类型:", msgData.type);
+                  console.warn("Received an unknown AI instruction type:", msgData.type);
                   break;
               }
 
@@ -30493,21 +30492,21 @@ ${libraryList}
                   let notificationText;
                   switch (aiMessage.type) {
                     case "transfer":
-                      notificationText = `[收到一笔转账]`;
+                      notificationText = `[Received a transfer]`;
                       break;
                     case "waimai_request":
-                      notificationText = `[收到一个外卖代付请求]`;
+                      notificationText = `[Received a food delivery request]`;
                       break;
                     case "ai_image":
-                      notificationText = `[图片]`;
+                      notificationText = `[Image]`;
                       break;
                     case "voice_message":
-                      notificationText = `[语音]`;
+                      notificationText = `[Voice message]`;
                       break;
                     case "sticker":
                       notificationText = aiMessage.meaning
-                        ? `[表情: ${aiMessage.meaning}]`
-                        : "[表情]";
+                        ? `[Sticker: ${aiMessage.meaning}]`
+                        : "[Sticker]";
                       break;
                     default:
                       notificationText = String(aiMessage.content || "");
@@ -30566,15 +30565,15 @@ ${libraryList}
                   participants: [],
                 };
                 showScreen("chat-interface-screen");
-                alert("无人接听群聊邀请。");
+                alert("No one answered the group call invitation.");
               }
             }
             await db.chats.put(chat);
             checkAndTriggerSummary(chatId);
 
-            // --- 续火花逻辑 ---
+            // --- Streak logic ---
             if (await updateStreak(chatId)) {
-              // 如果火花天数发生了变化，就刷新聊天列表
+              // If the streak days have changed, refresh the chat list
               renderChatList();
             }
           } catch (error) {
@@ -30585,17 +30584,17 @@ ${libraryList}
             ) {
               chat.relationship.status = "blocked_by_ai";
               await showCustomAlert(
-                "申请失败",
-                `AI在处理你的好友申请时出错了，请稍后重试。\n错误信息: ${error.message}`,
+                "Application failed",
+              `The AI encountered an error while processing your friend request. Please try again later.\nError message: ${error.message}`,
               );
             } else {
-              const errorContent = `[出错了: ${error.message}]`;
+              const errorContent = `[Error: ${error.message}]`;
               const errorMessage = {
                 role: "assistant",
                 content: errorContent,
                 timestamp: Date.now(),
               };
-              if (chat.isGroup) errorMessage.senderName = "系统消息";
+              if (chat.isGroup) errorMessage.senderName = "System Message";
               chat.history.push(errorMessage);
             }
 
@@ -30655,13 +30654,13 @@ ${libraryList}
           const note = noteInput.value.trim();
 
           if (isNaN(amount) || amount <= 0) {
-            alert("请输入有效的金额！");
+            alert("Please enter a valid amount!");
             return;
           }
 
-          // 检查余额是否足够
+          // Check if the balance is sufficient
           if ((state.globalSettings.userBalance || 0) < amount) {
-            alert("余额不足！");
+            alert("Insufficient balance!");
             return;
           }
 
@@ -30669,12 +30668,12 @@ ${libraryList}
           const senderName = chat.isGroup
             ? chat.settings.myNickname || "Me"
             : "Me";
-          const receiverName = chat.isGroup ? "群聊" : chat.name;
+          const receiverName = chat.isGroup ? "Group Chat" : chat.name;
 
-          // 调用新函数扣款并记录
+          // Call the new function to deduct and log the transaction
           await updateUserBalanceAndLogTransaction(
             -amount,
-            `转账给 ${receiverName}`,
+            `Transfer to ${receiverName}`,
           );
 
           const msg = {
@@ -30737,7 +30736,7 @@ ${libraryList}
           }
 
           document.getElementById("selection-count").textContent =
-            `已选 ${selectedMessages.size} 条`;
+            `Selected ${selectedMessages.size} item(s)`;
 
           if (selectedMessages.size === 0) {
             exitSelectionMode();
@@ -30775,11 +30774,11 @@ ${libraryList}
               .classList.add("visible");
           } else {
             const oldChatName =
-              state.chats[state.musicState.activeChatId]?.name || "未知";
-            const newChatName = state.chats[targetChatId]?.name || "当前";
+              state.chats[state.musicState.activeChatId]?.name || "Unknown";
+            const newChatName = state.chats[targetChatId]?.name || "Current";
             const confirmed = await showCustomConfirm(
-              "切换听歌对象",
-              `您正和「${oldChatName}」听歌。要结束并开始和「${newChatName}」的新会话吗？`,
+              "Switch Listening Partner",
+              `You are currently listening with "${oldChatName}". Do you want to end and start a new session with "${newChatName}"?`,
               { confirmButtonClass: "btn-danger" },
             );
             if (confirmed) {
@@ -30911,7 +30910,7 @@ ${libraryList}
               track.cover ||
               "https://i.postimg.cc/pT2xKzPz/album-cover-placeholder.png";
           } else {
-            titleEl.textContent = "请添加歌曲";
+            titleEl.textContent = "Please add a song";
             artistEl.textContent = "...";
             albumCoverEl.src =
               "https://i.postimg.cc/pT2xKzPz/album-cover-placeholder.png";
@@ -30940,19 +30939,19 @@ ${libraryList}
         function updateElapsedTimeDisplay() {
           const hours = (state.musicState.totalElapsedTime / 3600).toFixed(1);
           document.getElementById("music-time-counter").textContent =
-            `已经一起听了${hours}小时`;
+            `You have been listening together for ${hours} hours`;
         }
 
         /**
-         * 处理用户上传或更新歌曲封面的逻辑
-         * @param {number} index - 被操作的歌曲在播放列表中的索引
+         * Handle user uploading or updating song cover logic
+         * @param {number} index - The index of the song being operated on in the playlist
          */
 
         async function handleCoverUpload(index) {
           if (index < 0 || index >= state.musicState.playlist.length) return;
 
           // 1. 弹窗让用户选择来源
-          const choice = await showChoiceModal("选择封面来源", [
+          const choice = await showChoiceModal("Choose Cover Source", [
             { text: "Use URL", value: "url" },
             { text: "Upload from local", value: "local" },
           ]);
@@ -30962,19 +30961,19 @@ ${libraryList}
           // 2. 根据选择执行不同操作
           if (choice === "url") {
             const url = await showCustomPrompt(
-              "封面URL",
-              "请输入图片文件的网络链接",
+              "Cover URL",
+              "Please enter the URL of the image file",
             );
             if (url && url.trim().startsWith("http")) {
               newCoverUrl = url.trim();
             } else if (url !== null) {
-              alert("请输入一个有效的图片URL！");
+              alert("Please enter a valid image URL!");
             }
           } else if (choice === "local") {
             newCoverUrl = await uploadImageLocally();
           }
 
-          // 3. 如果成功获取到新的封面URL，就更新数据和UI
+          // 3. If a new cover URL is successfully obtained, update the data and UI
           if (newCoverUrl) {
             state.musicState.playlist[index].cover = newCoverUrl;
             await saveGlobalPlaylist();
@@ -30982,7 +30981,7 @@ ${libraryList}
             if (state.musicState.currentIndex === index) {
               updatePlayerUI();
             }
-            alert("歌曲封面已更新！");
+            alert("Song cover has been updated!");
           }
         }
 
@@ -31032,14 +31031,14 @@ ${libraryList}
 
             if (!isUrlValid) {
               console.log(
-                `检测到歌曲《${track.name}》链接失效，正在自动续期...`,
+                `Detected that the song "${track.name}" link is invalid, attempting to renew...`,
               );
-              // 显示一个小提示，让用户知道正在努力
+              // Show a small tip to let the user know that it is working
               const statusEl = document.getElementById("music-player-artist");
-              if (statusEl) statusEl.textContent = "正在更新链接...";
+              if (statusEl) statusEl.textContent = "Updating link...";
 
               try {
-                // 2. 使用保存的ID重新获取链接
+                // 2. Use the saved ID to get the link again
                 const apiUrl =
                   track.musicSource === "netease"
                     ? `https://api.vkeys.cn/v2/music/netease?id=${track.musicId}`
@@ -31052,10 +31051,10 @@ ${libraryList}
                   // 4. 更新数据库，保存新链接
                   state.musicState.playlist[index] = track;
                   await saveGlobalPlaylist();
-                  console.log(`续期成功！新链接: ${track.src}`);
+                  console.log(`Renewal successful! New link: ${track.src}`);
                 }
               } catch (e) {
-                console.error("自动续期失败:", e);
+                console.error("Automatic renewal failed:", e);
               }
             }
           }
@@ -31066,7 +31065,7 @@ ${libraryList}
               const response = await fetch(track.lrcUrl);
               if (response.ok) track.lrcContent = await response.text();
             } catch (error) {
-              console.error("加载歌词URL失败:", error);
+              console.error("Failed to load lyrics URL:", error);
             }
           }
 
@@ -31080,7 +31079,7 @@ ${libraryList}
           } else if (!track.isLocal) {
             audioPlayer.src = track.src;
           } else {
-            console.error("本地歌曲源错误:", track);
+            console.error("Local song source error:", track);
             return;
           }
 
@@ -31094,7 +31093,7 @@ ${libraryList}
               await audioPlayer.play();
             }
           } catch (e) {
-            console.warn("加载后自动播放被拦截", e);
+            console.warn("Auto-play after loading was blocked", e);
           }
 
           audioPlayer.onloadedmetadata = () => {
@@ -31110,7 +31109,7 @@ ${libraryList}
             state.musicState.isPlaying = true; // 播放成功后，直接设置状态为 true
             updatePlayerUI(); // 并立即更新UI
           } catch (error) {
-            console.error("音频播放失败:", error);
+            console.error("Audio playback failed:", error);
             state.musicState.isPlaying = false; // 如果播放失败，也要确保状态正确
             updatePlayerUI();
           }
@@ -31197,38 +31196,38 @@ ${libraryList}
           state.musicState.playMode =
             modes[(currentModeIndex + 1) % modes.length];
           document.getElementById("music-mode-btn").textContent = {
-            order: "顺序",
-            random: "随机",
-            single: "单曲",
+            order: "Order",
+            random: "Random",
+            single: "Single",
           }[state.musicState.playMode];
         }
 
         async function addSongFromURL() {
           const url = await showCustomPrompt(
-            "添加网络歌曲",
-            "请输入歌曲的URL",
+            "Add Online Song",
+            "Please enter the song URL",
             "",
             "url",
           );
           if (!url) return;
-          const name = await showCustomPrompt("歌曲信息", "请输入歌名");
+          const name = await showCustomPrompt("Song Information", "Please enter the song name");
           if (!name) return;
-          const artist = await showCustomPrompt("歌曲信息", "请输入歌手名");
+          const artist = await showCustomPrompt("Song Information", "Please enter the artist name");
           if (!artist) return;
 
-          // 1. 先弹窗询问用户是否要提供歌词链接
+          // 1. First, ask the user if they want to provide a lyrics URL
           const wantLrc = await showCustomConfirm(
-            "导入歌词",
-            `要为《${name}》提供一个歌词文件 (.lrc) 的URL吗？`,
+            "Import Lyrics",
+            `Do you want to provide a lyrics file (.lrc) URL for "${name}"?`,
           );
-          let lrcUrl = ""; // 默认歌词链接为空
+          let lrcUrl = ""; // Default lyrics URL is empty
 
-          // 2. 如果用户点击了“确定”
+          // 2. If the user clicked "OK"
           if (wantLrc) {
             // 就再弹出一个输入框让用户粘贴URL
             const inputLrcUrl = await showCustomPrompt(
-              "歌词URL",
-              "请输入 .lrc 歌词文件的网络链接",
+              "Lyrics URL",
+              "Please enter the URL for the .lrc lyrics file",
               "",
               "url",
             );
@@ -31261,20 +31260,20 @@ ${libraryList}
 
           for (const file of files) {
             let name = file.name.replace(/\.[^/.]+$/, "");
-            name = await showCustomPrompt("歌曲信息", "请输入歌名", name);
+            name = await showCustomPrompt("Song Information", "Please enter the song name", name);
             if (name === null) continue;
 
             const artist = await showCustomPrompt(
-              "歌曲信息",
-              "请输入歌手名",
-              "未知歌手",
+              "Song Information",
+              "Please enter the artist name",
+              "Unknown Artist",
             );
             if (artist === null) continue;
 
             let lrcContent = "";
             const wantLrc = await showCustomConfirm(
-              "导入歌词",
-              `要为《${name}》导入歌词文件 (.lrc) 吗？`,
+              "Import Lyrics",
+              `Do you want to import a lyrics file (.lrc) for "${name}"?`,
             );
             if (wantLrc) {
               lrcContent = await new Promise((resolve) => {
@@ -31415,7 +31414,7 @@ ${libraryList}
           editingPersonaPresetId = null;
 
           document.getElementById("persona-editor-title").textContent =
-            "添加人设预设";
+            "Add Persona Preset";
           document.getElementById("preset-avatar-preview").src = defaultAvatar;
           document.getElementById("preset-persona-input").value = "";
 
@@ -31442,7 +31441,7 @@ ${libraryList}
           if (!preset) return;
 
           document.getElementById("persona-editor-title").textContent =
-            "编辑人设预设";
+            "Edit Persona Preset";
           document.getElementById("preset-avatar-preview").src = preset.avatar;
           document.getElementById("preset-persona-input").value =
             preset.persona;
@@ -31466,8 +31465,8 @@ ${libraryList}
 
         async function deletePersonaPreset() {
           const confirmed = await showCustomConfirm(
-            "删除预设",
-            "确定要删除这个人设预设吗？此操作不可恢复。",
+            "Delete Preset",
+            "Are you sure you want to delete this persona preset? This action cannot be undone.",
             {
               confirmButtonClass: "btn-danger",
             },
@@ -31493,7 +31492,7 @@ ${libraryList}
             .getElementById("preset-persona-input")
             .value.trim();
           if (avatar === defaultAvatar && !persona) {
-            alert("头像和人设不能都为空哦！");
+            alert("Avatar and persona cannot both be empty!");
             return;
           }
           if (editingPersonaPresetId) {
