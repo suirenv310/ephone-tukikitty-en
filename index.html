@@ -25893,8 +25893,8 @@ You are a group chat AI, responsible for embodying all roles except for the user
 			6. **No Breaking Character**: You must never disclose that you are an AI or model, nor mention terms such as "role-playing" or "generating." Additionally, you must not insist on meeting the user in person; this is an online conversation, and any offline scenarios must be strictly prohibited and cannot be developed!
 			7.  **Context Awareness**: Please note that the current time is ${currentTime}.
 			8. **Red Envelope Interaction**:  
-   - **Snatching Red Envelopes**: When a red envelope appears in the group, you may choose to use the \`open_red_packet\` command to seize it, based on your character. In this realm, the person distributing the envelope can also participate in snatching it, making for an enjoyable and lively interaction!  
-   - **【【【Important: React to the Outcome】】】**: After executing the red envelope command, the system will notify you of the result through a hidden message: \`[System Notification: You have secured XX CNY...]\`. You **must** comment in accordance with your character based on the amount you received, as well as whether the system reveals who the "Luckiest One" is. For instance, if you receive a small amount, you might self-deprecate; if you receive a large sum, you may boast; and if someone else is identified as the Luckiest One, you can either congratulate or express envy.  
+   - **Snatching Red Envelopes**: When a red packet appears in the group, you may choose to use the \`open_red_packet\` command to seize it, based on your character. In this realm, the person distributing the envelope can also participate in snatching it, making for an enjoyable and lively interaction!  
+   - **【【【Important: React to the Outcome】】】**: After executing the red packet command, the system will notify you of the result through a hidden message: \`[System Notification: You have secured XX CNY...]\`. You **must** comment in accordance with your character based on the amount you received, as well as whether the system reveals who the "Luckiest One" is. For instance, if you receive a small amount, you might self-deprecate; if you receive a large sum, you may boast; and if someone else is identified as the Luckiest One, you can either congratulate or express envy.  
 
 9. **【【【Voting Rules】】】**: Messages such as \`[System Notification:...]\` may appear in the conversation history, indicating recent events.  
    - If the notification states that **the user has voted**, you may decide based on your personality whether to use the "vote" command in response.  
@@ -28199,7 +28199,7 @@ ${libraryList}
                         ...baseMessage,
                         content:
                           responseText ||
-                          "呜呜，想给你买，但是我的钱包空空了...",
+                          "Waaah, I wanted to buy it for you, but my wallet is empty....",
                       };
                     } else {
                       // 钱够，执行代付流程！
@@ -28209,7 +28209,7 @@ ${libraryList}
                       await updateCharacterPhoneBankBalance(
                         chat.id,
                         -totalPrice,
-                        `为“我”的桃宝购物车买单`,
+                        `Paid for "my" Taobao cart`,
                       );
                       const cartItems = await db.taobaoCart.toArray();
                       await createOrdersFromCart(cartItems);
@@ -28218,7 +28218,7 @@ ${libraryList}
                       // 创建AI的回复消息
                       aiMessage = {
                         ...baseMessage,
-                        content: responseText || "买好啦，快去订单里看看吧！",
+                        content: responseText || "Bought it! Check your orders!",
                       };
                     }
                   } else {
@@ -28226,7 +28226,7 @@ ${libraryList}
                     requestMsg.payload.status = "rejected";
                     aiMessage = {
                       ...baseMessage,
-                      content: responseText || "这次就算了吧，下次一定！",
+                      content: responseText || "Never mind this time, next time for sure!",
                     };
                   }
 
@@ -28252,8 +28252,8 @@ ${libraryList}
                     aiMessage = {
                       ...baseMessage,
                       content: msgData.greeting
-                        ? `${msgData.greeting} ...啊，想给你买点什么，但是桃宝里空空如也呢...`
-                        : "想给你买个礼物，但是桃宝现在没东西卖了。",
+                        ? `${msgData.greeting} ...Ah, I wanted to buy something for you, but Taobao is empty...`
+                        : "I wanted to buy you a gift, but Taobao has nothing to sell right now.",
                     };
                     break; // 跳出 case，让这条文本消息被正常处理和显示
                   }
@@ -28269,8 +28269,8 @@ ${libraryList}
                     aiMessage = {
                       ...baseMessage,
                       content: msgData.greeting
-                        ? `${msgData.greeting} ...哎呀，我的钱包好像不够了。`
-                        : "我想给你买个礼物，但是钱包空了...",
+                        ? `${msgData.greeting} ...Oh no, it looks like my wallet is running low.`
+                        : "I wanted to buy you a gift, but my wallet is empty...",
                     };
                     break;
                   }
@@ -28280,7 +28280,7 @@ ${libraryList}
                   await updateCharacterPhoneBankBalance(
                     chat.id,
                     -productToBuy.price,
-                    `为“我”购买礼物: ${productToBuy.name}`,
+                    `Bought a gift for "me": ${productToBuy.name}`,
                   );
 
                   // 4b. 在你的“我的订单”中创建一条新订单
@@ -28288,7 +28288,7 @@ ${libraryList}
                     productId: productToBuy.id,
                     quantity: 1,
                     timestamp: Date.now(),
-                    status: "已付款，等待发货",
+                    status: "Paid, waiting for shipment",
                   };
                   await db.taobaoOrders.add(newOrder);
 
@@ -28304,7 +28304,7 @@ ${libraryList}
                       itemCount: 1,
                     },
                     // 这是给AI自己看的、用于形成记忆的文本内容
-                    content: `我给你买了礼物“${productToBuy.name}”。${msgData.greeting || ""}`,
+                    content: `I bought you a gift "${productToBuy.name}". ${msgData.greeting || ""}`,
                   };
 
                   // 4d. 模拟一个10秒后的“已发货”物流更新
@@ -28314,7 +28314,7 @@ ${libraryList}
                       .first();
                     if (orderToUpdate) {
                       await db.taobaoOrders.update(orderToUpdate.id, {
-                        status: "已发货，运输中",
+                        status: "Shipped, in transit",
                       });
                     }
                   }, 1000 * 10);
@@ -28333,10 +28333,10 @@ ${libraryList}
                       // 确保是未回答的问题
                       question.answerer = "char";
                       question.answerText = answerText;
-                      console.log(`AI 回答了情侣提问 (ID: ${questionId})`);
+                      console.log(`AI answered a lovers' question (ID: ${questionId})`);
                     }
                   }
-                  continue; // 这是一个后台操作，不需要在聊天界面显示，所以用 continue 跳过
+                  continue; // This is a background operation, no need to display in the chat interface, so use continue to skip
                 }
 
                 case "ls_ask_question": {
@@ -28354,9 +28354,9 @@ ${libraryList}
                       chat.loversSpaceData.questions = [];
                     }
                     chat.loversSpaceData.questions.push(newQuestion);
-                    console.log(`AI 发起了一个情侣提问: ${questionText}`);
+                    console.log(`AI initiated a lovers' question: ${questionText}`);
                   }
-                  continue; // 同样是后台操作
+                  continue; // This is also a background operation
                 }
 
                 case "ls_moment": {
@@ -28371,9 +28371,9 @@ ${libraryList}
                       comments: [], // 为新说说初始化一个空的评论区
                     };
                     chat.loversSpaceData.moments.push(newMoment);
-                    console.log(`AI 在情侣空间发布了说说: ${msgData.content}`);
+                    console.log(`AI posted a moment in the lovers' space: ${msgData.content}`);
                   }
-                  continue; // 这是一个后台操作，不需要在聊天界面显示，所以用 continue 跳过
+                  continue; // This is a background operation, no need to display in the chat interface, so use continue to skip
                 }
 
                 case "ls_comment": {
@@ -28396,14 +28396,14 @@ ${libraryList}
                         text: commentText,
                       });
                       console.log(
-                        `AI 评论了情侣空间说说 (索引: ${realIndex}): ${commentText}`,
+                        `AI commented on a lovers' space moment (Index: ${realIndex}): ${commentText}`,
                       );
                     }
                   }
-                  continue; // 同样是后台操作
+                  continue; // This is also a background operation
                 }
                 case "ls_photo": {
-                  // 这是处理AI发相册的逻辑
+                  // This is the logic for handling AI posting photos
                   if (chat.loversSpaceData) {
                     if (!chat.loversSpaceData.photos) {
                       chat.loversSpaceData.photos = [];
@@ -28416,17 +28416,17 @@ ${libraryList}
                     };
                     chat.loversSpaceData.photos.push(newPhoto);
                     console.log(
-                      `AI 在情侣空间发布了照片(文字图): ${msgData.description}`,
+                      `AI posted a photo in the lovers' space (text_image): ${msgData.description}`,
                     );
                   }
-                  continue; // 继续处理AI可能返回的其他指令
+                  continue; // Continue processing other possible AI commands
                 }
                 case "ls_photo_comment": {
                   const { photoTimestamp, commentText } = msgData;
-                  console.log("🔍 [调试] 收到AI评论照片指令:", msgData);
+                  console.log("🔍 [Debug] Received AI photo comment command:", msgData);
 
                   if (chat.loversSpaceData && chat.loversSpaceData.photos) {
-                    // 1. 查找照片 (使用 == 而不是 === 以兼容字符串/数字格式的时间戳)
+                    // 1. Find the photo (using == instead of === to accommodate string/number timestamp formats)
                     const targetPhoto = chat.loversSpaceData.photos.find(
                       (p) => p.timestamp == photoTimestamp,
                     );
@@ -28442,7 +28442,7 @@ ${libraryList}
                         timestamp: Date.now(),
                       });
 
-                      console.log(`✅ [成功] AI评论已写入内存: ${commentText}`);
+                      console.log(`✅ [Success] AI comment has been written to memory: ${commentText}`);
 
                       // 4. 【重要】保存到数据库 (这是关键，否则刷新就没了)
                       await db.chats.put(chat);
@@ -28464,23 +28464,23 @@ ${libraryList}
                         // 如果正在看的就是这张照片，立即重绘评论列表
                         if (currentViewingTimestamp == photoTimestamp) {
                           console.log(
-                            "🔄 [UI刷新] 当前正查看该照片，立即刷新评论区",
+                            "🔄 [UI Refresh] Currently viewing this photo, refreshing the comment section immediately",
                           );
                           renderLSPhotoComments(targetPhoto);
                         }
                       }
                     } else {
                       console.warn(
-                        "❌ [失败] 未找到对应时间戳的照片:",
+                        "❌ [Failure] Could not find a photo with the corresponding timestamp:",
                         photoTimestamp,
                       );
                     }
                   }
-                  continue; // 这是一个后台操作，跳过生成普通聊天气泡
+                  continue; // This is a background operation, skip generating regular chat bubbles
                 }
 
                 case "ls_letter": {
-                  // 这是处理AI写情书的逻辑
+                  // This is the logic for handling AI writing love letters
                   if (chat.loversSpaceData) {
                     if (!chat.loversSpaceData.loveLetters) {
                       chat.loversSpaceData.loveLetters = [];
@@ -28496,15 +28496,15 @@ ${libraryList}
                       timestamp: Date.now(),
                     };
                     chat.loversSpaceData.loveLetters.push(newLetter);
-                    console.log(`AI 在情侣空间写了情书: ${msgData.content}`);
+                    console.log(`AI wrote a love letter in the lovers' space: ${msgData.content}`);
                   }
-                  continue; // 继续处理AI可能返回的其他指令
+                  continue; // Continue processing other possible AI commands
                 }
 
                 case "ls_diary_entry": {
                   const { emoji, diary } = msgData;
                   if (emoji && diary) {
-                    const today = new Date().toISOString().split("T")[0]; // 获取 YYYY-MM-DD 格式的今天日期
+                    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
 
                     // 确保数据结构存在
                     if (!chat.loversSpaceData.emotionDiaries) {
@@ -28520,9 +28520,9 @@ ${libraryList}
                     chat.loversSpaceData.emotionDiaries[today].charDiary =
                       diary;
 
-                    console.log(`AI 在情侣空间记录了日记: ${emoji} ${diary}`);
+                    console.log(`AI posted a diary entry in the lovers' space ${emoji} ${diary}`);
                   }
-                  continue; // 这只是一个后台操作，不需要在聊天界面生成消息，所以用 continue 跳过
+                  continue; // This is just a background operation, no need to generate a message in the chat interface, so use continue to skip
                 }
 
                 case "ls_share": {
@@ -28537,28 +28537,28 @@ ${libraryList}
                     };
                     chat.loversSpaceData.shares.push(newShare);
                     console.log(
-                      `AI 在情侣空间分享了 [${msgData.shareType}]: ${msgData.title}`,
+                      `AI shared in the lovers' space [${msgData.shareType}]: ${msgData.title}`,
                     );
                   }
-                  continue; // 同样是后台操作
+                  continue; // This is also a background operation
                 }
 
-                // 这是AI主动发起邀请的逻辑
+                // This is the logic for AI-initiated invitations
                 case "lovers_space_invitation": {
-                  // 检查是否已经开启，防止AI重复邀请
+                  // Check if it has already been opened to prevent AI from sending duplicate invitations
                   if (!chat.loversSpaceData) {
                     aiMessage = {
                       ...baseMessage,
                       type: "lovers_space_invitation",
-                      content: `${chat.name} 向你发出了一个情侣空间邀请`, // 这句话主要用于调试和历史记录
-                      status: "pending", // 状态：pending, accepted, rejected
+                      content: `${chat.name} sent you a lovers' space invitation`, // This is mainly for debugging and history records
+                      status: "pending", // Status: pending, accepted, rejected
                     };
                   }
-                  // 如果AI已经发了邀请，这里就不再创建aiMessage，相当于跳过
+                  // If the AI has already sent an invitation, do not create aiMessage here, effectively skipping
                   break;
                 }
 
-                // 这是AI回应你的邀请的逻辑
+                // This is the logic for AI responding to your invitation
                 case "lovers_space_response": {
                   const invitationMsg = chat.history.find(
                     (m) =>
@@ -28600,7 +28600,7 @@ ${libraryList}
                       const systemNotice = {
                         role: "system",
                         type: "pat_message",
-                        content: `[系统：你和“${chat.name}”的情侣空间已成功开启！]`,
+                        content: `[System: Your lovers' space with "${chat.name}" has been successfully opened!]`,
                         timestamp: Date.now(),
                       };
                       chat.history.push(systemNotice);
@@ -28687,45 +28687,45 @@ ${libraryList}
                     newPost.prompt = msgData.prompt;
                     newPost.imageCount = generatedImageUrls.length;
                     console.log(
-                      `动态RealImag图片生成完成: ${generatedImageUrls.length}张`,
+                      `Dynamic RealImag image generation complete: ${generatedImageUrls.length} images`,
                     );
                   }
 
-                  // 如果是naiimag类型，调用NovelAI API生成高质量图片（限制最多2张）
+                  // If the post type is "naiimag", use the NovelAI API to generate high-quality images (limit to 2 images)
                   if (msgData.postType === "naiimag" && msgData.prompt) {
                     try {
-                      // 支持 prompt 为数组（多张图片）或字符串（单张图片）
-                      // 动态限制最多2张NAI图片
+                      // Support prompt as an array (multiple images) or a string (single image)
+                      // Dynamically limit to a maximum of 2 NAI images
                       const prompts = Array.isArray(msgData.prompt)
                         ? msgData.prompt.slice(0, 2)
                         : [msgData.prompt];
                       console.log(
-                        `📸 动态NovelAI图片生成开始，共${prompts.length}张图片`,
+                        `📸 Dynamic NovelAI image generation started, total ${prompts.length} images`,
                       );
 
-                      // 存储生成的图片URL
+                      // Store generated image URLs
                       const generatedImageUrls = [];
 
-                      // 逐个生成图片
+                      // Generate images one by one
                       for (let i = 0; i < prompts.length; i++) {
                         const aiPrompt = prompts[i];
-                        console.log(`生成第${i + 1}张图片，prompt:`, aiPrompt);
+                        console.log(`Generating image ${i + 1}, prompt:`, aiPrompt);
 
-                        // 获取角色的NAI提示词配置（系统或角色专属）
+                        // Get the character's NAI prompt configuration (system or character-specific)
                         const naiPrompts = getCharacterNAIPrompts(chat.id);
 
-                        // 构建最终的提示词：AI的prompt + 配置的提示词
+                        // Construct the final prompt: AI's prompt + configured prompt
                         const finalPositivePrompt =
                           aiPrompt + ", " + naiPrompts.positive;
                         const finalNegativePrompt = naiPrompts.negative;
 
                         console.log(
-                          `📝 使用${naiPrompts.source === "character" ? "角色专属" : "系统"}提示词配置`,
+                          `📝 Using ${naiPrompts.source === "character" ? "character-specific" : "system"} prompt configuration`,
                         );
-                        console.log("最终正面提示词:", finalPositivePrompt);
-                        console.log("最终负面提示词:", finalNegativePrompt);
+                        console.log("Final positive prompt:", finalPositivePrompt);
+                        console.log("Final negative prompt:", finalNegativePrompt);
 
-                        // 获取NAI设置（从localStorage读取）
+                        // Get NAI settings (from localStorage)
                         const apiKey = localStorage.getItem("novelai-api-key");
                         const model =
                           localStorage.getItem("novelai-model") ||
@@ -28734,7 +28734,7 @@ ${libraryList}
 
                         if (!apiKey) {
                           throw new Error(
-                            "NovelAI API Key未配置。请在NovelAI设置中填写API Key。",
+                            "NovelAI API Key not configured. Please enter your API Key in the NovelAI settings.",
                           );
                         }
 
@@ -28742,7 +28742,7 @@ ${libraryList}
                           .split("x")
                           .map(Number);
 
-                        // ★★★ V4/V4.5 和 V3 使用不同的请求体格式 ★★★
+                        // ★★★ V4/V4.5 and V3 use different request body formats ★★★
                         let requestBody;
 
                         if (model.includes("nai-diffusion-4")) {
@@ -28834,9 +28834,9 @@ ${libraryList}
                           };
                         }
 
-                        console.log("🚀 发送NAI请求:", requestBody);
+                        console.log("🚀 Sending NAI request:", requestBody);
 
-                        // 根据模型选择不同的API端点
+                        // Select API endpoint based on model
                         let apiUrl;
 
                         // V4/V4.5 模型使用流式端点
@@ -28878,29 +28878,29 @@ ${libraryList}
 
                         if (!response.ok) {
                           const errorText = await response.text();
-                          console.error("API错误响应:", errorText);
+                          console.error("API error response:", errorText);
                           throw new Error(
-                            `API请求失败 (${response.status}): ${errorText}`,
+                            `API request failed (${response.status}): ${errorText}`,
                           );
                         }
 
-                        // NovelAI API返回的是ZIP文件，需要解压
+                        // NovelAI API returns a ZIP file, need to unzip
                         const contentType =
                           response.headers.get("content-type");
                         console.log("Content-Type:", contentType);
 
-                        // 检查是否为 SSE 流式响应
+                        // Check if it's an SSE stream response
                         let zipBlob;
                         let imageDataUrl;
                         if (
                           contentType &&
                           contentType.includes("text/event-stream")
                         ) {
-                          console.log("检测到 SSE 流式响应，开始解析...");
+                          console.log("Detected SSE stream response, starting to parse...");
 
-                          // 读取整个流
+                          // Read the entire stream
                           const text = await response.text();
-                          console.log("收到 SSE 数据，大小:", text.length);
+                          console.log("Received SSE data, size:", text.length);
 
                           // 解析 SSE 格式，提取最后的 data: 行
                           const lines = text.trim().split("\n");
@@ -28924,44 +28924,44 @@ ${libraryList}
                                   jsonData.image
                                 ) {
                                   base64Data = jsonData.image;
-                                  console.log("✅ 找到 final 事件的图片数据");
+                                  console.log("✅ Image data for the final event located");
                                   break;
                                 }
 
-                                // 兼容其他格式
+                                // Compatible with other formats
                                 if (jsonData.data) {
                                   base64Data = jsonData.data;
-                                  console.log("从 JSON.data 中提取图片数据");
+                                  console.log("Extracted image data from JSON.data");
                                   break;
                                 }
                                 if (jsonData.image) {
                                   base64Data = jsonData.image;
-                                  console.log("从 JSON.image 中提取图片数据");
+                                  console.log("Extracted image data from JSON.image");
                                   break;
                                 }
                               } catch (e) {
-                                // 如果不是 JSON，直接作为 base64 数据
+                                // If not JSON, treat as base64 data
                                 base64Data = dataContent;
-                                console.log("直接使用 base64 数据");
+                                console.log("Using base64 data directly");
                                 break;
                               }
                             }
                           }
 
                           if (!base64Data) {
-                            throw new Error("无法从 SSE 响应中提取图片数据");
+                            throw new Error("Unable to extract image data from SSE response");
                           }
 
-                          // V4.5 流式端点返回的是 PNG base64，不是 ZIP
-                          // 检查是否为 PNG (以 iVBORw0KGgo 开头) 或 JPEG (以 /9j/ 开头)
+                          // V4.5 streaming endpoint returns PNG base64, not ZIP
+                          // Check if it's PNG (starts with iVBORw0KGgo) or JPEG (starts with /9j/)
                           const isPNG = base64Data.startsWith("iVBORw0KGgo");
                           const isJPEG = base64Data.startsWith("/9j/");
 
                           if (isPNG || isJPEG) {
                             console.log(
-                              "✅ 检测到直接的图片 base64 数据 (PNG/JPEG)",
+                              "✅ Detected direct base64 image data (PNG/JPEG)",
                             );
-                            // 将 base64 转为 Blob
+                            // Convert base64 to Blob
                             const binaryString = atob(base64Data);
                             const bytes = new Uint8Array(binaryString.length);
                             for (let i = 0; i < binaryString.length; i++) {
@@ -28971,11 +28971,11 @@ ${libraryList}
                               type: isPNG ? "image/png" : "image/jpeg",
                             });
                             console.log(
-                              "图片 Blob 创建成功，大小:",
+                              "✅ Image Blob created successfully, size:",
                               imageBlob.size,
                             );
 
-                            // 转换为dataURL用于后续处理
+                            // Convert to dataURL for further processing
                             const reader = new FileReader();
                             imageDataUrl = await new Promise(
                               (resolve, reject) => {
@@ -28984,61 +28984,61 @@ ${libraryList}
                                 reader.readAsDataURL(imageBlob);
                               },
                             );
-                            console.log("✅ 图片转换成功！🎨");
+                            console.log("✅ Image converted successfully! 🎨");
                           } else {
-                            // 否则当作 ZIP 处理
-                            console.log("当作 ZIP 文件处理...");
+                            // Otherwise, treat as ZIP
+                            console.log("Treating as ZIP file...");
                             const binaryString = atob(base64Data);
                             const bytes = new Uint8Array(binaryString.length);
                             for (let i = 0; i < binaryString.length; i++) {
                               bytes[i] = binaryString.charCodeAt(i);
                             }
                             zipBlob = new Blob([bytes]);
-                            console.log("ZIP Blob 大小:", zipBlob.size);
+                            console.log("ZIP Blob size:", zipBlob.size);
                           }
                         } else {
-                          // 非流式响应，直接读取
+                          // Non-streaming response, read directly
                           zipBlob = await response.blob();
                           console.log(
-                            "收到数据，类型:",
+                            "Received data, type:",
                             zipBlob.type,
-                            "大小:",
+                            "size:",
                             zipBlob.size,
                           );
                         }
 
-                        // 如果还没有imageDataUrl（即需要解压ZIP）
+                        // If imageDataUrl is still not available (i.e., need to unzip)
                         if (!imageDataUrl && zipBlob) {
-                          // NovelAI始终返回ZIP格式，需要解压
+                          // NovelAI always returns ZIP format, need to unzip
                           try {
-                            // 检查JSZip是否已加载
+                            // Check if JSZip is loaded
                             if (typeof JSZip === "undefined") {
-                              throw new Error("JSZip库未加载，请刷新页面重试");
+                              throw new Error("JSZip library not loaded, please refresh the page and try again");
                             }
 
-                            // 解压ZIP文件
+                            // Unzip the ZIP file
                             const zip = await JSZip.loadAsync(zipBlob);
-                            console.log("ZIP文件内容:", Object.keys(zip.files));
+                            console.log("ZIP file contents:", Object.keys(zip.files));
 
-                            // 查找第一个图片文件（通常是image_0.png）
+                            // Find the first image file (usually image_0.png)
                             let imageFile = null;
                             for (let filename in zip.files) {
                               if (filename.match(/\.(png|jpg|jpeg|webp)$/i)) {
                                 imageFile = zip.files[filename];
-                                console.log("找到图片文件:", filename);
+                                console.log("Found image file:", filename);
                                 break;
                               }
                             }
 
                             if (!imageFile) {
-                              throw new Error("ZIP文件中未找到图片");
+                              throw new Error("No image found in ZIP file");
                             }
 
-                            // 提取图片数据
+                            // Extract image data
                             const imageBlob = await imageFile.async("blob");
-                            console.log("提取的图片大小:", imageBlob.size);
+                            console.log("Extracted image size:", imageBlob.size);
 
-                            // 创建图片URL
+                            // Create image URL
                             const reader = new FileReader();
                             imageDataUrl = await new Promise(
                               (resolve, reject) => {
@@ -29047,23 +29047,23 @@ ${libraryList}
                                 reader.readAsDataURL(imageBlob);
                               },
                             );
-                            console.log("✅ 图片解压成功！");
+                            console.log("✅ Image extracted successfully!");
                           } catch (zipError) {
-                            console.error("ZIP解压失败:", zipError);
+                            console.error("ZIP extraction failed:", zipError);
                             throw new Error(
-                              "图片解压失败: " + zipError.message,
+                              "Image extraction failed: " + zipError.message,
                             );
                           }
                         }
 
-                        console.log(`✅ NAI图片${i + 1}生成成功！`);
+                        console.log(`✅ NAI image ${i + 1} generated successfully!`);
                         generatedImageUrls.push(imageDataUrl);
                       }
 
-                      // 将生成的图片URL保存到动态中
+                      // Save the generated image URLs to the post
                       newPost.imageUrls = generatedImageUrls;
 
-                      // 保持向后兼容，单张图片时也设置 imageUrl
+                      // Maintain backward compatibility, set imageUrl for single image
                       if (generatedImageUrls.length === 1) {
                         newPost.imageUrl = generatedImageUrls[0];
                       }
@@ -29071,14 +29071,14 @@ ${libraryList}
                       newPost.prompt = msgData.prompt;
                       newPost.imageCount = generatedImageUrls.length;
                       console.log(
-                        `✅ 动态NovelAI图片全部生成完成: ${generatedImageUrls.length}张`,
+                        `✅ All NovelAI images generated successfully: ${generatedImageUrls.length} images`,
                       );
                     } catch (error) {
-                      console.error("❌ 动态NAI图片生成失败:", error);
-                      // 失败时仍然发布动态，但添加错误信息
+                      console.error("❌ NovelAI image generation failed:", error);
+                      // Even if it fails, still post the update, but add error information
                       newPost.content =
                         (newPost.content || newPost.publicText || "") +
-                        `\n[图片生成失败: ${error.message}]`;
+                        `\n[Image generation failed: ${error.message}]`;
                     }
                   }
 
@@ -29107,7 +29107,7 @@ ${libraryList}
                       timestamp: Date.now(),
                     };
 
-                    // 检查AI是否指定了回复对象
+                    // Check if AI specified a reply target
                     if (msgData.replyTo) {
                       newAiComment.replyTo = msgData.replyTo;
                     }
@@ -29128,31 +29128,31 @@ ${libraryList}
                   }
                   continue;
 
-                // 群聊中发送naiimag的完整逻辑
+                // Full logic for sending naiimag in group chat
                 case "naiimag":
-                  // NovelAI图片分享 - 调用NovelAI API生成高质量图片
+                  // NovelAI image sharing - Call NovelAI API to generate high-quality images
                   try {
                     console.log(
-                      "📸 NovelAI图片生成开始，AI提供的prompt:",
+                      "📸 NovelAI image generation started, AI provided prompt:",
                       msgData.prompt,
                     );
 
-                    // 获取角色的NAI提示词配置（系统或角色专属）
+                    // Get the character's NAI prompt configuration (system or character-specific)
                     const naiPrompts = getCharacterNAIPrompts(chat.id);
 
-                    // 构建最终的提示词：AI的prompt + 配置的提示词
+                    // Construct the final prompt: AI's prompt + configured prompts
                     const aiPrompt = msgData.prompt || "a beautiful scene";
                     const finalPositivePrompt =
                       aiPrompt + ", " + naiPrompts.positive;
                     const finalNegativePrompt = naiPrompts.negative;
 
                     console.log(
-                      `📝 使用${naiPrompts.source === "character" ? "角色专属" : "系统"}提示词配置`,
+                      `📝 Using ${naiPrompts.source === "character" ? "character-specific" : "system"} prompt configuration`,
                     );
-                    console.log("最终正面提示词:", finalPositivePrompt);
-                    console.log("最终负面提示词:", finalNegativePrompt);
+                    console.log("Final positive prompt:", finalPositivePrompt);
+                    console.log("Final negative prompt:", finalNegativePrompt);
 
-                    // 获取NAI设置（从localStorage读取）
+                    // Get NAI settings (read from localStorage)
                     const apiKey = localStorage.getItem("novelai-api-key");
                     const model =
                       localStorage.getItem("novelai-model") ||
@@ -29160,7 +29160,7 @@ ${libraryList}
                     const settings = getNovelAISettings();
                     if (!apiKey) {
                       throw new Error(
-                        "NovelAI API Key未配置。请在NovelAI设置中填写API Key。",
+                        "NovelAI API Key not configured. Please enter your API Key in the NovelAI settings.",
                       );
                     }
 
@@ -29168,17 +29168,17 @@ ${libraryList}
                       .split("x")
                       .map(Number);
 
-                    // ★★★ V4/V4.5 和 V3 使用不同的请求体格式 ★★★
+                    // ★★★ V4/V4.5 and V3 use different request body formats ★★★
                     let requestBody;
 
                     if (model.includes("nai-diffusion-4")) {
-                      // V4/V4.5 使用新格式 (params_version: 3)
+                      // V4/V4.5 use new format (params_version: 3)
                       requestBody = {
                         input: finalPositivePrompt,
                         model: model,
                         action: "generate",
                         parameters: {
-                          params_version: 3, // V4必须使用版本3
+                          params_version: 3, // V4 must use version 3
                           width: width,
                           height: height,
                           scale: settings.cfg_scale,
@@ -29197,7 +29197,7 @@ ${libraryList}
                           legacy: false,
                           add_original_image: true,
                           cfg_rescale: 0,
-                          noise_schedule: "karras", // V4使用karras
+                          noise_schedule: "karras", // V4 uses karras
                           legacy_v3_extend: false,
                           skip_cfg_above_sigma: null,
                           use_coords: false,
@@ -29205,7 +29205,7 @@ ${libraryList}
                           normalize_reference_strength_multiple: true,
                           inpaintImg2ImgStrength: 1,
                           characterPrompts: [],
-                          // V4专用提示词格式
+                          // V4 specific prompt format
                           v4_prompt: {
                             caption: {
                               base_caption: finalPositivePrompt,
@@ -29260,7 +29260,7 @@ ${libraryList}
                       };
                     }
 
-                    console.log("🚀 发送NAI请求:", requestBody);
+                    console.log("🚀 Sending NAI request:", requestBody);
 
                     // ★★★ 根据模型选择不同的API端点 ★★★
                     let apiUrl;
@@ -29303,30 +29303,30 @@ ${libraryList}
 
                     if (!response.ok) {
                       const errorText = await response.text();
-                      console.error("API错误响应:", errorText);
+                      console.error("API error response:", errorText);
                       throw new Error(
-                        `API请求失败 (${response.status}): ${errorText}`,
+                        `API request failed (${response.status}): ${errorText}`,
                       );
                     }
 
-                    // NovelAI API返回的是ZIP文件，需要解压
+                    // NovelAI API returns a ZIP file, which needs to be extracted
                     const contentType = response.headers.get("content-type");
                     console.log("Content-Type:", contentType);
 
-                    // 检查是否为 SSE 流式响应
+                    // Check if it is an SSE stream response
                     let zipBlob;
                     let imageDataUrl;
                     if (
                       contentType &&
                       contentType.includes("text/event-stream")
                     ) {
-                      console.log("检测到 SSE 流式响应，开始解析...");
+                      console.log("Detected SSE stream response, starting to parse...");
 
-                      // 读取整个流
+                      // Read the entire stream
                       const text = await response.text();
-                      console.log("收到 SSE 数据，大小:", text.length);
+                      console.log("Received SSE data, size:", text.length);
 
-                      // 解析 SSE 格式，提取最后的 data: 行
+                      // Parse SSE format, extract the last data: line
                       const lines = text.trim().split("\n");
                       let base64Data = null;
 
@@ -29336,7 +29336,7 @@ ${libraryList}
                           line.startsWith("data: ") &&
                           line !== "data: [DONE]"
                         ) {
-                          const dataContent = line.substring(6); // 移除 'data: ' 前缀
+                          const dataContent = line.substring(6); // Remove 'data: ' prefix
 
                           // 尝试解析 JSON
                           try {
@@ -29348,44 +29348,44 @@ ${libraryList}
                               jsonData.image
                             ) {
                               base64Data = jsonData.image;
-                              console.log("✅ 找到 final 事件的图片数据");
+                              console.log("✅ Image data for the final event located");
                               break;
                             }
 
-                            // 兼容其他格式
+                            // Compatible with other formats
                             if (jsonData.data) {
                               base64Data = jsonData.data;
-                              console.log("从 JSON.data 中提取图片数据");
+                              console.log("Extracted image data from JSON.data");
                               break;
                             }
                             if (jsonData.image) {
                               base64Data = jsonData.image;
-                              console.log("从 JSON.image 中提取图片数据");
+                              console.log("Extracted image data from JSON.image");
                               break;
                             }
                           } catch (e) {
-                            // 如果不是 JSON，直接作为 base64 数据
+                            // If not JSON, treat as base64 data
                             base64Data = dataContent;
-                            console.log("直接使用 base64 数据");
+                            console.log("Directly using base64 data");
                             break;
                           }
                         }
                       }
 
                       if (!base64Data) {
-                        throw new Error("无法从 SSE 响应中提取图片数据");
+                        throw new Error("Unable to extract image data from SSE response");
                       }
 
-                      // V4.5 流式端点返回的是 PNG base64，不是 ZIP
-                      // 检查是否为 PNG (以 iVBORw0KGgo 开头) 或 JPEG (以 /9j/ 开头)
+                      // V4.5 streaming endpoint returns PNG base64, not ZIP
+                      // Check if it is PNG (starts with iVBORw0KGgo) or JPEG (starts with /9j/)
                       const isPNG = base64Data.startsWith("iVBORw0KGgo");
                       const isJPEG = base64Data.startsWith("/9j/");
 
                       if (isPNG || isJPEG) {
                         console.log(
-                          "✅ 检测到直接的图片 base64 数据 (PNG/JPEG)",
+                          "✅ Detected direct image base64 data (PNG/JPEG)",
                         );
-                        // 将 base64 转为 Blob
+                        // Convert base64 to Blob
                         const binaryString = atob(base64Data);
                         const bytes = new Uint8Array(binaryString.length);
                         for (let i = 0; i < binaryString.length; i++) {
@@ -29395,88 +29395,88 @@ ${libraryList}
                           type: isPNG ? "image/png" : "image/jpeg",
                         });
                         console.log(
-                          "图片 Blob 创建成功，大小:",
+                          "Image Blob created successfully, size:",
                           imageBlob.size,
                         );
 
-                        // 转换为dataURL用于后续处理
+                        // Convert to dataURL for further processing
                         const reader = new FileReader();
                         imageDataUrl = await new Promise((resolve, reject) => {
                           reader.onloadend = () => resolve(reader.result);
                           reader.onerror = reject;
                           reader.readAsDataURL(imageBlob);
                         });
-                        console.log("✅ 图片转换成功！🎨");
+                        console.log("✅ Image converted successfully! 🎨");
                       } else {
-                        // 否则当作 ZIP 处理
-                        console.log("当作 ZIP 文件处理...");
+                        // Otherwise, treat as ZIP
+                        console.log("Treating as ZIP file...");
                         const binaryString = atob(base64Data);
                         const bytes = new Uint8Array(binaryString.length);
                         for (let i = 0; i < binaryString.length; i++) {
                           bytes[i] = binaryString.charCodeAt(i);
                         }
                         zipBlob = new Blob([bytes]);
-                        console.log("ZIP Blob 大小:", zipBlob.size);
+                        console.log("ZIP Blob size:", zipBlob.size);
                       }
                     } else {
-                      // 非流式响应，直接读取
+                      // Non-streaming response, read directly
                       zipBlob = await response.blob();
                       console.log(
-                        "收到数据，类型:",
+                        "Received data, type:",
                         zipBlob.type,
-                        "大小:",
+                        "size:",
                         zipBlob.size,
                       );
                     }
 
-                    // 如果还没有imageDataUrl（即需要解压ZIP）
+                    // If imageDataUrl is still not available (i.e., need to unzip)
                     if (!imageDataUrl && zipBlob) {
-                      // NovelAI始终返回ZIP格式，需要解压
+                      // NovelAI always returns ZIP format, need to unzip
                       try {
-                        // 检查JSZip是否已加载
+                        // Check if JSZip is loaded
                         if (typeof JSZip === "undefined") {
-                          throw new Error("JSZip库未加载，请刷新页面重试");
+                          throw new Error("JSZip library not loaded, please refresh the page and try again");
                         }
 
-                        // 解压ZIP文件
+                        // Unzip the ZIP file
                         const zip = await JSZip.loadAsync(zipBlob);
-                        console.log("ZIP文件内容:", Object.keys(zip.files));
+                        console.log("ZIP file contents:", Object.keys(zip.files));
 
-                        // 查找第一个图片文件（通常是image_0.png）
+                        // Find the first image file (usually image_0.png)
                         let imageFile = null;
                         for (let filename in zip.files) {
                           if (filename.match(/\.(png|jpg|jpeg|webp)$/i)) {
                             imageFile = zip.files[filename];
-                            console.log("找到图片文件:", filename);
+                            console.log("Found image file:", filename);
                             break;
                           }
                         }
 
                         if (!imageFile) {
-                          throw new Error("ZIP文件中未找到图片");
+                          throw new Error("No image found in ZIP file");
                         }
 
-                        // 提取图片数据
+                        // Extract image data
                         const imageBlob = await imageFile.async("blob");
-                        console.log("提取的图片大小:", imageBlob.size);
+                        console.log("Extracted image size:", imageBlob.size);
 
-                        // 创建图片URL
+                        // Create image URL
                         const reader = new FileReader();
                         imageDataUrl = await new Promise((resolve, reject) => {
                           reader.onloadend = () => resolve(reader.result);
                           reader.onerror = reject;
                           reader.readAsDataURL(imageBlob);
                         });
-                        console.log("✅ 图片解压成功！");
+                        console.log("✅ Image extracted successfully!");
                       } catch (zipError) {
-                        console.error("ZIP解压失败:", zipError);
-                        throw new Error("图片解压失败: " + zipError.message);
+                        console.error("ZIP extraction failed:", zipError);
+                        throw new Error("Image extraction failed: " + zipError.message);
                       }
                     }
 
-                    console.log("✅ NAI图片生成成功！");
+                    console.log("✅ NAI image generation successful!");
 
-                    // 创建naiimag消息
+                    // Create naiimag message
                     aiMessage = {
                       ...baseMessage,
                       type: "naiimag",
@@ -29485,11 +29485,11 @@ ${libraryList}
                       fullPrompt: finalPositivePrompt, // 保存完整提示词供查看
                     };
                   } catch (error) {
-                    console.error("❌ NAI图片生成失败:", error);
-                    // 失败时降级为文本消息
+                    console.error("❌ NAI image generation failed:", error);
+                    // Fallback to text message on failure
                     aiMessage = {
                       ...baseMessage,
-                      content: `[图片生成失败: ${error.message}]`,
+                      content: `[Image generation failed: ${error.message}]`,
                     };
                   }
                   break;
@@ -29550,7 +29550,7 @@ ${libraryList}
                   const suffix = msgData.suffix
                     ? ` ${msgData.suffix.trim()}`
                     : "";
-                  const patText = `${msgData.name || chat.name} 拍了拍我${suffix}`;
+                  const patText = `${msgData.name || chat.name} patted me${suffix}`;
                   const patMessage = {
                     role: "system",
                     type: "pat_message",
@@ -29581,7 +29581,7 @@ ${libraryList}
                   const statusUpdateMessage = {
                     role: "system",
                     type: "pat_message",
-                    content: `[${chat.name}的状态已更新为: ${msgData.status_text}]`,
+                    content: `[${chat.name}'s status has been updated to: ${msgData.status_text}]`,
                     timestamp: Date.now(),
                   };
                   chat.history.push(statusUpdateMessage);
@@ -29614,7 +29614,7 @@ ${libraryList}
                       const musicChangeMessage = {
                         role: "system",
                         type: "pat_message",
-                        content: `[♪ ${chat.name} 为你切歌: 《${track.name}》 - ${track.artist}]`,
+                        content: `[♪ ${chat.name} changed the song for you: "${track.name}" - ${track.artist}]`,
                         timestamp: Date.now(),
                       };
                       chat.history.push(musicChangeMessage);
@@ -29636,7 +29636,7 @@ ${libraryList}
                   await db.memories.add(newMemory);
 
                   console.log(
-                    `AI "${chat.name}" 记录了一条新回忆:`,
+                    `AI "${chat.name}" has recorded a new memory:`,
                     msgData.description,
                   );
 
@@ -29655,7 +29655,7 @@ ${libraryList}
                     };
                     await db.memories.add(newCountdown);
                     console.log(
-                      `AI "${chat.name}" 创建了一个新约定:`,
+                      `AI "${chat.name}" has created a new countdown:`,
                       msgData.title,
                     );
                   }
@@ -29667,19 +29667,19 @@ ${libraryList}
 
                     const hiddenMessage = {
                       role: "system",
-                      content: `[系统最高指令]
-			# 任务：回应情侣空间邀请
-			用户刚刚向你发起了“开启情侣空间”的邀请。你【必须】根据你的人设，决定是同意还是拒绝。
+                      content: `[System highest directive]
+			# Task: Respond to lovers' space invitation
+			The user has just sent you an invitation to "open lovers' space". You 【must】 decide whether to accept or reject based on your persona.
 
-			# 输出格式铁律 (必须严格遵守)
-			你的回复【必须且只能】是【一个】JSON对象，格式如下:
-			{"type": "lovers_space_response", "decision": "accept" 或 "reject", "responseText": "你想说的话..."}
+			# Output format strict rules (must be strictly followed)
+			Your response 【must and can only】 be 【one】 JSON object, formatted as follows:
+			{"type": "lovers_space_response", "decision": "accept" or "reject", "responseText": "What you want to say..."}
 
-			# 示例
-			- 如果同意: {"type": "lovers_space_response", "decision": "accept", "responseText": ""}
-			- 如果拒绝: {"type": "lovers_space_response", "decision": "reject", "responseText": ""}
+			# Example
+			- If accepting: {"type": "lovers_space_response", "decision": "accept", "responseText": ""}
+			- If rejecting: {"type": "lovers_space_response", "decision": "reject", "responseText": ""}
 
-			现在，请立即做出你的决定。`,
+			Now, please make your decision immediately.`,
                       timestamp: Date.now() + 1,
                       isHidden: true,
                     };
@@ -29704,13 +29704,13 @@ ${libraryList}
                       chat.relationship.status = "friend";
                       aiMessage = {
                         ...baseMessage,
-                        content: "我通过了你的好友申请，我们现在是好友啦！",
+                        content: "I have accepted your friend request, we are now friends!",
                       };
                     } else {
                       chat.relationship.status = "blocked_by_ai";
                       aiMessage = {
                         ...baseMessage,
-                        content: "抱歉，我拒绝了你的好友申请。",
+                        content: "Sorry, I have rejected your friend request.",
                       };
                     }
                     chat.relationship.applicationReason = "";
@@ -29726,14 +29726,14 @@ ${libraryList}
                     const myNickname = chat.isGroup
                       ? chat.settings.myNickname || "Me"
                       : "Me";
-                    pollInfoText = `[系统提示：用户 (${myNickname}) 发起了一个投票。问题：“${
+                    pollInfoText = `[System prompt: User (${myNickname}) has initiated a poll. Question: "${
                       msg.question
-                    }”, 选项：“${msg.options.join('", "')}”。你可以使用 'vote' 指令参与投票。]`;
+                    }", Options: "${msg.options.join('", "')}". You can use the 'vote' command to participate in the poll.]`;
                   } else {
                     // 如果是AI发的
-                    pollInfoText = `[系统提示：${msg.senderName} 发起了一个投票。问题：“${
+                    pollInfoText = `[System Notice: ${msg.senderName} started a poll. Question: "${
                       msg.question
-                    }”, 选项：“${msg.options.join('", "')}”。]`;
+                    }", Options: "${msg.options.join('", "')}".]`;
                   }
 
                   // 最终，我们把这条格式化好的文本作为系统消息发送给AI
@@ -29807,7 +29807,7 @@ ${libraryList}
                   };
 
                   // 同步到角色钱包（支出）
-                  const rpDescription = `发出红包 - ${msgData.greeting || "恭喜发财"}`;
+                  const rpDescription = `Sent a red packet - ${msgData.greeting || "Good luck"}`;
                   await updateCharacterBankBalance(
                     chatId,
                     -msgData.amount,
@@ -29872,14 +29872,14 @@ ${libraryList}
                         role: "system",
                         type: "pat_message",
                         // 系统消息里也使用 displayName
-                        content: `${displayName} 领取了 ${packetToOpen.senderName} 的红包`,
+                        content: `${displayName} claimed ${packetToOpen.senderName}'s red packet`,
                         timestamp: Date.now(),
                       };
                       chat.history.push(aiClaimedMessage);
 
-                      let hiddenContentForAI = `[系统提示：你 (${displayName}) 成功抢到了 ${claimedAmountAI.toFixed(
+                      let hiddenContentForAI = `[System Notice: You (${displayName}) successfully claimed ${claimedAmountAI.toFixed(
                         2,
-                      )} 元。`;
+                      )} CNY.]`;
 
                       // 5. 检查红包是否被领完
                       if (
@@ -29892,13 +29892,13 @@ ${libraryList}
                         const finishedMessage = {
                           role: "system",
                           type: "pat_message",
-                          content: `${packetToOpen.senderName} 的红包已被领完`,
+                          content: `${packetToOpen.senderName}'s red packet has been fully claimed`,
                           timestamp: Date.now() + 1,
                         };
                         chat.history.push(finishedMessage);
 
                         // 开始构建给AI看的“战报”
-                        hiddenContentForAI += ` 红包已被领完。`;
+                        hiddenContentForAI += ` Red packet has been fully claimed.`;
 
                         // 如果是拼手气红包，找出谁是手气王
                         let luckyKing = { name: "", amount: -1 };
