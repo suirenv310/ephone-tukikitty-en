@@ -1038,6 +1038,14 @@ body {
   display: block;
   margin: auto;
 }
+
+/* ===== Advance Plot & Impersonate User — loading state ===== */
+#advance-plot-btn:disabled,
+#impersonate-user-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .chat-image {
   max-width: 100%;
   border-radius: 10px;
@@ -3144,12 +3152,16 @@ body {
 }
 
 /* 动态编辑模态框的样式 (它将复用现有的操作菜单样式) */
+#post-actions-modal .custom-modal-footer {
+  flex-direction: column;
+}
 #post-actions-modal .custom-modal-footer button {
   width: 100%;
   border: none;
   border-bottom: 1px solid #dbdbdb;
   padding: 14px;
-  font-size: 18px;
+  font-size: 16px;
+  text-align: center;
 }
 #post-actions-modal .custom-modal-footer button:last-child {
   border-bottom: none;
@@ -3158,6 +3170,86 @@ body {
   margin-top: 8px;
   border-radius: 8px;
   background-color: #f0f0f0;
+  color: #333;
+}
+
+/* ===== add-product-choice-modal — column layout ===== */
+#add-product-choice-modal .custom-modal-footer {
+  flex-direction: column;
+}
+#add-product-choice-modal .custom-modal-footer button {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #dbdbdb;
+  padding: 14px;
+  font-size: 16px;
+  text-align: center;
+  color: var(--accent-color);
+  background: none;
+}
+#add-product-choice-modal .custom-modal-footer button:last-child {
+  border-bottom: none;
+}
+#add-product-choice-modal #cancel-add-choice-btn {
+  margin-top: 0;
+  border-radius: 0 0 14px 14px;
+  background-color: #f0f0f0;
+  color: #333;
+}
+
+/* ===== Poke / Pat ===== */
+
+/* Centered bubble (system-style, same row as recalled/pat messages) */
+.poke-action-bubble {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 16px;
+  background: linear-gradient(135deg, #fff3e0, #fce4ec);
+  border: 1.5px solid #f8bbd0;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #880e4f;
+  animation: pokeWiggle 0.45s ease;
+  white-space: nowrap;
+  cursor: default;
+  user-select: none;
+}
+
+/* Variant inside a regular chat bubble (char initiates via [POKE]/[PAT] tag) */
+.inline-char-poke {
+  margin-bottom: 6px;
+}
+
+/* Text after the poke bubble when char also sends a message */
+.poke-followup-text {
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.poke-emoji {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.poke-text {
+  font-size: 13px;
+}
+
+@keyframes pokeWiggle {
+  0%   { transform: scale(1)    rotate(0deg); }
+  20%  { transform: scale(1.12) rotate(-6deg); }
+  40%  { transform: scale(1.12) rotate(6deg); }
+  60%  { transform: scale(1.06) rotate(-3deg); }
+  80%  { transform: scale(1.03) rotate(3deg); }
+  100% { transform: scale(1)    rotate(0deg); }
+}
+
+/* Disabled state while sending */
+#poke-pat-btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
@@ -3200,6 +3292,104 @@ body {
   text-overflow: ellipsis;
 }
 /* ▲▲▲ 粘贴结束 ▲▲▲ */
+
+/* ===== Message Actions Modal – 2-column grid layout ===== */
+#message-actions-modal .custom-modal-footer {
+  flex-direction: column;
+  border-top: none;
+  padding: 12px;
+  gap: 0;
+}
+
+/* 2-column grid */
+.msg-action-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+/* Individual cell button */
+.msg-action-grid button {
+  flex: none;
+  border-radius: 10px;
+  background-color: #f2f2f7;
+  border: none;
+  padding: 13px 6px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text-primary);
+  text-align: center;
+  transition: background-color 0.15s;
+}
+.msg-action-grid button:active {
+  background-color: #dcdce0;
+}
+
+/* span full width inside grid (Multi-select & reroll) */
+.msg-action-grid-span,
+.msg-action-grid button.msg-action-grid-span {
+  grid-column: 1 / -1;
+}
+
+/* Multi-select: also needs to be IN the grid visually,
+   but it's declared as .msg-action-grid-span so it spans both cols */
+#select-message-btn {
+  background-color: #f2f2f7;
+  border-radius: 10px;
+  border: none;
+  padding: 13px 6px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background-color 0.15s;
+}
+#select-message-btn:active { background-color: #dcdce0; }
+
+/* Regenerate Image button — spans full width, blue tinted */
+#reroll-nai-btn {
+  background-color: #e3f2fd;
+  color: #1976d2;
+  border-radius: 10px;
+  border: none;
+  padding: 13px 6px;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+  margin-bottom: 8px;
+  transition: background-color 0.15s;
+}
+#reroll-nai-btn:active { background-color: #bbdefb; }
+
+/* Cancel button — full width, light grey */
+.msg-action-cancel {
+  width: 100%;
+  border-radius: 10px;
+  background-color: #f0f0f0;
+  border: none;
+  padding: 13px;
+  font-size: 15px;
+  cursor: pointer;
+  color: #333;
+  text-align: center;
+  margin-top: 0;
+  transition: background-color 0.15s;
+}
+.msg-action-cancel:active { background-color: #dcdcdc; }
+
+/* Dark mode support */
+#phone-screen.dark-mode .msg-action-grid button,
+#phone-screen.dark-mode #select-message-btn {
+  background-color: #2c2c2e;
+  color: #f0f0f0;
+}
+#phone-screen.dark-mode .msg-action-cancel {
+  background-color: #1c1c1e;
+  color: #f0f0f0;
+}
+/* ===== End Message Actions Modal ===== */
 
 /* ▼▼▼ 【全新】可视化消息编辑器样式 ▼▼▼ */
 #message-editor-container {
@@ -3327,6 +3517,90 @@ body {
   background-color: #4cd964; /* 新建用绿色，以示区分 */
 }
 /* ▲▲▲ 新CSS粘贴结束 ▲▲▲ */
+
+/* ===== Waimai Modal – Mode Toggle ===== */
+.waimai-mode-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.waimai-mode-btn {
+  flex: 1;
+  padding: 9px 6px;
+  border: 1.5px solid var(--border-color, #e0e0e0);
+  border-radius: 10px;
+  background: none;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text-primary, #333);
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+  text-align: center;
+}
+.waimai-mode-btn.active {
+  background-color: var(--accent-color, #ff6b6b);
+  border-color: var(--accent-color, #ff6b6b);
+  color: #fff;
+  font-weight: 600;
+}
+.waimai-mode-btn:not(.active):hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+/* ===== Wallet balance row in Order mode ===== */
+#waimai-balance-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0faf0;
+  border: 1px solid #c8e6c9;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.waimai-balance-label {
+  color: #555;
+}
+.waimai-balance-value {
+  font-weight: 700;
+  font-size: 15px;
+  color: #2e7d32;
+}
+#phone-screen.dark-mode #waimai-balance-display {
+  background: #1b2e1b;
+  border-color: #2e5930;
+}
+#phone-screen.dark-mode .waimai-balance-label { color: #aaa; }
+#phone-screen.dark-mode .waimai-balance-value { color: #66bb6a; }
+
+/* ===== Quantity badge on waimai_request card ===== */
+.waimai-qty-badge {
+  display: inline-block;
+  background: rgba(255,100,50,0.12);
+  color: #d84315;
+  border-radius: 20px;
+  padding: 1px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+/* ===== waimai_order_for_char card ===== */
+.waimai-order-for-char-card .gift-card-header {
+  background: linear-gradient(135deg, #43a047 0%, #66bb6a 100%);
+}
+/* Dark mode for waimai toggle */
+#phone-screen.dark-mode .waimai-mode-btn {
+  color: #f0f0f0;
+  border-color: #3a3a3c;
+}
+#phone-screen.dark-mode .waimai-mode-btn.active {
+  background-color: var(--accent-color, #ff6b6b);
+  border-color: var(--accent-color, #ff6b6b);
+  color: #fff;
+}
+/* ===== End Waimai Modal styles ===== */
 
 /* ▼▼▼ 【全新】外卖代付卡片样式 ▼▼▼ */
 .message-bubble.is-waimai-request .content {

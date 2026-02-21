@@ -2583,6 +2583,46 @@
                 />
               </svg>
             </button>
+            <!-- Advance Plot button -->
+            <button
+              id="advance-plot-btn"
+              class="chat-action-icon-btn action-button"
+              title="Advance Plot – AI tiếp tục câu chuyện không cần user reply"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="5,4 13,12 5,20" fill="currentColor" stroke="none"/>
+                <polygon points="13,4 21,12 13,20" fill="currentColor" stroke="none"/>
+              </svg>
+            </button>
+
+            <!-- Impersonate User button -->
+            <button
+              id="impersonate-user-btn"
+              class="chat-action-icon-btn action-button"
+              title="Impersonate User – AI gợi ý lời thoại cho bạn (chỉ điền vào ô chat)"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                <path d="M17 13l2 2 4-4" stroke-width="2" stroke="currentColor"/>
+              </svg>
+            </button>
+
+            <!-- Poke / Pat button -->
+            <button
+              id="poke-pat-btn"
+              class="chat-action-icon-btn action-button"
+              title="Poke / Pat"
+            >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+                <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                <line x1="6" y1="1" x2="6" y2="4"/>
+                <line x1="10" y1="1" x2="10" y2="4"/>
+                <line x1="14" y1="1" x2="14" y2="4"/>
+              </svg>
+            </button>
+
             <!-- Aurora multimedia button (changed to monochrome) -->
             <button
               id="aurora-media-btn"
@@ -7396,32 +7436,26 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
     </div>
 
     <div id="message-actions-modal" class="modal">
-      <div id="custom-modal" style="width: 250px">
-        <div class="custom-modal-footer">
-          <!-- New action buttons -->
+      <div id="custom-modal" style="width: 260px">
+        <div class="custom-modal-footer" id="message-actions-footer">
+          <!-- Regenerate Image (hidden by default, shown for NAI images) -->
           <button
             id="reroll-nai-btn"
-            style="display: none; background-color: #e3f2fd; color: #1976d2"
+            style="display: none"
+            class="msg-action-grid-span"
           >
             🎨 Regenerate Image
           </button>
-          <!-- Added this -->
-          <button id="edit-message-btn">Edit</button>
-          <button id="copy-message-btn">Copy</button>
-          <button id="recall-message-btn">Recall</button>
-          <button id="quote-message-btn">Quote</button>
-          <button id="select-message-btn">Multi-select</button>
-          <!-- Cancel button -->
-          <button
-            id="cancel-message-action-btn"
-            style="
-              margin-top: 8px;
-              border-radius: 8px;
-              background-color: #f0f0f0;
-            "
-          >
-            Cancel
-          </button>
+          <!-- 2-column grid for main actions -->
+          <div class="msg-action-grid">
+            <button id="edit-message-btn">✏️ Edit</button>
+            <button id="copy-message-btn">📋 Copy</button>
+            <button id="recall-message-btn">🗑️ Recall</button>
+            <button id="quote-message-btn">💬 Quote</button>
+            <button id="select-message-btn" class="msg-action-grid-span">☑️ Multi-select</button>
+          </div>
+          <!-- Cancel — full width -->
+          <button id="cancel-message-action-btn" class="msg-action-cancel">Cancel</button>
         </div>
       </div>
     </div>
@@ -7432,6 +7466,26 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
           <button id="edit-post-btn">Edit Post</button>
           <button id="copy-post-btn">Copy Content</button>
           <button id="cancel-post-action-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Poke / Pat choice modal -->
+    <div id="poke-choice-modal" class="modal">
+      <div id="custom-modal" style="width: 230px">
+        <div class="custom-modal-header" style="text-align:center; padding: 14px 16px 10px">
+          Choose an action
+        </div>
+        <div class="custom-modal-footer" style="flex-direction: column">
+          <button id="do-poke-btn" style="width:100%; border:none; border-bottom:1px solid #dbdbdb; padding:14px; font-size:16px; cursor:pointer; background:none; color:var(--accent-color)">
+            👉 Poke
+          </button>
+          <button id="do-pat-btn" style="width:100%; border:none; border-bottom:1px solid #dbdbdb; padding:14px; font-size:16px; cursor:pointer; background:none; color:var(--accent-color)">
+            🤚 Pat
+          </button>
+          <button id="cancel-poke-btn" style="width:100%; border:none; padding:14px; font-size:16px; cursor:pointer; background:#f0f0f0; color:#555; border-radius: 0 0 14px 14px">
+            Cancel
+          </button>
         </div>
       </div>
     </div>
@@ -7463,21 +7517,54 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
 
     <!-- [New] Food delivery payment request modal -->
     <div id="waimai-request-modal" class="modal">
-      <div class="modal-content" style="width: 290px">
+      <div class="modal-content" style="width: 300px">
         <div class="modal-header">
-          <span>Request Food Delivery Payment</span>
+          <span id="waimai-modal-title">Food Delivery</span>
         </div>
         <div class="modal-body">
+
+          <!-- Mode toggle: Request Payment vs Order for Them -->
+          <div class="waimai-mode-toggle">
+            <button class="waimai-mode-btn active" id="waimai-mode-request" data-mode="request">
+              💳 Request Payment
+            </button>
+            <button class="waimai-mode-btn" id="waimai-mode-order" data-mode="order">
+              🛵 Order for Them
+            </button>
+          </div>
+
+          <!-- Wallet balance — only shown in "Order for Them" mode -->
+          <div id="waimai-balance-display" style="display:none">
+            <span class="waimai-balance-label">Your wallet:</span>
+            <span id="waimai-balance-value" class="waimai-balance-value">¥0.00</span>
+          </div>
+
+          <!-- Item Info -->
           <div class="form-group">
             <label for="waimai-product-info">Item Info</label>
             <input
               type="text"
               id="waimai-product-info"
-              placeholder="e.g., A cup of mango pomelo sago"
+              placeholder="e.g., Mango pomelo sago"
             />
           </div>
+
+          <!-- Quantity (new) -->
           <div class="form-group">
-            <label for="waimai-amount">Payment Amount (¥)</label>
+            <label for="waimai-quantity">Quantity</label>
+            <input
+              type="number"
+              id="waimai-quantity"
+              placeholder="e.g., 1"
+              min="1"
+              step="1"
+              value="1"
+            />
+          </div>
+
+          <!-- Amount -->
+          <div class="form-group">
+            <label for="waimai-amount" id="waimai-amount-label">Amount (¥)</label>
             <input
               type="number"
               id="waimai-amount"
@@ -7486,6 +7573,17 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
               step="0.01"
             />
           </div>
+
+          <!-- Note — only shown in "Order for Them" mode -->
+          <div class="form-group" id="waimai-note-group" style="display: none">
+            <label for="waimai-note">Note (optional)</label>
+            <input
+              type="text"
+              id="waimai-note"
+              placeholder="e.g., Less sugar, extra ice"
+            />
+          </div>
+
         </div>
         <div class="modal-footer">
           <button class="cancel" id="waimai-cancel-btn">Cancel</button>
@@ -23509,6 +23607,34 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               if (isSelectionMode) toggleMessageSelection(msg.timestamp);
             });
             return wrapper;
+
+          } else if (msg.type === "poke_action") {
+            // ── Poke / Pat — centered system-style bubble ─────────────────
+            const isUserInitiated = msg.direction === "user_to_char";
+            const actionEmoji = msg.actionType === "pat" ? "🤚" : "👉";
+            const actionLabel = msg.actionType === "pat" ? "patted" : "poked";
+            const charName    = chat?.name || "them";
+            const actorName   = isUserInitiated ? "You" : charName;
+            const targetName  = isUserInitiated ? charName : "you";
+
+            const wrapper = document.createElement("div");
+            wrapper.className = "message-wrapper system-pat";
+            wrapper.dataset.timestamp = msg.timestamp;
+
+            const bubble = document.createElement("div");
+            bubble.className = "message-bubble poke-action-bubble";
+            bubble.dataset.timestamp = msg.timestamp;
+            bubble.innerHTML = `
+              <span class="poke-emoji">${actionEmoji}</span>
+              <span class="poke-text">${actorName} ${actionLabel} ${targetName}!</span>
+              <span class="poke-emoji">${actionEmoji}</span>`;
+
+            wrapper.appendChild(bubble);
+            addLongPressListener(wrapper, () => showMessageActions(msg.timestamp));
+            wrapper.addEventListener("click", () => {
+              if (isSelectionMode) toggleMessageSelection(msg.timestamp);
+            });
+            return wrapper;
           } else if (msg.type === "narrative") {
             const wrapper = document.createElement("div");
             wrapper.className = "message-wrapper system-pat"; // 复用系统消息的居中样式
@@ -23865,6 +23991,35 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 			            </div>
 			        </div>
 			    `;
+          } else if (msg.type === "waimai_order_for_char") {
+            // User ordered food FOR the character (reverse of waimai_request)
+            bubble.classList.add("is-gift-notification");
+
+            const orderQtyText = (msg.quantity && msg.quantity > 1)
+              ? ` <span class="waimai-qty-badge">×${msg.quantity}</span>` : "";
+            const orderNoteHtml = msg.note
+              ? `<div class="waimai-remark">
+                   <span class="remark-label">Note:</span>
+                   <span class="remark-text">${msg.note}</span>
+                 </div>` : "";
+
+            contentHtml = `
+                <div class="waimai-meituan-card waimai-order-for-char-card">
+                    <div class="gift-card-header">
+                        <div class="icon">🛵</div>
+                        <div class="title">You ordered for ${chat.name}</div>
+                    </div>
+                    <div class="gift-card-body">
+                        <p class="greeting" style="font-weight:bold;font-size:16px;">
+                            ${msg.productInfo}${orderQtyText}
+                        </p>
+                        <p style="font-size:13px;color:#888;">
+                            Amount: ¥${Number(msg.amount).toFixed(2)}
+                        </p>
+                        ${orderNoteHtml}
+                    </div>
+                </div>`;
+
           } else if (msg.type === "waimai_gift_from_char") {
             bubble.classList.add("is-gift-notification");
             const payload = msg.payload;
@@ -24136,6 +24291,11 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 			                    <button class="waimai-pay-btn" data-choice="paid">Pay for them</button>
 			                </div>`;
             }
+            // Show quantity badge if more than 1
+            const qtyBadge = (msg.quantity && msg.quantity > 1)
+              ? `<span class="waimai-qty-badge">×${msg.quantity}</span>`
+              : "";
+
             contentHtml = `
 			            <div class="waimai-card">
 			                <div class="waimai-header">
@@ -24146,7 +24306,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 			                </div>
 			                <div class="waimai-catchphrase">Hi, you're just one meal away from me～</div>
 			                <div class="waimai-main">
-			                    <div class="request-title">${requestTitle}</div>
+			                    <div class="request-title">${requestTitle} ${qtyBadge}</div>
 			                    <div class="payment-box">
 			                        <div class="payment-label">Amount Due</div>
 			                        <div class="amount">¥${Number(msg.amount).toFixed(2)}</div>
@@ -24184,9 +24344,11 @@ console.log(`[System] Database for user ${userId} has been loaded`);
                   const paidByText = msg.paidBy
                     ? `<br><br><b>Status:</b> Paid by ${msg.paidBy}`
                     : "";
+                  const qtyLine = (msg.quantity && msg.quantity > 1)
+                    ? `<br><b>Quantity:</b> ${msg.quantity}` : "";
                   showCustomAlert(
                     "Order Details",
-                    `<b>Product:</b> ${msg.productInfo}<br><b>Amount:</b> ¥${Number(msg.amount).toFixed(2)}${paidByText}`,
+                    `<b>Product:</b> ${msg.productInfo}${qtyLine}<br><b>Amount:</b> ¥${Number(msg.amount).toFixed(2)}${paidByText}`,
                   );
                 });
               }
@@ -24446,7 +24608,27 @@ console.log(`[System] Database for user ${userId} has been loaded`);
               msg.fullPrompt || msg.prompt || "NovelAI Generated"
             }">`;
           } else {
-            contentHtml = String(msg.content || "").replace(/\n/g, "<br>");
+            const rawContent = String(msg.content || "");
+            // ── Detect char-initiated poke/pat: [POKE] or [PAT] at start ──
+            const charPokeMatch = !isUser && rawContent.match(/^\[(POKE|PAT)\]\s*\n?/i);
+            if (charPokeMatch) {
+              const pokeType  = charPokeMatch[1].toLowerCase(); // "poke" or "pat"
+              const pokeEmoji = pokeType === "pat" ? "🤚" : "👉";
+              const pokeLabel = pokeType === "pat" ? "patted" : "poked";
+              const charDisplayName = chat?.name || "They";
+              const cleanText = rawContent.slice(charPokeMatch[0].length).trim();
+              contentHtml =
+                `<div class="poke-action-bubble inline-char-poke">` +
+                  `<span class="poke-emoji">${pokeEmoji}</span>` +
+                  `<span class="poke-text">${charDisplayName} ${pokeLabel} you!</span>` +
+                  `<span class="poke-emoji">${pokeEmoji}</span>` +
+                `</div>` +
+                (cleanText
+                  ? `<div class="poke-followup-text">${cleanText.replace(/\n/g, "<br>")}</div>`
+                  : "");
+            } else {
+              contentHtml = rawContent.replace(/\n/g, "<br>");
+            }
           }
 
           // 1. 检查消息对象中是否存在引用信息 (msg.quote)
@@ -24622,6 +24804,177 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           return `${formattedDate} ${senderName}: ${contentText}`;
         }
         window.formatMessageForContext = formatMessageForContext;
+
+        // ===== ADVANCE PLOT & IMPERSONATE USER =====
+
+        /**
+         * Advance Plot: gọi AI tiếp tục câu chuyện không cần user reply.
+         * Đây chỉ là alias của triggerAiResponse, dùng cho nút >>.
+         */
+        async function advancePlot() {
+          await triggerAiResponse();
+        }
+
+        /**
+         * Impersonate User: gọi AI để gợi ý lời thoại người dùng có thể nói tiếp,
+         * dựa trên myPersona và lịch sử hội thoại. Kết quả chỉ điền vào ô chat,
+         * KHÔNG gửi đi.
+         */
+        async function impersonateUser() {
+          if (!state.activeChatId) return;
+          const chat = state.chats[state.activeChatId];
+          const { proxyUrl, apiKey, model } = state.apiConfig;
+          if (!proxyUrl || !apiKey || !model) {
+            alert("Vui lòng cấu hình API trước khi dùng tính năng này.");
+            return;
+          }
+
+          const chatInput = document.getElementById("chat-input");
+          const btn = document.getElementById("impersonate-user-btn");
+
+          // Trạng thái loading
+          btn.disabled = true;
+          const originalContent = btn.innerHTML;
+          btn.innerHTML = "⏳";
+
+          try {
+            const myNickname = chat.settings.myNickname || "User";
+            const myPersona = chat.settings.myPersona || "(No persona set)";
+            const charName = chat.name || "AI";
+            const charPersona = chat.settings.aiPersona || "";
+            const maxMem = chat.settings.maxMemory || 20;
+
+            // Lấy lịch sử gần nhất, bỏ hidden/summary
+            const recentHistory = chat.history
+              .filter(m => !m.isHidden && m.type !== "summary" && m.content)
+              .slice(-maxMem)
+              .map(m => {
+                if (m.role === "user") return `${myNickname}: ${String(m.content).substring(0, 300)}`;
+                if (m.role === "assistant") return `${charName}: ${String(m.content).substring(0, 300)}`;
+                if (m.type === "narrative") return `[Narrator]: ${String(m.content).substring(0, 200)}`;
+                return null;
+              })
+              .filter(Boolean)
+              .join("\n");
+
+            const impersonatePrompt = `**【LANGUAGE RULE – HIGHEST PRIORITY】: Reply in Vietnamese (Tiếng Việt) ONLY. Never use Chinese or any other language.**
+
+# Task
+You are a writing assistant. Generate ONE natural, in-character chat message that **${myNickname}** (the user) would plausibly send next in the ongoing conversation below.
+
+# ${myNickname}'s Persona
+${myPersona}
+
+# Character they're talking with: ${charName}
+${charPersona ? charPersona.substring(0, 800) : "(No description)"}
+
+# Recent Conversation
+${recentHistory || "(No messages yet)"}
+
+# Rules
+- Output ONLY the message content itself — no quotes, no prefix like "${myNickname}:", nothing else.
+- Write in the same language/style ${myNickname} has been using in the conversation.
+- Keep it short and natural like a real chat message (1–3 sentences max).
+- Stay in character based on ${myNickname}'s persona.
+- Do NOT write as ${charName}. Write as ${myNickname} only.`;
+
+            const messagesForApi = [{ role: "user", content: impersonatePrompt }];
+            let isGemini = proxyUrl === GEMINI_API_URL;
+            let geminiConfig = toGeminiRequestData(model, apiKey, "", messagesForApi, isGemini);
+
+            const response = isGemini
+              ? await fetch(geminiConfig.url, geminiConfig.data)
+              : await fetch(`${proxyUrl}/v1/chat/completions`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${getRandomValue(apiKey)}`,
+                  },
+                  body: JSON.stringify({
+                    model: model,
+                    messages: messagesForApi,
+                    temperature: parseFloat(state.apiConfig.temperature) || 0.85,
+                  }),
+                });
+
+            if (!response.ok) {
+              const errData = await response.json().catch(() => ({}));
+              throw new Error(`API Error ${response.status}: ${errData?.error?.message || response.statusText}`);
+            }
+
+            const data = await response.json();
+            const generatedText = isGemini
+              ? data?.candidates?.[0]?.content?.parts?.[0]?.text
+              : data?.choices?.[0]?.message?.content;
+
+            if (generatedText && generatedText.trim()) {
+              chatInput.value = generatedText.trim();
+              chatInput.style.height = "auto";
+              chatInput.style.height = chatInput.scrollHeight + "px";
+              chatInput.focus();
+            } else {
+              alert("AI không tạo được lời thoại. Thử lại nhé!");
+            }
+          } catch (err) {
+            console.error("[ImpersonateUser] Error:", err);
+            alert("Lỗi khi tạo lời thoại: " + err.message);
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalContent;
+          }
+        }
+
+        // ===== END ADVANCE PLOT & IMPERSONATE USER =====
+
+        // ── Poke / Pat ───────────────────────────────────────────────────────
+        /**
+         * Open the poke/pat choice modal.
+         */
+        function openPokeModal() {
+          if (!state.activeChatId) return;
+          document.getElementById("poke-choice-modal").classList.add("visible");
+        }
+
+        /**
+         * Send a poke or pat action from user → char, then trigger AI reaction.
+         * @param {"poke"|"pat"} actionType
+         */
+        async function sendPokeAction(actionType) {
+          if (!state.activeChatId) return;
+          const chat = state.chats[state.activeChatId];
+          if (!chat) return;
+
+          // Close the choice modal
+          document.getElementById("poke-choice-modal").classList.remove("visible");
+
+          const actionEmoji = actionType === "pat" ? "🤚" : "👉";
+          const actionLabel = actionType === "pat" ? "patted" : "poked";
+
+          // Build the poke_action message object
+          const pokeMsg = {
+            id:        Date.now(),
+            role:      "user",
+            type:      "poke_action",
+            actionType,
+            direction: "user_to_char",
+            sender:    "user",
+            content:   `[Action: User ${actionLabel} ${chat.name} ${actionEmoji}]`,
+            timestamp: Date.now(),
+            isHidden:  false,
+          };
+
+          // Save to history + DB
+          chat.history.push(pokeMsg);
+          await db.chats.put(chat);
+
+          // Render the bubble + update chat list
+          appendMessage(pokeMsg, chat);
+          renderChatList();
+
+          // Let the char react
+          await triggerAiResponse();
+        }
+        // ─────────────────────────────────────────────────────────────────────
 
         async function triggerAiResponse() {
           if (!state.activeChatId) return;
@@ -26075,8 +26428,32 @@ You are a group chat AI, responsible for embodying all roles except for the user
                   if (msg.type === "waimai_request")
                     return {
                       role: "user",
-                      content: `(Timestamp: ${msg.timestamp}) [System notification: User initiated a food delivery request at timestamp ${msg.timestamp}, Product: "${msg.productInfo}", Amount: ${msg.amount} yuan. Please decide and respond using the 'waimai_response' command.]`,
+                      content: `(Timestamp: ${msg.timestamp}) [System notification: User initiated a food delivery request at timestamp ${msg.timestamp}, Product: "${msg.productInfo}", Quantity: ${msg.quantity || 1}, Amount: ${msg.amount} yuan. Please decide and respond using the 'waimai_response' command.]`,
                     };
+
+                  if (msg.type === "waimai_order_for_char")
+                    return {
+                      role: "user",
+                      content: `(Timestamp: ${msg.timestamp}) [System notification: The user ordered food for you! Item: "${msg.productInfo}", Quantity: ${msg.quantity || 1}, Amount: ¥${Number(msg.amount).toFixed(2)}${msg.note ? `, Note: "${msg.note}"` : ""}. Please react naturally and warmly to receiving this delivery!]`,
+                    };
+
+                  if (msg.type === "poke_action") {
+                    if (msg.direction === "user_to_char") {
+                      const act = msg.actionType === "pat" ? "patted" : "poked";
+                      const emoji = msg.actionType === "pat" ? "🤚" : "👉";
+                      return {
+                        role: "user",
+                        content: `[Action: The user just ${act} you ${emoji}! React naturally and in-character — you can be surprised, flustered, amused, or poke/pat back. To poke or pat the user back, start your reply with [POKE] or [PAT] on its own line, then continue with your message.]`,
+                      };
+                    }
+                    if (msg.direction === "char_to_user") {
+                      const act = msg.actionType === "pat" ? "patted" : "poked";
+                      return {
+                        role: "assistant",
+                        content: `[Action: You ${act} the user.]`,
+                      };
+                    }
+                  }
 
                   if (
                     Array.isArray(msg.content) &&
@@ -26650,8 +27027,32 @@ ${libraryList}
                   if (msg.type === "waimai_request")
                     return {
                       role: "user",
-                      content: `(Timestamp: ${msg.timestamp}) [System Notice: The user initiated a food delivery request at timestamp ${msg.timestamp}, Product: "${msg.productInfo}", Amount: ${msg.amount} CNY. Please make a decision and respond using the 'waimai_response' command.]`,
+                      content: `(Timestamp: ${msg.timestamp}) [System Notice: The user initiated a food delivery request at timestamp ${msg.timestamp}, Product: "${msg.productInfo}", Quantity: ${msg.quantity || 1}, Amount: ${msg.amount} CNY. Please make a decision and respond using the 'waimai_response' command.]`,
                     };
+
+                  if (msg.type === "waimai_order_for_char")
+                    return {
+                      role: "user",
+                      content: `(Timestamp: ${msg.timestamp}) [System Notice: The user ordered food for you! Item: "${msg.productInfo}", Quantity: ${msg.quantity || 1}, Amount: ¥${Number(msg.amount).toFixed(2)}${msg.note ? `, Note: "${msg.note}"` : ""}. Please react naturally and warmly to receiving this delivery!]`,
+                    };
+
+                  if (msg.type === "poke_action") {
+                    if (msg.direction === "user_to_char") {
+                      const act = msg.actionType === "pat" ? "patted" : "poked";
+                      const emoji = msg.actionType === "pat" ? "🤚" : "👉";
+                      return {
+                        role: "user",
+                        content: `[Action: The user just ${act} you ${emoji}! React naturally and in-character — you can be surprised, flustered, amused, or poke/pat back. To poke or pat the user back, start your reply with [POKE] or [PAT] on its own line, then continue with your message.]`,
+                      };
+                    }
+                    if (msg.direction === "char_to_user") {
+                      const act = msg.actionType === "pat" ? "patted" : "poked";
+                      return {
+                        role: "assistant",
+                        content: `[Action: You ${act} the user.]`,
+                      };
+                    }
+                  }
 
                   if (
                     Array.isArray(msg.content) &&
@@ -40906,9 +41307,9 @@ const ivTags = {
                 (newData.bank.transactions || []).forEach((transaction) => {
                   const amount = parseFloat(transaction.amount);
                   if (!isNaN(amount)) {
-                    if (transaction.type === "收入")
+                    if (transaction.type === "Income")
                       phoneData.bank.balance += amount;
-                    else if (transaction.type === "支出")
+                    else if (transaction.type === "Paid")
                       phoneData.bank.balance -= amount;
                   }
                 });
@@ -41471,9 +41872,9 @@ const ivTags = {
                   if (!isNaN(amount)) {
                     // 只有在AI没有直接提供新余额时，我们才根据交易记录自己计算
                     if (typeof newData.bank.balance !== "number") {
-                      if (transaction.type === "收入") {
+                      if (transaction.type === "Income") {
                         phoneData.bank.balance += amount;
-                      } else if (transaction.type === "支出") {
+                      } else if (transaction.type === "Paid") {
                         phoneData.bank.balance -= amount;
                       }
                     }
@@ -44820,9 +45221,9 @@ const ivTags = {
           if (!chat.settings.petAdopted) {
             // 如果未领养，弹出确认框
             const confirmed = await showCustomConfirm(
-              "领养新宠物",
-              `你还没有为“${chat.name}”领养宠物，要现在开启宠物系统吗？`,
-              { confirmText: "现在领养" },
+              "Adopt a new pet.",
+              `You haven't adopted a pet for "${chat.name}" yet. Do you want to start the pet system now?`,
+              { confirmText: "Adopt now" },
             );
 
             if (confirmed) {
@@ -44833,7 +45234,7 @@ const ivTags = {
                 type: "None",
                 name: "",
                 image: "🥚",
-                persona: "一只可爱的小宠物，对世界充满好奇。",
+                persona: "A cute little pet, curious about the world.",
                 petChatHistory: [],
                 isCustomImage: false,
                 display: { show: false, size: 100, top: "80%", left: "50%" },
@@ -44847,16 +45248,16 @@ const ivTags = {
               };
               await db.chats.put(chat);
               alert(
-                `恭喜！你已成功为“${chat.name}”开启宠物系统！现在来为它设置一下吧。`,
+                `Congratulations! You have successfully started the pet system for "${chat.name}"! Now let's set it up.`,
               );
-              // 领养成功后，再次调用本函数，这次会直接进入设置界面
+              // After successful adoption, call this function again to directly enter the settings interface
               openPetModal();
             }
-            // 如果用户取消，则什么也不做
+            // If the user cancels, do nothing
             return;
           }
 
-          // --- 如果已经领养，则执行原来的显示逻辑 ---
+          // --- If already adopted, execute the original display logic ---
           currentPetData = JSON.parse(JSON.stringify(chat.settings.pet));
 
           document.getElementById("pet-type-input").value =
@@ -44928,7 +45329,7 @@ const ivTags = {
               lastUpdated + intervalsPassed * PET_DECAY_INTERVAL;
 
             console.log(
-              `宠物"${pet.name}"数值衰减: ${intervalsPassed}个周期, 饱食度-${totalHungerDecay}, 心情-${totalHappinessDecay}`,
+              `Pet "${pet.name}" stats decay: ${intervalsPassed} intervals, Hunger -${totalHungerDecay}, Happiness -${totalHappinessDecay}`,
             );
             return true; // 数值已改变
           }
@@ -46270,7 +46671,7 @@ const ivTags = {
           // --- 核心逻辑 ---
           // 1. 创建一条新的交易记录
           const newTransaction = {
-            type: amount > 0 ? "收入" : "支出",
+            type: amount > 0 ? "Income" : "Paid",
             amount: Math.abs(amount), // 交易记录里的金额总是正数
             description: description,
             timestamp: Date.now(), // 记录交易发生的时间
@@ -54584,6 +54985,26 @@ const ivTags = {
           document
             .getElementById("wait-reply-btn")
             .addEventListener("click", triggerAiResponse);
+          document
+            .getElementById("advance-plot-btn")
+            .addEventListener("click", advancePlot);
+          document
+            .getElementById("impersonate-user-btn")
+            .addEventListener("click", impersonateUser);
+          document
+            .getElementById("poke-pat-btn")
+            .addEventListener("click", openPokeModal);
+          document
+            .getElementById("do-poke-btn")
+            .addEventListener("click", () => sendPokeAction("poke"));
+          document
+            .getElementById("do-pat-btn")
+            .addEventListener("click", () => sendPokeAction("pat"));
+          document
+            .getElementById("cancel-poke-btn")
+            .addEventListener("click", () =>
+              document.getElementById("poke-choice-modal").classList.remove("visible")
+            );
           chatInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -55203,7 +55624,7 @@ const ivTags = {
           document
             .getElementById("add-world-book-btn")
             .addEventListener("click", async () => {
-              const name = await showCustomPrompt("创建世界书", "请输入书名");
+              const name = await showCustomPrompt("Creating the World Book", "Please enter the book name");
               if (name && name.trim()) {
                 const newBook = {
                   id: "wb_" + Date.now(),
@@ -55228,7 +55649,7 @@ const ivTags = {
                   .getElementById("world-book-name-input")
                   .value.trim();
                 if (!newName) {
-                  alert("书名不能为空！");
+                  alert("Book name cannot be empty!");
                   return;
                 }
                 book.name = newName;
@@ -57039,70 +57460,172 @@ const ivTags = {
               }
             });
 
-          // 外卖请求功能事件绑定
+          // ===== Food Delivery Modal event bindings =====
           const waimaiModal = document.getElementById("waimai-request-modal");
+
+          // Track current mode: "request" = ask char to pay | "order" = user orders FOR char
+          let waimaiCurrentMode = "request";
+
+          // Open modal
           document
             .getElementById("send-waimai-request-btn")
             .addEventListener("click", () => {
               waimaiModal.classList.add("visible");
             });
 
+          // Close modal (Cancel)
           document
             .getElementById("waimai-cancel-btn")
             .addEventListener("click", () => {
               waimaiModal.classList.remove("visible");
             });
 
+          // Mode toggle buttons
+          document.querySelectorAll(".waimai-mode-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              waimaiCurrentMode = btn.dataset.mode;
+
+              // Update active state
+              document.querySelectorAll(".waimai-mode-btn").forEach((b) =>
+                b.classList.remove("active")
+              );
+              btn.classList.add("active");
+
+              const isOrderMode = waimaiCurrentMode === "order";
+
+              // Toggle Note field visibility
+              document.getElementById("waimai-note-group").style.display =
+                isOrderMode ? "block" : "none";
+
+              // Toggle wallet balance display
+              const balanceDisplay = document.getElementById("waimai-balance-display");
+              if (isOrderMode) {
+                const bal = state.globalSettings?.userBalance || 0;
+                document.getElementById("waimai-balance-value").textContent =
+                  `¥${bal.toFixed(2)}`;
+                balanceDisplay.style.display = "flex";
+              } else {
+                balanceDisplay.style.display = "none";
+              }
+
+              // Update labels & button text
+              document.getElementById("waimai-modal-title").textContent =
+                isOrderMode ? "Order Food for Them" : "Food Delivery";
+              document.getElementById("waimai-amount-label").textContent =
+                isOrderMode ? "Order Amount (¥)" : "Amount (¥)";
+              document.getElementById("waimai-confirm-btn").textContent =
+                isOrderMode ? "Place Order" : "Send Request";
+            });
+          });
+
+          // Confirm button
           document
             .getElementById("waimai-confirm-btn")
             .addEventListener("click", async () => {
               if (!state.activeChatId) return;
 
-              const productInfoInput = document.getElementById(
-                "waimai-product-info",
-              );
-              const amountInput = document.getElementById("waimai-amount");
+              const productInfoInput = document.getElementById("waimai-product-info");
+              const amountInput     = document.getElementById("waimai-amount");
+              const quantityInput   = document.getElementById("waimai-quantity");
+              const noteInput       = document.getElementById("waimai-note");
 
               const productInfo = productInfoInput.value.trim();
-              const amount = parseFloat(amountInput.value);
+              const amount      = parseFloat(amountInput.value);
+              const quantity    = Math.max(1, parseInt(quantityInput.value) || 1);
+              const note        = noteInput.value.trim();
 
               if (!productInfo) {
-                alert("请输入商品信息！");
+                alert("Please enter item info!");
                 return;
               }
               if (isNaN(amount) || amount <= 0) {
-                alert("请输入有效的代付金额！");
+                alert("Please enter a valid amount!");
                 return;
               }
 
               const chat = state.chats[state.activeChatId];
-              const now = Date.now();
-
+              const now  = Date.now();
               const myNickname = chat.isGroup
                 ? chat.settings.myNickname || "Me"
                 : "Me";
 
-              const msg = {
-                role: "user",
-                senderName: myNickname,
-                type: "waimai_request",
-                productInfo: productInfo,
-                amount: amount,
-                status: "pending",
-                countdownEndTime: now + 15 * 60 * 1000,
-                timestamp: now,
-              };
+              if (waimaiCurrentMode === "order") {
+                // ── "Order for Them" flow ──
+                // User is buying food FOR the character using their own wallet balance.
 
-              chat.history.push(msg);
+                // ── Balance check ──
+                const userBalance = state.globalSettings?.userBalance || 0;
+                if (userBalance < amount) {
+                  await showCustomAlert(
+                    "Insufficient Balance",
+                    `You need ¥${amount.toFixed(2)} but only have ¥${userBalance.toFixed(2)} in your wallet. Please top up first!`
+                  );
+                  return;
+                }
 
-              // 那一大段代码已经被删除了
+                // ── Deduct from user wallet and log the transaction ──
+                await window.updateUserBalanceAndLogTransaction(
+                  -amount,
+                  `Ordered "${productInfo}" (×${quantity}) for ${chat.name}`
+                );
 
-              await db.chats.put(chat);
-              appendMessage(msg, chat);
-              renderChatList();
+                const orderMsg = {
+                  role: "user",
+                  senderName: myNickname,
+                  type: "waimai_order_for_char",
+                  productInfo,
+                  quantity,
+                  amount,
+                  note,
+                  timestamp: now,
+                };
 
+                // Hidden system note so the AI understands what just happened
+                const systemNote = {
+                  role: "system",
+                  content: `[System Notice: ${myNickname} has ordered food for you! ` +
+                    `Item: "${productInfo}", Quantity: ${quantity}, ` +
+                    `Amount: ¥${amount.toFixed(2)}` +
+                    (note ? `, Note: "${note}"` : "") +
+                    `. Please react naturally to receiving this delivery!]`,
+                  timestamp: now + 1,
+                  isHidden: true,
+                };
+
+                chat.history.push(orderMsg);
+                chat.history.push(systemNote);
+                await db.chats.put(chat);
+                appendMessage(orderMsg, chat);
+                renderChatList();
+
+                // Let AI react to receiving the order
+                triggerAiResponse();
+
+              } else {
+                // ── "Request Payment" flow (original behaviour + quantity) ──
+                const msg = {
+                  role: "user",
+                  senderName: myNickname,
+                  type: "waimai_request",
+                  productInfo,
+                  quantity,
+                  amount,
+                  status: "pending",
+                  countdownEndTime: now + 15 * 60 * 1000,
+                  timestamp: now,
+                };
+
+                chat.history.push(msg);
+                await db.chats.put(chat);
+                appendMessage(msg, chat);
+                renderChatList();
+              }
+
+              // Reset form
               productInfoInput.value = "";
-              amountInput.value = "";
+              amountInput.value      = "";
+              quantityInput.value    = "1";
+              noteInput.value        = "";
               waimaiModal.classList.remove("visible");
             });
           document
