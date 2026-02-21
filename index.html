@@ -5777,6 +5777,40 @@
               </div>
             </div>
 
+            <!-- Impersonate User Settings -->
+            <div class="form-group">
+              <label class="toggle-switch-label">
+                <span class="toggle-switch-text">✏️ Impersonate User Settings</span>
+                <input type="checkbox" id="impersonate-expand-toggle" style="display:none"/>
+              </label>
+            </div>
+            <div class="moe-details-box" id="impersonate-settings-details" style="display: block">
+              <div class="form-group">
+                <label style="font-size:12px; color:#888; margin-bottom:4px; display:block">
+                  Custom Prompt
+                  <span style="font-weight:400"> — use <code>{{user}}</code>, <code>{{char}}</code>, <code>{{wordCount}}</code></span>
+                </label>
+                <textarea
+                  id="impersonate-prompt-input"
+                  rows="5"
+                  class="moe-input"
+                  placeholder="Leave blank to use default prompt"
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label>Target Word Count</label>
+                <input
+                  type="number"
+                  id="impersonate-wordcount-input"
+                  value="150"
+                  min="30"
+                  max="2000"
+                  step="10"
+                  class="moe-input"
+                />
+              </div>
+            </div>
+
             <!-- Chat summary -->
             <div class="form-group">
               <label class="toggle-switch-label">
@@ -24838,45 +24872,62 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           btn.innerHTML = "⏳";
 
           try {
-            const myNickname = chat.settings.myNickname || "User";
-            const myPersona = chat.settings.myPersona || "(No persona set)";
-            const charName = chat.name || "AI";
-            const charPersona = chat.settings.aiPersona || "";
-            const maxMem = chat.settings.maxMemory || 20;
+            const myNickname  = chat.settings.myNickname || "User";
+            const myPersona   = chat.settings.myPersona  || "(No persona set)";
+            const charName    = chat.name || "AI";
+            const charPersona = chat.settings.aiPersona  || "";
+            const maxMem      = chat.settings.maxMemory  || 20;
+
+            // Impersonate-user specific settings
+            const impersonateCfg = chat.settings.impersonateUser || {};
+            const wordCount      = impersonateCfg.wordCount || 150;
+            const customPrompt   = (impersonateCfg.prompt || "").trim();
 
             // Lấy lịch sử gần nhất, bỏ hidden/summary
             const recentHistory = chat.history
               .filter(m => !m.isHidden && m.type !== "summary" && m.content)
               .slice(-maxMem)
               .map(m => {
-                if (m.role === "user") return `${myNickname}: ${String(m.content).substring(0, 300)}`;
-                if (m.role === "assistant") return `${charName}: ${String(m.content).substring(0, 300)}`;
-                if (m.type === "narrative") return `[Narrator]: ${String(m.content).substring(0, 200)}`;
+                if (m.role === "user")      return `${myNickname}: ${String(m.content).substring(0, 400)}`;
+                if (m.role === "assistant") return `${charName}: ${String(m.content).substring(0, 400)}`;
+                if (m.type === "narrative") return `[Narrator]: ${String(m.content).substring(0, 300)}`;
                 return null;
               })
               .filter(Boolean)
               .join("\n");
 
-            const impersonatePrompt = `**【LANGUAGE RULE – HIGHEST PRIORITY】: Reply in Vietnamese (Tiếng Việt) ONLY. Never use Chinese or any other language.**
+            // ── Default prompt (third-person narrative style) ─────────────
+            const DEFAULT_IMPERSONATE_PROMPT =
+`You are a creative writing assistant. Write the next reply for **{{user}}** in the ongoing scene below.
 
-# Task
-You are a writing assistant. Generate ONE natural, in-character chat message that **${myNickname}** (the user) would plausibly send next in the ongoing conversation below.
+Write in **third person**, narrating {{user}}'s actions, facial expressions, body language, and inner thoughts like a novelist — immersive and detailed. You may include brief dialogue if it feels natural.
+
+Aim for approximately **{{wordCount}} words**. Output ONLY {{user}}'s reply — no chapter headings, no labels, no meta-commentary.`;
+
+            // ── Resolve the prompt (use custom if provided) ───────────────
+            const resolvedPrompt = (customPrompt || DEFAULT_IMPERSONATE_PROMPT)
+              .replace(/\{\{user\}\}/g,      myNickname)
+              .replace(/\{\{char\}\}/g,      charName)
+              .replace(/\{\{wordCount\}\}/g, String(wordCount));
+
+            const impersonatePrompt =
+`${resolvedPrompt}
+
+---
 
 # ${myNickname}'s Persona
 ${myPersona}
 
-# Character they're talking with: ${charName}
+# ${charName}'s Persona
 ${charPersona ? charPersona.substring(0, 800) : "(No description)"}
 
 # Recent Conversation
 ${recentHistory || "(No messages yet)"}
 
-# Rules
-- Output ONLY the message content itself — no quotes, no prefix like "${myNickname}:", nothing else.
-- Write in the same language/style ${myNickname} has been using in the conversation.
-- Keep it short and natural like a real chat message (1–3 sentences max).
-- Stay in character based on ${myNickname}'s persona.
-- Do NOT write as ${charName}. Write as ${myNickname} only.`;
+---
+Now write {{user}}'s next reply (~{{wordCount}} words, third person narrative).`
+              .replace(/\{\{user\}\}/g,      myNickname)
+              .replace(/\{\{wordCount\}\}/g, String(wordCount));
 
             const messagesForApi = [{ role: "user", content: impersonatePrompt }];
             let isGemini = proxyUrl === GEMINI_API_URL;
@@ -56183,6 +56234,13 @@ const ivTags = {
               document.getElementById("offline-novelai-toggle").checked =
                 offlineModeSettings.enableNovelAI || false;
 
+              // Load impersonate user settings
+              const impersonateSettings = chat.settings.impersonateUser || {};
+              document.getElementById("impersonate-prompt-input").value =
+                impersonateSettings.prompt || "";
+              document.getElementById("impersonate-wordcount-input").value =
+                impersonateSettings.wordCount || 150;
+
               // 3. 渲染预设下拉框
               renderOfflinePresetsSelector();
 
@@ -57070,6 +57128,14 @@ const ivTags = {
               ).checked;
 
               // presets 的数据在管理函数中直接操作，这里无需保存
+
+              // --- Save impersonate user settings ---
+              if (!chat.settings.impersonateUser) chat.settings.impersonateUser = {};
+              chat.settings.impersonateUser.prompt = document
+                .getElementById("impersonate-prompt-input")
+                .value.trim();
+              chat.settings.impersonateUser.wordCount =
+                parseInt(document.getElementById("impersonate-wordcount-input").value) || 150;
 
               // --- 保存聊天总结设置 ---
               if (!chat.settings.summary) chat.settings.summary = {}; // 初始化
