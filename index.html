@@ -17181,15 +17181,15 @@ Hide the fact that you accidentally poisoned Wang Qiang with sleeping pills. You
           );
         }
 
+        const _fetchConfig = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        };
         return {
           url: _geminiUrl,
-          data: {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(body),
-          },
+          data: _fetchConfig,
+          options: _fetchConfig, // alias — some callers use .options, some use .data
         };
       };
       document.addEventListener("DOMContentLoaded", () => {
