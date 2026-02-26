@@ -54806,7 +54806,7 @@ const ivTags = {
 
               // 1. === 有 API Key 的情况 ===
               if (pollApiKey) {
-                const primaryUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?${queryParams}&key=${pollApiKey}`;
+                const primaryUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${queryParams}&key=${pollApiKey}`;
                 console.log(
                   `[Global Image Gen] 使用 API Key 请求: ${primaryUrl}`,
                 );
@@ -54828,23 +54828,28 @@ const ivTags = {
               }
 
               // 2. === None API Key (公开接口) 的情况 ===
-              // 定义加载器
-              const loadImage = (url) =>
-                new Promise((resolve, reject) => {
-                  const img = new Image();
-                  img.src = url;
-                  img.onload = () => resolve(url);
-                  img.onerror = () => reject(new Error(`图片加载失败: ${url}`));
+              // 用 fetch 而非 img tag，可转 base64 持久化存储
+              const fetchToBase64 = async (url) => {
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const blob = await resp.blob();
+                return await new Promise((resolve, reject) => {
+                  const reader = new FileReader();
+                  reader.onloadend = () => resolve(reader.result);
+                  reader.onerror = reject;
+                  reader.readAsDataURL(blob);
                 });
+              };
 
-              // 优先尝试 gen.pollinations.ai
-              const primaryUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?${queryParams}`;
+              // 当前正式 endpoint: image.pollinations.ai/prompt/
+              const primaryUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${queryParams}`;
+              console.log(`[Global Image Gen] 请求: ${primaryUrl}`);
 
-              return await loadImage(primaryUrl).catch(async () => {
+              return await fetchToBase64(primaryUrl).catch(async () => {
                 console.warn(`[Global Image Gen] 主接口失败，尝试备用接口...`);
-                // 备用接口 pollinations.ai/p/
-                const fallbackUrl = `https://pollinations.ai/p/${encodedPrompt}?${queryParams}`;
-                return await loadImage(fallbackUrl);
+                // 备用: gen.pollinations.ai
+                const fallbackUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?${queryParams}`;
+                return await fetchToBase64(fallbackUrl);
               });
             } catch (error) {
               console.error(
