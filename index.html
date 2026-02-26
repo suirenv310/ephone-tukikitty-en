@@ -1252,6 +1252,18 @@
                   class="moe-slider"
                 />
               </div>
+              <div class="form-group" style="margin-top:10px">
+                <label>CORS Proxy <span style="font-size:11px;color:#888">(needed when deployed to web)</span></label>
+                <select id="api-cors-proxy" class="moe-input">
+                  <option value="">None (local / server-side proxy)</option>
+                  <option value="https://corsproxy.io/?">corsproxy.io (recommended)</option>
+                  <option value="custom">Custom...</option>
+                </select>
+              </div>
+              <div id="api-custom-proxy-group" class="form-group" style="display:none">
+                <label>Custom CORS Proxy URL</label>
+                <input type="text" id="api-custom-proxy-url" class="moe-input" placeholder="https://your-proxy.com/?"/>
+              </div>
               <button id="fetch-models-btn" class="moe-btn-secondary">
                 📡 Fetch Model List
               </button>
@@ -17147,10 +17159,15 @@ Hide the fact that you accidentally poisoned Wang Qiang with sleeping pills. You
           };
         }
 
+        // Apply CORS proxy if configured
+        const _geminiBase = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${getRandomValue(apiKey)}`;
+        const _apiCorsProxy = localStorage.getItem("api-cors-proxy") || "";
+        const _geminiUrl = _apiCorsProxy
+          ? _apiCorsProxy + encodeURIComponent(_geminiBase)
+          : _geminiBase;
+
         return {
-          url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${getRandomValue(
-            apiKey,
-          )}`,
+          url: _geminiUrl,
           data: {
             method: "POST",
             headers: {
@@ -22745,6 +22762,17 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             state.apiConfig.proxyUrl || "";
           document.getElementById("api-key").value =
             state.apiConfig.apiKey || "";
+
+          // Load CORS proxy setting
+          const savedApiProxy = localStorage.getItem("api-cors-proxy") || "";
+          const apiProxySelect = document.getElementById("api-cors-proxy");
+          if (savedApiProxy === "" || savedApiProxy === "https://corsproxy.io/?") {
+            apiProxySelect.value = savedApiProxy;
+          } else {
+            apiProxySelect.value = "custom";
+            document.getElementById("api-custom-proxy-url").value = savedApiProxy;
+            document.getElementById("api-custom-proxy-group").style.display = "block";
+          }
 
           // --- Minimax settings ---
           document.getElementById("minimax-group-id").value =
@@ -56276,6 +56304,13 @@ const ivTags = {
                 .getElementById("pollinations-api-key")
                 .value.trim();
 
+              // Save API CORS proxy
+              const _apiProxySelect = document.getElementById("api-cors-proxy").value;
+              const _apiProxyFinal = _apiProxySelect === "custom"
+                ? (document.getElementById("api-custom-proxy-url").value.trim() || "")
+                : _apiProxySelect;
+              localStorage.setItem("api-cors-proxy", _apiProxyFinal);
+
               // 如果开启了自动备份，立即重启定时器
               handleAutoBackupTimer();
               await db.apiConfig.put(state.apiConfig);
@@ -56365,6 +56400,14 @@ const ivTags = {
           ApiKeyInput.addEventListener("blur", (e) => {
             e.target.setAttribute("type", "password");
           });
+
+          // API CORS proxy dropdown — show/hide custom input
+          document
+            .getElementById("api-cors-proxy")
+            .addEventListener("change", (e) => {
+              document.getElementById("api-custom-proxy-group").style.display =
+                e.target.value === "custom" ? "block" : "none";
+            });
 
           document
             .getElementById("fetch-models-btn")
