@@ -54828,9 +54828,18 @@ const ivTags = {
               }
 
               // 2. === None API Key (公开接口) 的情况 ===
-              // 用 fetch 而非 img tag，可转 base64 持久化存储
+              // 如果配置了 Cloudflare Worker，通过 Worker 中转解决 401/CORS
+              const _imgProxy = (() => {
+                const p = (localStorage.getItem("api-cors-proxy") || "").trim();
+                if (!p || p.endsWith("?") || p.endsWith("=")) return "";
+                return p.replace(/\/+$/, "");
+              })();
+
               const fetchToBase64 = async (url) => {
-                const resp = await fetch(url);
+                const fetchUrl = _imgProxy
+                  ? `${_imgProxy}/?url=${encodeURIComponent(url)}`
+                  : url;
+                const resp = await fetch(fetchUrl);
                 if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const blob = await resp.blob();
                 return await new Promise((resolve, reject) => {
@@ -54843,11 +54852,10 @@ const ivTags = {
 
               // 当前正式 endpoint: image.pollinations.ai/prompt/
               const primaryUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${queryParams}`;
-              console.log(`[Global Image Gen] 请求: ${primaryUrl}`);
+              console.log(`[Global Image Gen] proxy=${_imgProxy || "none"} url=${primaryUrl}`);
 
               return await fetchToBase64(primaryUrl).catch(async () => {
                 console.warn(`[Global Image Gen] 主接口失败，尝试备用接口...`);
-                // 备用: gen.pollinations.ai
                 const fallbackUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?${queryParams}`;
                 return await fetchToBase64(fallbackUrl);
               });
