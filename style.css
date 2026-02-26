@@ -29393,3 +29393,249 @@ input:checked + .slider::after {
     height: 90%;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   PERSONA MANAGER
+   ══════════════════════════════════════════════════════════════ */
+
+/* Fix modal footer button widths for 3-button row */
+#persona-manager-editor-modal .modal-footer {
+  gap: 8px;
+}
+#persona-manager-editor-modal .modal-footer button {
+  flex: 1;
+  width: auto;
+  padding: 12px 8px;
+  border-radius: 12px;
+}
+#persona-manager-editor-modal .moe-btn-danger {
+  width: auto;
+  padding: 12px 8px;
+  border-radius: 12px;
+  background: #fee2e2;
+  color: #c0392b;
+  border: 1px solid #fca5a5;
+  font-weight: 600;
+}
+
+/* Grid layout */
+.persona-manager-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+/* Individual card */
+.pm-persona-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.18s, box-shadow 0.18s;
+  border: 2px solid transparent;
+  position: relative;
+}
+.pm-persona-card:active {
+  transform: scale(0.97);
+}
+.pm-persona-card.pm-card-active {
+  border-color: var(--pm-card-color, #4d96ff);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.14);
+}
+
+/* Colored top strip */
+.pm-card-top-bar {
+  height: 6px;
+  background: var(--pm-card-color, #4d96ff);
+  width: 100%;
+}
+
+/* Body layout */
+.pm-card-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 8px 6px;
+}
+
+/* Avatar */
+.pm-card-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--pm-card-color, #4d96ff);
+  flex-shrink: 0;
+}
+#active-persona-banner .pm-card-avatar {
+  width: 56px;
+  height: 56px;
+}
+
+/* Info block */
+.pm-card-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+.pm-card-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.pm-card-nickname {
+  font-size: 11px;
+  color: #999;
+  margin-top: 1px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pm-card-balance {
+  font-size: 12px;
+  color: var(--pm-card-color, #4d96ff);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* Active badge */
+.pm-active-badge {
+  background: #d1fae5;
+  color: #065f46;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+/* Edit button */
+.pm-card-edit-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 8px;
+  color: #aaa;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.pm-card-edit-btn:hover {
+  background: #f0f0f0;
+}
+
+/* Deactivate button */
+.pm-card-deactivate-btn {
+  display: block;
+  width: calc(100% - 16px);
+  margin: 0 8px 8px;
+  padding: 7px;
+  background: #fff0f0;
+  color: #c0392b;
+  border: none;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+.pm-card-deactivate-btn:active {
+  background: #fde;
+}
+
+/* Empty notice */
+.persona-manager-empty-notice {
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #1d4ed8;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Color picker */
+.pm-color-picker {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.pm-color-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 3px solid transparent;
+  box-sizing: border-box;
+  transition: transform 0.15s, border-color 0.15s;
+}
+.pm-color-dot:hover {
+  transform: scale(1.15);
+}
+.pm-color-dot.selected {
+  border-color: #fff;
+  box-shadow: 0 0 0 2px #333;
+  transform: scale(1.15);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  #persona-manager-body {
+    background: #1a1a2e;
+  }
+  .pm-persona-card {
+    background: #222235;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  .pm-card-name { color: #eee; }
+  .pm-card-nickname { color: #777; }
+  .persona-manager-empty-notice {
+    background: #1e3a5f;
+    border-color: #2a5298;
+    color: #90caf9;
+  }
+  .pm-card-deactivate-btn {
+    background: #3a1a1a;
+    color: #ff7777;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   IMAGE GENERATION — PROVIDER TAB SWITCHER
+   ══════════════════════════════════════════════════════════════ */
+.img-gen-provider-tabs {
+  display: flex;
+  background: #f0f0f0;
+  border-radius: 10px;
+  padding: 3px;
+  gap: 3px;
+}
+.img-gen-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  padding: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.img-gen-tab.active {
+  background: #fff;
+  color: var(--accent-color, #4d96ff);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}

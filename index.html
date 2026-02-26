@@ -561,6 +561,25 @@
                 >
               </div>
             </div>
+            <div style="position: absolute; bottom: 15px; left: 205px">
+              <div class="desktop-app-icon" id="persona-manager-app-icon" onclick="showScreen('persona-manager-screen')">
+                <div class="icon-bg-desktop">
+                  <img
+                    id="icon-img-persona-manager"
+                    src="https://i.postimg.cc/qRqpK5kP/anime-avatar.jpg"
+                    alt="Personas"
+                  />
+                </div>
+                <span
+                  class="label"
+                  style="
+                    color: white;
+                    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+                  "
+                  >Personas</span
+                >
+              </div>
+            </div>
           </div>
         </div>
 
@@ -625,6 +644,50 @@
         <div class="pagination-dots">
           <span class="dot active"></span>
           <span class="dot"></span>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════ -->
+      <!-- PERSONA MANAGER SCREEN                        -->
+      <!-- ══════════════════════════════════════════════ -->
+      <div id="persona-manager-screen" class="screen">
+        <div class="header">
+          <span class="back-btn" onclick="showScreen('home-screen')">‹</span>
+          <span>Personas</span>
+          <div class="header-actions">
+            <span class="action-btn" id="pm-add-btn" title="New Persona" onclick="openPersonaManagerEditor(null)">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="form-container settings-scroll-container" id="persona-manager-body">
+
+          <!-- ★ Active Persona section card ★ -->
+          <div class="settings-group-card" id="active-persona-section" style="display:none;">
+            <div class="settings-section-title">✦ Active Persona</div>
+            <div id="active-persona-banner"></div>
+          </div>
+
+          <!-- No active persona notice -->
+          <div id="no-active-persona-notice" class="persona-manager-empty-notice" style="display:none;">
+            <span>🌐</span> No active persona — tap a card below to switch into one!
+          </div>
+
+          <!-- ★ All personas section card ★ -->
+          <div class="settings-group-card" id="all-personas-section" style="display:none;">
+            <div class="settings-section-title">🎭 All Personas</div>
+            <div id="persona-manager-grid" class="persona-manager-grid"></div>
+          </div>
+
+          <!-- Empty state (no personas at all) -->
+          <div id="persona-manager-empty" style="display:none; text-align:center; padding:60px 20px; color:#aaa;">
+            <div style="font-size:48px; margin-bottom:12px;">🎭</div>
+            <div style="font-size:16px; font-weight:600; color:#888; margin-bottom:8px;">No Personas Yet</div>
+            <div style="font-size:13px; color:#bbb;">Tap the <b>＋</b> button above to create your first persona!</div>
+          </div>
         </div>
       </div>
 
@@ -1384,7 +1447,7 @@
           <div class="moe-card">
             <div class="moe-card-header">
               <span class="icon">🎨</span>
-              <h3>NovelAI Image Generation</h3>
+              <h3>Image Generation</h3>
             </div>
             <div class="moe-card-body">
               <div class="form-group">
@@ -1397,52 +1460,69 @@
                 </label>
               </div>
               <div id="novelai-details" style="display: none; margin-top: 10px">
+
+                <!-- Provider tab switcher -->
                 <div class="form-group">
-                  <label>Model</label>
-                  <select id="novelai-model" class="moe-input">
-                    <option value="nai-diffusion-4-curated-preview">
-                      V4.5 Curated
-                    </option>
-                    <option value="nai-diffusion-4-5-full">V4.5 Full</option>
-                    <option value="nai-diffusion-3">V3 Anime</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>API Key</label>
-                  <div style="position: relative">
-                    <input
-                      type="password"
-                      id="novelai-api-key"
-                      class="moe-input"
-                    />
-                    <span
-                      id="novelai-key-toggle"
-                      style="
-                        position: absolute;
-                        right: 10px;
-                        top: 10px;
-                        cursor: pointer;
-                      "
-                      >👀</span
-                    >
+                  <label>Provider</label>
+                  <div class="img-gen-provider-tabs">
+                    <button class="img-gen-tab active" data-provider="novelai"
+                      onclick="switchImageGenProvider('novelai')">NovelAI</button>
+                    <button class="img-gen-tab" data-provider="pixai"
+                      onclick="switchImageGenProvider('pixai')">PixAI</button>
                   </div>
                 </div>
-                <div class="moe-btn-group">
-                  <button
-                    type="button"
-                    id="novelai-settings-btn"
-                    class="moe-btn-secondary"
-                  >
-                    Settings
-                  </button>
-                  <button
-                    type="button"
-                    id="novelai-test-btn"
-                    class="moe-btn-secondary"
-                  >
-                    Test
-                  </button>
+
+                <!-- NovelAI section -->
+                <div id="novelai-provider-section">
+                  <div class="form-group">
+                    <label>Model</label>
+                    <select id="novelai-model" class="moe-input">
+                      <option value="nai-diffusion-4-curated-preview">V4.5 Curated</option>
+                      <option value="nai-diffusion-4-5-full">V4.5 Full</option>
+                      <option value="nai-diffusion-3">V3 Anime</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>API Key</label>
+                    <div style="position: relative">
+                      <input type="password" id="novelai-api-key" class="moe-input"/>
+                      <span id="novelai-key-toggle"
+                        style="position:absolute;right:10px;top:10px;cursor:pointer">👀</span>
+                    </div>
+                  </div>
+                  <div class="moe-btn-group">
+                    <button type="button" id="novelai-settings-btn" class="moe-btn-secondary">Settings</button>
+                    <button type="button" id="novelai-test-btn" class="moe-btn-secondary">Test</button>
+                  </div>
                 </div>
+
+                <!-- PixAI section -->
+                <div id="pixai-provider-section" style="display:none">
+                  <div class="form-group">
+                    <label>Model</label>
+                    <select id="pixai-model" class="moe-input">
+                      <option value="1935090615918113018">Tsubaki v1.1 — Natural Language (DiT)</option>
+                      <option value="1934789864939078594">Tsubaki Flash — Fast (DiT)</option>
+                      <option value="1894092844569363483">Tsubaki — Multi-character (DiT)</option>
+                      <option value="1914519679917387494">Serin — Korean Style (DiT)</option>
+                      <option value="1861558740588989558">Haruka v2 — Accurate Hands (SDXL)</option>
+                      <option value="1811528826405408057">Hoshino — Japanese Style (SDXL)</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>API Key</label>
+                    <div style="position: relative">
+                      <input type="password" id="pixai-api-key" class="moe-input"/>
+                      <span id="pixai-key-toggle"
+                        style="position:absolute;right:10px;top:10px;cursor:pointer">👀</span>
+                    </div>
+                  </div>
+                  <div class="moe-btn-group">
+                    <button type="button" id="pixai-settings-btn" class="moe-btn-secondary">Settings</button>
+                    <button type="button" id="pixai-test-btn" class="moe-btn-secondary">Test</button>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -5539,6 +5619,20 @@
               <label for="ai-persona">Their Persona</label>
               <textarea id="ai-persona" rows="3" class="moe-input"></textarea>
             </div>
+            <!-- ★ Use Global Persona toggle ★ -->
+            <div class="form-group" id="use-global-persona-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; background:#f0f4ff; padding:10px 14px; border-radius:14px; margin-bottom:4px;">
+                <div>
+                  <div style="font-weight:600; font-size:14px; color:#4d96ff;">🌐 Use Global Persona</div>
+                  <div style="font-size:12px; color:#888;" id="global-persona-sync-label">Sync "My Persona" with active persona.</div>
+                </div>
+                <label class="toggle-switch-label" style="margin:0">
+                  <input type="checkbox" id="use-global-persona-toggle" onchange="onUseGlobalPersonaToggle(this.checked)"/>
+                  <span class="toggle-switch-slider"></span>
+                </label>
+              </div>
+            </div>
+
             <div class="form-group" id="my-persona-group">
               <label for="my-persona">My Persona</label>
               <textarea id="my-persona" rows="3" class="moe-input"></textarea>
@@ -5766,7 +5860,7 @@
               >
                 <label class="toggle-switch-label" style="margin: 0">
                   <span class="toggle-switch-text" style="font-size: 13px"
-                    >Auto-generate image each round (NovelAI)</span
+                    >Auto-generate image each round</span
                   >
                   <input type="checkbox" id="offline-novelai-toggle" />
                   <span
@@ -6591,6 +6685,106 @@
       </div>
     </div>
 
+    <!-- ══════════════════════════════════════════════ -->
+    <!-- PERSONA MANAGER EDITOR MODAL                  -->
+    <!-- ══════════════════════════════════════════════ -->
+    <div id="persona-manager-editor-modal" class="modal">
+      <div class="modal-content moe-settings-content" style="max-height:90vh; overflow-y:auto;">
+        <div class="modal-header">
+          <span id="pm-editor-title">✨ New Persona</span>
+        </div>
+        <div class="modal-body">
+
+          <!-- Identity Card -->
+          <div class="settings-group-card" style="margin-bottom:14px;">
+            <div class="settings-section-title">🪪 Identity</div>
+
+            <div class="form-group">
+              <label>Display Name <span style="color:#e74c3c;">*</span></label>
+              <input type="text" id="pm-editor-name" class="moe-input" placeholder="e.g. Rich CEO"/>
+            </div>
+
+            <div class="form-group">
+              <label>Color Theme</label>
+              <div id="pm-editor-color-picker" class="pm-color-picker">
+                <div class="pm-color-dot selected" data-color="#4d96ff" style="background:#4d96ff;"></div>
+                <div class="pm-color-dot" data-color="#ff6b6b" style="background:#ff6b6b;"></div>
+                <div class="pm-color-dot" data-color="#51cf66" style="background:#51cf66;"></div>
+                <div class="pm-color-dot" data-color="#fcc419" style="background:#fcc419;"></div>
+                <div class="pm-color-dot" data-color="#cc5de8" style="background:#cc5de8;"></div>
+                <div class="pm-color-dot" data-color="#f06595" style="background:#f06595;"></div>
+              </div>
+              <input type="hidden" id="pm-editor-color" value="#4d96ff"/>
+            </div>
+
+            <div class="form-group">
+              <label>Avatar URL</label>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="text" id="pm-editor-avatar" class="moe-input" placeholder="https://..." style="flex:1;"
+                  oninput="document.getElementById('pm-editor-avatar-preview').src=this.value||'https://i.postimg.cc/qRqpK5kP/anime-avatar.jpg'"/>
+                <img id="pm-editor-avatar-preview" src="https://i.postimg.cc/qRqpK5kP/anime-avatar.jpg"
+                  style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #ddd;flex-shrink:0;"/>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Nickname (shown everywhere)</label>
+              <input type="text" id="pm-editor-nickname" class="moe-input" placeholder="e.g. Alex"/>
+            </div>
+
+            <div class="form-group">
+              <label>My Persona Description</label>
+              <textarea id="pm-editor-description" rows="3" class="moe-input" placeholder="Describe this persona's personality, background..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Starting Balance (¥)</label>
+              <input type="number" id="pm-editor-balance" class="moe-input" value="0" min="0" step="100"/>
+            </div>
+          </div>
+
+          <!-- Weibo Card -->
+          <div class="settings-group-card" style="margin-bottom:14px;">
+            <div class="settings-section-title">🌐 Weibo Profile</div>
+            <div style="font-size:12px; color:#999; margin-bottom:10px;">Optional — leave blank to inherit from Identity above</div>
+
+            <div class="form-group">
+              <label>Weibo Nickname</label>
+              <input type="text" id="pm-editor-weibo-nickname" class="moe-input" placeholder="Leave blank to use nickname above"/>
+            </div>
+
+            <div class="form-group">
+              <label>Weibo Avatar URL</label>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="text" id="pm-editor-weibo-avatar" class="moe-input" placeholder="Leave blank to use avatar above" style="flex:1;"
+                  oninput="document.getElementById('pm-editor-weibo-avatar-preview').src=this.value||'https://i.postimg.cc/qRqpK5kP/anime-avatar.jpg'"/>
+                <img id="pm-editor-weibo-avatar-preview" src="https://i.postimg.cc/qRqpK5kP/anime-avatar.jpg"
+                  style="width:50px;height:50px;border-radius:50%;object-fit:cover;border:2px solid #ddd;flex-shrink:0;"/>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Profession</label>
+              <input type="text" id="pm-editor-weibo-profession" class="moe-input" placeholder="e.g. CEO, Student..."/>
+            </div>
+
+            <div class="form-group">
+              <label>Weibo Bio / User Persona</label>
+              <textarea id="pm-editor-weibo-persona" rows="3" class="moe-input" placeholder="How does this persona present themselves on Weibo..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="cancel" onclick="closePersonaManagerEditor()">Cancel</button>
+          <button id="pm-editor-delete-btn" onclick="deletePersonaFromManager()" class="moe-btn-danger" style="display:none;">
+            🗑 Delete
+          </button>
+          <button onclick="savePersonaFromModal()" class="save">💾 Save</button>
+        </div>
+      </div>
+    </div>
+
     <div id="member-settings-modal" class="modal">
       <div class="modal-content">
         <div class="modal-header"><span>Edit Group Member</span></div>
@@ -7168,6 +7362,99 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
       </div>
     </div>
 
+    <!-- PixAI generation settings modal -->
+    <div id="pixai-settings-modal" class="modal" style="display: none">
+      <div class="modal-content" style="max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto">
+        <div class="modal-header">
+          <span>PixAI Generation Settings</span>
+          <span class="close" id="close-pixai-settings"
+            style="cursor:pointer; float:right; font-size:28px; font-weight:bold">&times;</span>
+        </div>
+        <div class="modal-body" style="padding: 20px">
+
+          <!-- Resolution -->
+          <div class="form-group">
+            <label style="color:#333">Image Size</label>
+            <select id="pai-resolution" class="moe-input">
+              <optgroup label="DiT / SDXL">
+                <option value="768x1280" selected>Portrait (768×1280)</option>
+                <option value="1280x768">Landscape (1280×768)</option>
+                <option value="1024x1024">Square (1024×1024)</option>
+                <option value="896x1152">Portrait (896×1152)</option>
+                <option value="1152x896">Landscape (1152×896)</option>
+              </optgroup>
+              <optgroup label="SD v1 (Hoshino / older)">
+                <option value="512x768">Portrait (512×768)</option>
+                <option value="768x512">Landscape (768×512)</option>
+                <option value="512x512">Square (512×512)</option>
+                <option value="768x1024">Portrait (768×1024)</option>
+                <option value="1024x768">Landscape (1024×768)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <!-- Steps -->
+          <div class="form-group">
+            <label style="color:#333">Sampling Steps</label>
+            <input type="number" id="pai-steps" value="28" min="8" max="50" class="moe-input"/>
+          </div>
+
+          <!-- CFG Scale -->
+          <div class="form-group">
+            <label style="color:#333">Prompt Adherence (CFG Scale)</label>
+            <input type="number" id="pai-cfg-scale" value="5" min="1.1" max="15" step="0.5" class="moe-input"/>
+          </div>
+
+          <!-- Seed -->
+          <div class="form-group">
+            <label style="color:#333">Random Seed (-1 = random)</label>
+            <input type="number" id="pai-seed" value="-1" min="-1" max="9999999999" class="moe-input"/>
+          </div>
+
+          <!-- Default Positive Prompt -->
+          <div class="form-group">
+            <label style="color:#333">Default Positive Prompt</label>
+            <textarea id="pai-default-positive" rows="3" class="moe-input"
+              placeholder="masterpiece, best quality, 1girl, beautiful..."
+            >masterpiece, best quality, 1girl, beautiful, detailed face, detailed eyes, long hair, anime style</textarea>
+          </div>
+
+          <!-- Default Negative Prompt -->
+          <div class="form-group">
+            <label style="color:#333">Default Negative Prompt</label>
+            <textarea id="pai-default-negative" rows="3" class="moe-input"
+              placeholder="lowres, bad anatomy, bad hands, text, error..."
+            >lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry</textarea>
+          </div>
+
+          <!-- CORS Proxy -->
+          <div class="form-group" style="border-top:1px solid #ddd; padding-top:15px; margin-top:15px">
+            <label style="color:#333">🌐 CORS Proxy Settings</label>
+            <select id="pai-cors-proxy" class="moe-input">
+              <option value="">❌ Direct (no proxy)</option>
+              <option value="https://corsproxy.io/?" selected>✅ corsproxy.io (Recommended)</option>
+              <option value="https://api.allorigins.win/raw?url=">allorigins.win</option>
+              <option value="https://cors-anywhere.herokuapp.com/">cors-anywhere (requires activation)</option>
+              <option value="custom">🔧 Custom Proxy</option>
+            </select>
+          </div>
+          <div id="pai-custom-proxy-group" class="form-group" style="display:none">
+            <label style="color:#333">Custom Proxy URL</label>
+            <input type="text" id="pai-custom-proxy-url" class="moe-input" placeholder="https://your-proxy.com/?"/>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button id="reset-pixai-settings-btn" class="form-button form-button-secondary" style="margin-right:10px">
+            Reset to Default
+          </button>
+          <button id="save-pixai-settings-btn" class="form-button form-button-secondary">
+            Save Settings
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- NovelAI test generation modal -->
     <div id="novelai-test-modal" class="modal" style="display: none">
       <div
@@ -7307,6 +7594,60 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
         </div>
         <div class="modal-footer">
           <button id="close-nai-test-btn" class="form-button">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PixAI test generation modal -->
+    <div id="pixai-test-modal" class="modal" style="display: none">
+      <div class="modal-content" style="max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto">
+        <div class="modal-header">
+          <span>🖼️ PixAI Test Generation</span>
+          <span class="close" id="close-pixai-test"
+            style="cursor:pointer; float:right; font-size:28px; font-weight:bold">&times;</span>
+        </div>
+        <div class="modal-body" style="padding: 20px">
+
+          <div class="form-group">
+            <label style="color:#333">Positive Prompt (test only)</label>
+            <textarea id="pai-test-prompt" rows="4" class="moe-input"
+              placeholder="1girl, solo, long hair, blue eyes, smile..."
+            >1girl, solo, long hair, blue eyes, smile, outdoors, cherry blossoms, spring</textarea>
+          </div>
+
+          <div class="form-group">
+            <label style="color:#333">Negative Prompt (optional — leave blank to use default)</label>
+            <textarea id="pai-test-negative" rows="3" class="moe-input"
+              placeholder="Leave blank to use default negative prompt from settings"></textarea>
+          </div>
+
+          <div style="text-align:center; margin: 20px 0">
+            <button id="pai-generate-btn"
+              style="background:#007bff; color:#fff; border:none; padding:12px 30px; border-radius:6px; cursor:pointer; font-size:16px; font-weight:bold">
+              Generate Image
+            </button>
+          </div>
+
+          <div id="pai-test-status" style="text-align:center; color:#666; margin:15px 0; display:none">
+            Generating, please wait… (polling PixAI task)
+          </div>
+
+          <div id="pai-test-result" style="display:none; margin-top:20px">
+            <div style="font-weight:bold; color:#333; margin-bottom:10px">Generation Result:</div>
+            <div style="text-align:center; background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #e9ecef">
+              <img id="pai-result-image" style="max-width:100%; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1)"/>
+            </div>
+            <div style="margin-top:10px; text-align:center">
+              <button id="pai-download-btn" class="form-button-secondary" style="margin:0">Download Image</button>
+            </div>
+          </div>
+
+          <div id="pai-test-error"
+            style="display:none; margin-top:15px; padding:12px; background:#f8d7da; color:#721c24; border-radius:6px; border:1px solid #f5c6cb">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="close-pai-test-btn" class="form-button">Close</button>
         </div>
       </div>
     </div>
@@ -18869,6 +19210,9 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             applyCustomFont(state.globalSettings.fontUrl || "", true);
             renderFontPresets();
           }
+          if (screenId === "persona-manager-screen") {
+            renderPersonaManager();
+          }
         }
         window.showScreen = showScreen; // 确保 showScreen 自己也是全局的
 
@@ -21068,10 +21412,13 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             homeIconWidgetTextColor: "#FFFFFF", // <-- 修改这里的名字
             imageCompressionQuality: 0.7,
             userBalance: 520,
+            activePersonaId: null,
 
             homeAvatarFrame: "", // 为主屏幕头像框添加默认空值
           };
           // 确保即使从旧数据库加载，这个属性也存在
+          if (typeof state.globalSettings.activePersonaId === 'undefined')
+            state.globalSettings.activePersonaId = null;
           if (!state.globalSettings.widgetData) {
             state.globalSettings.widgetData = {};
           }
@@ -21155,6 +21502,14 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           window.state.musicState.playlist.unshift(keepAliveTrack);
 
           state.personaPresets = personaPresets || [];
+          // Orphan-check: clear activePersonaId if its persona was deleted
+          if (state.globalSettings.activePersonaId) {
+            const _apExists = state.personaPresets.some(p => p.id === state.globalSettings.activePersonaId);
+            if (!_apExists) {
+              state.globalSettings.activePersonaId = null;
+              db.globalSettings.put(state.globalSettings);
+            }
+          }
           state.apiPresets = apiPresets || [];
           state.bubbleStylePresets = bubbleStylePresets || [];
 
@@ -21701,6 +22056,230 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           }
           return defaultSettings;
         }
+
+        // ══════════════════════════════════════════════════════════════════════
+        // PIXAI IMAGE GENERATION
+        // ══════════════════════════════════════════════════════════════════════
+
+        /** Get PixAI settings (with defaults) */
+        function getPixAISettings() {
+          const defaultSettings = {
+            resolution: "768x1280",
+            steps: 28,
+            cfg_scale: 5,
+            seed: -1,
+            default_positive:
+              "masterpiece, best quality, 1girl, beautiful, detailed face, detailed eyes, long hair, anime style",
+            default_negative:
+              "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
+            cors_proxy: "https://corsproxy.io/?",
+            custom_proxy_url: "",
+          };
+          const saved = localStorage.getItem("pixai-settings");
+          if (saved) {
+            try { return { ...defaultSettings, ...JSON.parse(saved) }; }
+            catch (e) { return defaultSettings; }
+          }
+          return defaultSettings;
+        }
+
+        /** Load PixAI settings into the settings modal */
+        function loadPixAISettings() {
+          const s = getPixAISettings();
+          document.getElementById("pai-resolution").value = s.resolution;
+          document.getElementById("pai-steps").value = s.steps;
+          document.getElementById("pai-cfg-scale").value = s.cfg_scale;
+          document.getElementById("pai-seed").value = s.seed;
+          document.getElementById("pai-default-positive").value = s.default_positive;
+          document.getElementById("pai-default-negative").value = s.default_negative;
+          document.getElementById("pai-cors-proxy").value = s.cors_proxy;
+          document.getElementById("pai-custom-proxy-url").value = s.custom_proxy_url || "";
+          document.getElementById("pai-custom-proxy-group").style.display =
+            s.cors_proxy === "custom" ? "block" : "none";
+        }
+
+        /** Save PixAI settings from the modal to localStorage */
+        function savePixAISettings() {
+          localStorage.setItem("pixai-api-key",
+            document.getElementById("pixai-api-key").value.trim());
+          localStorage.setItem("pixai-model",
+            document.getElementById("pixai-model").value);
+          const settings = {
+            resolution: document.getElementById("pai-resolution").value,
+            steps: parseInt(document.getElementById("pai-steps").value),
+            cfg_scale: parseFloat(document.getElementById("pai-cfg-scale").value),
+            seed: parseInt(document.getElementById("pai-seed").value),
+            default_positive: document.getElementById("pai-default-positive").value,
+            default_negative: document.getElementById("pai-default-negative").value,
+            cors_proxy: document.getElementById("pai-cors-proxy").value,
+            custom_proxy_url: document.getElementById("pai-custom-proxy-url").value,
+          };
+          localStorage.setItem("pixai-settings", JSON.stringify(settings));
+          document.getElementById("pixai-settings-modal").style.display = "none";
+        }
+
+        /** Switch visible provider section */
+        function switchImageGenProvider(provider) {
+          localStorage.setItem("image-gen-provider", provider);
+          document.getElementById("novelai-provider-section").style.display =
+            provider === "novelai" ? "" : "none";
+          document.getElementById("pixai-provider-section").style.display =
+            provider === "pixai" ? "" : "none";
+          document.querySelectorAll(".img-gen-tab").forEach(t =>
+            t.classList.toggle("active", t.dataset.provider === provider));
+        }
+
+        /**
+         * Build a proxied URL from a base URL and cors proxy setting.
+         * @param {string} baseUrl
+         * @param {string} corsProxy
+         * @param {string} customProxyUrl
+         */
+        function buildPixAIProxiedUrl(baseUrl, corsProxy, customProxyUrl) {
+          if (!corsProxy || corsProxy === "") return baseUrl;
+          const proxy = corsProxy === "custom" ? (customProxyUrl || "") : corsProxy;
+          return proxy + encodeURIComponent(baseUrl);
+        }
+
+        /**
+         * Core PixAI image generation with async polling.
+         * Returns a base64 data URL string.
+         */
+        async function generatePixAIImage(prompt, negativePrompt, settings, modelId) {
+          const apiKey = localStorage.getItem("pixai-api-key") || "";
+          if (!apiKey) throw new Error("Please configure PixAI API Key first!");
+          if (!prompt) throw new Error("Please enter a prompt!");
+
+          const corsProxy = settings.cors_proxy === "custom"
+            ? (settings.custom_proxy_url || "")
+            : (settings.cors_proxy || "https://corsproxy.io/?");
+
+          const [width, height] = (settings.resolution || "768x1280")
+            .split("x").map(Number);
+
+          const requestBody = { parameters: {
+            prompts: prompt,
+            negativePrompts: negativePrompt || "",
+            modelId: modelId || "1935090615918113018",
+            width,
+            height,
+            batchSize: 1,
+            samplingSteps: settings.steps || 28,
+            cfgScale: settings.cfg_scale || 5,
+          }};
+          if (settings.seed && settings.seed > 0) {
+            requestBody.parameters.seed = settings.seed;
+          }
+
+          // 1. Create task
+          const createUrl = buildPixAIProxiedUrl(
+            "https://api.pixai.art/v1/task", corsProxy, settings.custom_proxy_url);
+          const createResp = await fetch(createUrl, {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+            body: JSON.stringify(requestBody),
+          });
+          if (!createResp.ok) {
+            const errText = await createResp.text().catch(() => createResp.status);
+            throw new Error(`PixAI create task failed (${createResp.status}): ${errText}`);
+          }
+          const taskData = await createResp.json();
+          const taskId = taskData.id;
+          if (!taskId) throw new Error("PixAI: No task ID returned");
+
+          // 2. Poll until completed
+          const pollBaseUrl = `https://api.pixai.art/v1/task/${taskId}`;
+          const maxPolls = 80; // 80 * 1.5s = 2 min
+          for (let i = 0; i < maxPolls; i++) {
+            await new Promise(r => setTimeout(r, 1500));
+            const pollUrl = buildPixAIProxiedUrl(
+              pollBaseUrl, corsProxy, settings.custom_proxy_url);
+            const pollResp = await fetch(pollUrl, {
+              headers: { "Authorization": `Bearer ${apiKey}` },
+            });
+            if (!pollResp.ok) throw new Error(`PixAI poll failed (${pollResp.status})`);
+            const pollData = await pollResp.json();
+
+            if (pollData.status === "completed") {
+              const imageUrl = pollData.outputs?.mediaUrls?.[0];
+              if (!imageUrl) throw new Error("PixAI: No image URL in completed response");
+              // Fetch image and convert to base64
+              const proxyImgUrl = buildPixAIProxiedUrl(
+                imageUrl, corsProxy, settings.custom_proxy_url);
+              const imgResp = await fetch(proxyImgUrl);
+              if (!imgResp.ok) throw new Error("PixAI: Failed to fetch generated image");
+              const blob = await imgResp.blob();
+              return await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = e => resolve(e.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+              });
+            } else if (pollData.status === "failed" || pollData.status === "cancelled") {
+              throw new Error(`PixAI task ${pollData.status}`);
+            }
+            // waiting / running → continue polling
+          }
+          throw new Error("PixAI: Timeout — image generation took too long (>2 min)");
+        }
+
+        /**
+         * Generate PixAI image for a character chat (mirrors generateNovelAIImageForCharacter).
+         */
+        async function generatePixAIImageForCharacter(chatId, customPrompt = "") {
+          const modelId = localStorage.getItem("pixai-model") || "1935090615918113018";
+          const settings = getPixAISettings();
+          const prompts = getCharacterNAIPrompts(chatId); // reuse existing function
+          let finalPrompt = prompts.positive;
+          if (customPrompt) finalPrompt = customPrompt + ", " + prompts.positive;
+          const negativePrompt = prompts.negative || settings.default_negative;
+          return await generatePixAIImage(finalPrompt, negativePrompt, settings, modelId);
+        }
+
+        /** Test generation handler for the PixAI test modal */
+        async function pixaiTestGenerate() {
+          const prompt = document.getElementById("pai-test-prompt").value.trim();
+          if (!prompt) { alert("Please enter a prompt!"); return; }
+
+          const settings = getPixAISettings();
+          const negativePrompt = document.getElementById("pai-test-negative").value.trim()
+            || settings.default_negative;
+          const modelId = localStorage.getItem("pixai-model") || "1935090615918113018";
+
+          const statusDiv = document.getElementById("pai-test-status");
+          const resultDiv = document.getElementById("pai-test-result");
+          const errorDiv = document.getElementById("pai-test-error");
+          const generateBtn = document.getElementById("pai-generate-btn");
+
+          statusDiv.style.display = "block";
+          resultDiv.style.display = "none";
+          errorDiv.style.display = "none";
+          generateBtn.disabled = true;
+          generateBtn.textContent = "Generating…";
+
+          try {
+            const imageDataUrl = await generatePixAIImage(prompt, negativePrompt, settings, modelId);
+            document.getElementById("pai-result-image").src = imageDataUrl;
+            resultDiv.style.display = "block";
+            statusDiv.style.display = "none";
+          } catch (err) {
+            errorDiv.textContent = "❌ " + err.message;
+            errorDiv.style.display = "block";
+            statusDiv.style.display = "none";
+          } finally {
+            generateBtn.disabled = false;
+            generateBtn.textContent = "Generate Image";
+          }
+        }
+
+        // Expose to global scope
+        window.switchImageGenProvider = switchImageGenProvider;
+        window.pixaiTestGenerate = pixaiTestGenerate;
+        window.generatePixAIImageForCharacter = generatePixAIImageForCharacter;
+
+        // ══════════════════════════════════════════════════════════════════════
+        // END PIXAI IMAGE GENERATION
+        // ══════════════════════════════════════════════════════════════════════
 
         /**
          * Get the NAI prompt configuration for a given character ID
@@ -24902,7 +25481,7 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
 Write in **third person**, narrating {{user}}'s actions, facial expressions, body language, and inner thoughts like a novelist — immersive and detailed. You may include brief dialogue if it feels natural.
 
-Aim for approximately **{{wordCount}} words** in Vietnamese (tiếng Việt). Output ONLY {{user}}'s reply — no chapter headings, no labels, no meta-commentary.`;
+Aim for approximately **{{wordCount}} words**. Output ONLY {{user}}'s reply — no chapter headings, no labels, no meta-commentary.`;
 
             // ── Resolve the prompt (use custom if provided) ───────────────
             const resolvedPrompt = (customPrompt || DEFAULT_IMPERSONATE_PROMPT)
@@ -25026,6 +25605,362 @@ Now write {{user}}'s next reply (~{{wordCount}} words, third person narrative).`
           await triggerAiResponse();
         }
         // ─────────────────────────────────────────────────────────────────────
+
+        // ══════════════════════════════════════════════════════════════════════
+        // PERSONA MANAGER
+        // ══════════════════════════════════════════════════════════════════════
+
+        /** Track which persona is being edited (null = creating new) */
+        let editingPersonaManagerId = null;
+
+        /** Generate a unique persona ID */
+        function generatePersonaId() {
+          return typeof crypto !== 'undefined' && crypto.randomUUID
+            ? 'persona_' + crypto.randomUUID()
+            : 'persona_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        /** Build HTML for one persona card */
+        function buildPersonaCardHTML(persona, isActive) {
+          const color = persona.color || '#4d96ff';
+          const avatarSrc = persona.avatar || 'https://i.postimg.cc/qRqpK5kP/anime-avatar.jpg';
+          const balanceFmt = (persona.balance ?? 0).toLocaleString('zh-CN', { minimumFractionDigits: 0 });
+          const activeBadge = isActive
+            ? `<span class="pm-active-badge">✓ Active</span>` : '';
+          const deactivateBtn = isActive
+            ? `<button class="pm-card-deactivate-btn" onclick="event.stopPropagation(); switchPersona(null)">Deactivate</button>` : '';
+          return `
+            <div class="pm-persona-card ${isActive ? 'pm-card-active' : ''}"
+              style="--pm-card-color:${color}"
+              onclick="confirmAndSwitchPersona('${persona.id}')"
+              data-persona-id="${persona.id}">
+              <div class="pm-card-top-bar"></div>
+              <div class="pm-card-body">
+                <img class="pm-card-avatar" src="${avatarSrc}" onerror="this.src='https://i.postimg.cc/qRqpK5kP/anime-avatar.jpg'"/>
+                <div class="pm-card-info">
+                  <div class="pm-card-name">${activeBadge} ${persona.name}</div>
+                  <div class="pm-card-nickname">@${persona.nickname || persona.name}</div>
+                  <div class="pm-card-balance">¥${balanceFmt}</div>
+                </div>
+                <button class="pm-card-edit-btn" onclick="event.stopPropagation(); openPersonaManagerEditor('${persona.id}')">✏️</button>
+              </div>
+              ${deactivateBtn}
+            </div>`;
+        }
+
+        /** Render the full persona manager screen */
+        function renderPersonaManager() {
+          // Only consider personas that have a .name (full personas, not old presets)
+          const allPersonas = (state.personaPresets || []).filter(p => p.name);
+          const activeId = state.globalSettings.activePersonaId;
+          const activePersona = allPersonas.find(p => p.id === activeId) || null;
+          const otherPersonas = allPersonas.filter(p => p.id !== activeId);
+
+          const banner = document.getElementById('active-persona-banner');
+          const activeSection = document.getElementById('active-persona-section');
+          const noActiveNotice = document.getElementById('no-active-persona-notice');
+          const allSection = document.getElementById('all-personas-section');
+          const grid = document.getElementById('persona-manager-grid');
+          const empty = document.getElementById('persona-manager-empty');
+
+          // ── Active persona section ────────────────────────────
+          if (activePersona) {
+            activeSection.style.display = 'block';
+            noActiveNotice.style.display = 'none';
+            banner.innerHTML = buildPersonaCardHTML(activePersona, true);
+          } else {
+            activeSection.style.display = 'none';
+            noActiveNotice.style.display = allPersonas.length > 0 ? 'block' : 'none';
+          }
+
+          // ── Grid section ──────────────────────────────────────
+          if (allPersonas.length === 0) {
+            allSection.style.display = 'none';
+            empty.style.display = 'block';
+          } else {
+            empty.style.display = 'none';
+            if (otherPersonas.length > 0) {
+              allSection.style.display = 'block';
+              grid.innerHTML = otherPersonas.map(p => buildPersonaCardHTML(p, false)).join('');
+            } else {
+              // Only active persona exists — no "other" grid needed
+              allSection.style.display = 'none';
+              grid.innerHTML = '';
+            }
+          }
+        }
+
+        /** Open the persona editor modal */
+        function openPersonaManagerEditor(personaId) {
+          editingPersonaManagerId = personaId;
+          const isNew = !personaId;
+          const modal = document.getElementById('persona-manager-editor-modal');
+          const titleEl = document.getElementById('pm-editor-title');
+          const deleteBtn = document.getElementById('pm-editor-delete-btn');
+
+          titleEl.textContent = isNew ? '✨ New Persona' : '✏️ Edit Persona';
+          deleteBtn.style.display = isNew ? 'none' : 'inline-block';
+
+          // Reset color picker selection
+          document.querySelectorAll('#pm-editor-color-picker .pm-color-dot').forEach(d => d.classList.remove('selected'));
+
+          if (isNew) {
+            document.getElementById('pm-editor-name').value = '';
+            document.getElementById('pm-editor-avatar').value = '';
+            document.getElementById('pm-editor-avatar-preview').src = 'https://i.postimg.cc/qRqpK5kP/anime-avatar.jpg';
+            document.getElementById('pm-editor-nickname').value = '';
+            document.getElementById('pm-editor-description').value = '';
+            document.getElementById('pm-editor-balance').value = '0';
+            document.getElementById('pm-editor-color').value = '#4d96ff';
+            document.getElementById('pm-editor-weibo-nickname').value = '';
+            document.getElementById('pm-editor-weibo-avatar').value = '';
+            document.getElementById('pm-editor-weibo-avatar-preview').src = 'https://i.postimg.cc/qRqpK5kP/anime-avatar.jpg';
+            document.getElementById('pm-editor-weibo-profession').value = '';
+            document.getElementById('pm-editor-weibo-persona').value = '';
+            // Select first color dot
+            const firstDot = document.querySelector('#pm-editor-color-picker .pm-color-dot');
+            if (firstDot) firstDot.classList.add('selected');
+          } else {
+            const persona = state.personaPresets.find(p => p.id === personaId);
+            if (!persona) return;
+            // If this is the active persona, show live balance
+            const liveBalance = (persona.id === state.globalSettings.activePersonaId)
+              ? (state.globalSettings.userBalance ?? persona.balance ?? 0)
+              : (persona.balance ?? 0);
+            document.getElementById('pm-editor-name').value = persona.name || '';
+            document.getElementById('pm-editor-avatar').value = persona.avatar || '';
+            document.getElementById('pm-editor-avatar-preview').src = persona.avatar || 'https://i.postimg.cc/qRqpK5kP/anime-avatar.jpg';
+            document.getElementById('pm-editor-nickname').value = persona.nickname || '';
+            document.getElementById('pm-editor-description').value = persona.description || '';
+            document.getElementById('pm-editor-balance').value = String(liveBalance);
+            document.getElementById('pm-editor-color').value = persona.color || '#4d96ff';
+            document.getElementById('pm-editor-weibo-nickname').value = persona.weiboNickname || '';
+            document.getElementById('pm-editor-weibo-avatar').value = persona.weiboAvatar || '';
+            document.getElementById('pm-editor-weibo-avatar-preview').src = persona.weiboAvatar || persona.avatar || 'https://i.postimg.cc/qRqpK5kP/anime-avatar.jpg';
+            document.getElementById('pm-editor-weibo-profession').value = persona.weiboUserProfession || '';
+            document.getElementById('pm-editor-weibo-persona').value = persona.weiboUserPersona || '';
+            // Select matching color dot
+            const matchDot = document.querySelector(`#pm-editor-color-picker .pm-color-dot[data-color="${persona.color || '#4d96ff'}"]`);
+            if (matchDot) matchDot.classList.add('selected');
+            else { const fd = document.querySelector('#pm-editor-color-picker .pm-color-dot'); if (fd) fd.classList.add('selected'); }
+          }
+
+          modal.classList.add('visible');
+        }
+
+        /** Close the persona editor modal */
+        function closePersonaManagerEditor() {
+          document.getElementById('persona-manager-editor-modal').classList.remove('visible');
+          editingPersonaManagerId = null;
+        }
+
+        /** Save persona from the editor modal */
+        async function savePersonaFromModal() {
+          const name = document.getElementById('pm-editor-name').value.trim();
+          if (!name) { showCustomAlert('Please enter a display name for this persona.'); return; }
+
+          const personaId = editingPersonaManagerId || generatePersonaId();
+          const isActive = personaId === state.globalSettings.activePersonaId;
+
+          // For the active persona, save current live balance (don't overwrite with stale form value)
+          const balanceInput = parseFloat(document.getElementById('pm-editor-balance').value) || 0;
+          const balance = isActive ? (state.globalSettings.userBalance ?? balanceInput) : balanceInput;
+
+          const persona = {
+            id: personaId,
+            name,
+            avatar: document.getElementById('pm-editor-avatar').value.trim(),
+            nickname: document.getElementById('pm-editor-nickname').value.trim() || name,
+            description: document.getElementById('pm-editor-description').value.trim(),
+            balance,
+            color: document.getElementById('pm-editor-color').value || '#4d96ff',
+            weiboNickname: document.getElementById('pm-editor-weibo-nickname').value.trim(),
+            weiboAvatar: document.getElementById('pm-editor-weibo-avatar').value.trim(),
+            weiboUserProfession: document.getElementById('pm-editor-weibo-profession').value.trim(),
+            weiboUserPersona: document.getElementById('pm-editor-weibo-persona').value.trim(),
+            createdAt: editingPersonaManagerId
+              ? ((state.personaPresets.find(p => p.id === personaId) || {}).createdAt || Date.now())
+              : Date.now(),
+          };
+
+          await db.personaPresets.put(persona);
+
+          // Update in-memory array
+          const idx = state.personaPresets.findIndex(p => p.id === personaId);
+          if (idx >= 0) state.personaPresets[idx] = persona;
+          else state.personaPresets.push(persona);
+
+          // If this was the active persona, update icon src
+          if (isActive) {
+            const iconEl = document.getElementById('icon-img-persona-manager');
+            if (iconEl && persona.avatar) iconEl.src = persona.avatar;
+          }
+
+          closePersonaManagerEditor();
+          renderPersonaManager();
+        }
+
+        /** Delete the persona currently being edited */
+        async function deletePersonaFromManager() {
+          const personaId = editingPersonaManagerId;
+          if (!personaId) return;
+
+          const persona = state.personaPresets.find(p => p.id === personaId);
+          const personaName = persona ? persona.name : 'this persona';
+
+          showCustomConfirm(
+            `Delete persona "${personaName}"? This cannot be undone.`,
+            async () => {
+              // If this was the active persona, clear it
+              if (state.globalSettings.activePersonaId === personaId) {
+                state.globalSettings.activePersonaId = null;
+                await db.globalSettings.put(state.globalSettings);
+              }
+
+              await db.personaPresets.delete(personaId);
+              state.personaPresets = state.personaPresets.filter(p => p.id !== personaId);
+
+              closePersonaManagerEditor();
+              renderPersonaManager();
+            }
+          );
+        }
+
+        /** Show a confirm before switching persona */
+        function confirmAndSwitchPersona(personaId) {
+          // If already active, do nothing
+          if (personaId === state.globalSettings.activePersonaId) return;
+          const persona = state.personaPresets.find(p => p.id === personaId);
+          if (!persona) return;
+          showCustomConfirm(
+            `Switch to persona "${persona.name}"?\nYour current balance will be saved.`,
+            () => switchPersona(personaId)
+          );
+        }
+
+        /** CORE: Switch to a persona (null = deactivate) */
+        async function switchPersona(personaId) {
+          // 1. Save current live balance to old active persona
+          const oldActiveId = state.globalSettings.activePersonaId;
+          if (oldActiveId) {
+            const oldPersona = state.personaPresets.find(p => p.id === oldActiveId);
+            if (oldPersona) {
+              oldPersona.balance = state.globalSettings.userBalance ?? oldPersona.balance;
+              await db.personaPresets.put(oldPersona);
+              const oldIdx = state.personaPresets.findIndex(p => p.id === oldActiveId);
+              if (oldIdx >= 0) state.personaPresets[oldIdx] = oldPersona;
+            }
+          }
+
+          // 2. Deactivate mode
+          if (!personaId) {
+            state.globalSettings.activePersonaId = null;
+            await db.globalSettings.put(state.globalSettings);
+            renderPersonaManager();
+            showCustomAlert('Persona deactivated.');
+            return;
+          }
+
+          // 3. Load new persona
+          const newPersona = state.personaPresets.find(p => p.id === personaId);
+          if (!newPersona) return;
+
+          // 4. Apply to globalSettings
+          state.globalSettings.activePersonaId = personaId;
+          state.globalSettings.userBalance = newPersona.balance ?? 0;
+          await db.globalSettings.put(state.globalSettings);
+
+          // 5. Apply to qzoneSettings
+          state.qzoneSettings.nickname = newPersona.nickname || newPersona.name;
+          state.qzoneSettings.avatar = newPersona.avatar || state.qzoneSettings.avatar;
+          state.qzoneSettings.weiboNickname = newPersona.weiboNickname || newPersona.nickname || newPersona.name;
+          state.qzoneSettings.weiboAvatar = newPersona.weiboAvatar || newPersona.avatar || state.qzoneSettings.weiboAvatar;
+          if (newPersona.weiboUserProfession) state.qzoneSettings.weiboUserProfession = newPersona.weiboUserProfession;
+          if (newPersona.weiboUserPersona) state.qzoneSettings.weiboUserPersona = newPersona.weiboUserPersona;
+          await saveQzoneSettings();
+
+          // 6. Sync chats that have useGlobalPersona=true
+          const chatIds = Object.keys(state.chats || {});
+          for (const cid of chatIds) {
+            const chat = state.chats[cid];
+            if (chat && chat.settings && chat.settings.useGlobalPersona) {
+              chat.settings.myPersona = newPersona.description || '';
+              await db.chats.put(chat);
+            }
+          }
+
+          // 7. Refresh UI
+          refreshPersonaUI();
+          renderPersonaManager();
+          showCustomAlert(`✨ Switched to "${newPersona.name}"`);
+        }
+
+        /** Refresh all UI elements that reflect the active persona */
+        function refreshPersonaUI() {
+          const activeId = state.globalSettings.activePersonaId;
+          const persona = activeId ? state.personaPresets.find(p => p.id === activeId) : null;
+
+          // Home screen profile avatar
+          const profileAvatarImg = document.getElementById('profile-avatar-img');
+          if (profileAvatarImg && state.qzoneSettings.avatar) {
+            profileAvatarImg.src = state.qzoneSettings.avatar;
+          }
+          // Home screen username
+          const profileUsername = document.getElementById('profile-username');
+          if (profileUsername) profileUsername.textContent = state.qzoneSettings.nickname || '';
+
+          // Persona manager icon
+          const iconEl = document.getElementById('icon-img-persona-manager');
+          if (iconEl && persona && persona.avatar) iconEl.src = persona.avatar;
+
+          // Wallet balance
+          if (typeof renderTaobaoBalance === 'function') renderTaobaoBalance();
+
+          // Weibo profile
+          if (typeof renderWeiboProfile === 'function') renderWeiboProfile();
+        }
+
+        /** Toggle handler for per-chat "Use Global Persona" */
+        function onUseGlobalPersonaToggle(checked) {
+          const textarea = document.getElementById('my-persona');
+          const syncLabel = document.getElementById('global-persona-sync-label');
+          if (!textarea) return;
+
+          if (checked) {
+            const activeId = state.globalSettings.activePersonaId;
+            const activePersona = activeId ? state.personaPresets.find(p => p.id === activeId) : null;
+            textarea.readOnly = true;
+            textarea.style.opacity = '0.6';
+            textarea.style.background = '#f5f5f5';
+            if (activePersona) {
+              textarea.value = activePersona.description || '';
+              if (syncLabel) syncLabel.textContent = `Synced with: ${activePersona.name}`;
+            } else {
+              textarea.value = '';
+              if (syncLabel) syncLabel.textContent = 'No active persona — description will be empty.';
+            }
+          } else {
+            textarea.readOnly = false;
+            textarea.style.opacity = '';
+            textarea.style.background = '';
+            if (syncLabel) syncLabel.textContent = 'Sync "My Persona" with active persona.';
+          }
+        }
+
+        // Expose globally
+        window.renderPersonaManager = renderPersonaManager;
+        window.openPersonaManagerEditor = openPersonaManagerEditor;
+        window.closePersonaManagerEditor = closePersonaManagerEditor;
+        window.savePersonaFromModal = savePersonaFromModal;
+        window.deletePersonaFromManager = deletePersonaFromManager;
+        window.confirmAndSwitchPersona = confirmAndSwitchPersona;
+        window.switchPersona = switchPersona;
+        window.refreshPersonaUI = refreshPersonaUI;
+        window.onUseGlobalPersonaToggle = onUseGlobalPersonaToggle;
+
+        // ══════════════════════════════════════════════════════════════════════
+        // END PERSONA MANAGER
+        // ══════════════════════════════════════════════════════════════════════
 
         async function triggerAiResponse() {
           if (!state.activeChatId) return;
@@ -25286,6 +26221,30 @@ Now write {{user}}'s next reply (~{{wordCount}} words, third person narrative).`
                       const finalPositivePrompt = `${aiPrompt}, ${naiPrompts.positive}`;
                       const finalNegativePrompt = naiPrompts.negative;
 
+                      // ★ Provider dispatch: PixAI or NovelAI ★
+                      const _imgProvider = localStorage.getItem("image-gen-provider") || "novelai";
+                      if (_imgProvider === "pixai") {
+                        const pixSettings = getPixAISettings();
+                        const pixModelId = localStorage.getItem("pixai-model") || "1935090615918113018";
+                        const imageDataUrl = await generatePixAIImage(
+                          finalPositivePrompt, finalNegativePrompt, pixSettings, pixModelId);
+                        if (imageDataUrl) {
+                          const imgMsg = {
+                            role: "assistant", senderName: chat.name,
+                            timestamp: Date.now(), type: "naiimag",
+                            imageUrl: imageDataUrl, prompt: aiPrompt, fullPrompt: finalPositivePrompt,
+                          };
+                          chat.history.push(imgMsg);
+                          await db.chats.put(chat);
+                          if (isViewingThisChat) {
+                            appendMessage(imgMsg, chat);
+                            const msgsDiv = document.getElementById("chat-messages");
+                            msgsDiv.scrollTop = msgsDiv.scrollHeight;
+                          }
+                        }
+                        return; // Done — skip NovelAI code below
+                      }
+                      // ── NovelAI path (unchanged) ─────────────────────────
                       const apiKey = localStorage.getItem("novelai-api-key");
                       const model =
                         localStorage.getItem("novelai-model") ||
@@ -29176,6 +30135,18 @@ ${libraryList}
                         console.log("Final positive prompt:", finalPositivePrompt);
                         console.log("Final negative prompt:", finalNegativePrompt);
 
+                        // ★ Provider dispatch: PixAI or NovelAI ★
+                        const _imgProv2 = localStorage.getItem("image-gen-provider") || "novelai";
+                        if (_imgProv2 === "pixai") {
+                          const pixSettings2 = getPixAISettings();
+                          const pixModelId2 = localStorage.getItem("pixai-model") || "1935090615918113018";
+                          const pixImgUrl = await generatePixAIImage(
+                            finalPositivePrompt, finalNegativePrompt, pixSettings2, pixModelId2);
+                          console.log(`✅ PixAI image ${i + 1} generated!`);
+                          generatedImageUrls.push(pixImgUrl);
+                          continue; // Next prompt iteration, skip NovelAI code
+                        }
+                        // ── NovelAI path (unchanged) ─────────────────────────
                         // Get NAI settings (from localStorage)
                         const apiKey = localStorage.getItem("novelai-api-key");
                         const model =
@@ -29602,6 +30573,23 @@ ${libraryList}
                     );
                     console.log("Final positive prompt:", finalPositivePrompt);
                     console.log("Final negative prompt:", finalNegativePrompt);
+
+                    // ★ Provider dispatch: PixAI or NovelAI ★
+                    const _imgProv3 = localStorage.getItem("image-gen-provider") || "novelai";
+                    if (_imgProv3 === "pixai") {
+                      const pixSettings3 = getPixAISettings();
+                      const pixModelId3 = localStorage.getItem("pixai-model") || "1935090615918113018";
+                      const pixImgUrl3 = await generatePixAIImage(
+                        finalPositivePrompt, finalNegativePrompt, pixSettings3, pixModelId3);
+                      aiMessage = {
+                        ...baseMessage,
+                        type: "naiimag",
+                        imageUrl: pixImgUrl3,
+                        prompt: aiPrompt,
+                        fullPrompt: finalPositivePrompt,
+                      };
+                      break;
+                    }
 
                     // Get NAI settings (read from localStorage)
                     const apiKey = localStorage.getItem("novelai-api-key");
@@ -33476,6 +34464,34 @@ const ivTags = {
           // 获取负面提示词
           const naiPrompts = getCharacterNAIPrompts(chat.id);
           const finalNegativePrompt = naiPrompts.negative;
+
+          // ★ Provider dispatch: PixAI or NovelAI ★
+          const _imgProvReroll = localStorage.getItem("image-gen-provider") || "novelai";
+          if (_imgProvReroll === "pixai") {
+            const pixApiKeyReroll = localStorage.getItem("pixai-api-key");
+            if (!pixApiKeyReroll) {
+              alert("Please configure your PixAI API Key first.");
+              return;
+            }
+            await showCustomAlert("正在重绘...", "正在使用 PixAI 重新生成图片，请稍候...");
+            try {
+              const pixSettings4 = getPixAISettings();
+              const pixModelId4 = localStorage.getItem("pixai-model") || "1935090615918113018";
+              const pixImgUrl4 = await generatePixAIImage(
+                finalPositivePrompt, finalNegativePrompt, pixSettings4, pixModelId4);
+              if (pixImgUrl4) {
+                message.imageUrl = pixImgUrl4;
+                await db.chats.put(chat);
+                document.getElementById("custom-modal-overlay").classList.remove("visible");
+                renderChatInterface(state.activeChatId);
+              }
+            } catch (err) {
+              console.error("PixAI reroll failed:", err);
+              document.getElementById("custom-modal-overlay").classList.remove("visible");
+              alert(`重绘失败: ${err.message}`);
+            }
+            return;
+          }
 
           // 获取设置
           const apiKey = localStorage.getItem("novelai-api-key");
@@ -55056,6 +56072,16 @@ const ivTags = {
             .addEventListener("click", () =>
               document.getElementById("poke-choice-modal").classList.remove("visible")
             );
+
+          // ★ Persona Manager color picker ★
+          document.getElementById('pm-editor-color-picker')?.addEventListener('click', e => {
+            const dot = e.target.closest('.pm-color-dot');
+            if (!dot) return;
+            document.querySelectorAll('#pm-editor-color-picker .pm-color-dot').forEach(d => d.classList.remove('selected'));
+            dot.classList.add('selected');
+            document.getElementById('pm-editor-color').value = dot.dataset.color;
+          });
+
           chatInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -55515,6 +56541,115 @@ const ivTags = {
               link.download = "novelai-generated-" + Date.now() + ".png";
               link.click();
             });
+
+          // ── PixAI event listeners ──────────────────────────────────────
+
+          // PixAI API Key visibility toggle
+          document
+            .getElementById("pixai-key-toggle")
+            .addEventListener("click", function () {
+              const input = document.getElementById("pixai-api-key");
+              if (input.type === "password") {
+                input.type = "text";
+                this.textContent = "😌";
+              } else {
+                input.type = "password";
+                this.textContent = "🧐";
+              }
+            });
+
+          // Open PixAI settings modal
+          document
+            .getElementById("pixai-settings-btn")
+            .addEventListener("click", () => {
+              loadPixAISettings();
+              document.getElementById("pixai-settings-modal").style.display = "flex";
+            });
+
+          // CORS proxy selector for PixAI
+          document
+            .getElementById("pai-cors-proxy")
+            .addEventListener("change", (e) => {
+              document.getElementById("pai-custom-proxy-group").style.display =
+                e.target.value === "custom" ? "block" : "none";
+            });
+
+          // Close PixAI settings modal
+          document
+            .getElementById("close-pixai-settings")
+            .addEventListener("click", () => {
+              document.getElementById("pixai-settings-modal").style.display = "none";
+            });
+
+          // Save PixAI settings
+          document
+            .getElementById("save-pixai-settings-btn")
+            .addEventListener("click", () => {
+              savePixAISettings();
+              alert("PixAI settings saved!");
+            });
+
+          // Reset PixAI settings
+          document
+            .getElementById("reset-pixai-settings-btn")
+            .addEventListener("click", () => {
+              if (confirm("Reset PixAI settings to defaults?")) {
+                localStorage.removeItem("pixai-settings");
+                loadPixAISettings();
+              }
+            });
+
+          // Open PixAI test modal
+          document
+            .getElementById("pixai-test-btn")
+            .addEventListener("click", () => {
+              const apiKey = document.getElementById("pixai-api-key").value.trim();
+              if (!apiKey) {
+                alert("Please enter your PixAI API Key first.");
+                return;
+              }
+              document.getElementById("pixai-test-modal").style.display = "flex";
+              document.getElementById("pai-test-result").style.display = "none";
+              document.getElementById("pai-test-error").style.display = "none";
+            });
+
+          // Close PixAI test modal
+          document
+            .getElementById("close-pixai-test")
+            .addEventListener("click", () => {
+              document.getElementById("pixai-test-modal").style.display = "none";
+            });
+          document
+            .getElementById("close-pai-test-btn")
+            .addEventListener("click", () => {
+              document.getElementById("pixai-test-modal").style.display = "none";
+            });
+
+          // PixAI generate button (test modal)
+          document
+            .getElementById("pai-generate-btn")
+            .addEventListener("click", async () => {
+              await pixaiTestGenerate();
+            });
+
+          // PixAI download button
+          document
+            .getElementById("pai-download-btn")
+            .addEventListener("click", () => {
+              const img = document.getElementById("pai-result-image");
+              const link = document.createElement("a");
+              link.href = img.src;
+              link.download = "pixai-generated-" + Date.now() + ".png";
+              link.click();
+            });
+
+          // Restore selected provider + load PixAI key/model on page init
+          switchImageGenProvider(localStorage.getItem("image-gen-provider") || "novelai");
+          document.getElementById("pixai-api-key").value = localStorage.getItem("pixai-api-key") || "";
+          const _savedPixModel = localStorage.getItem("pixai-model");
+          if (_savedPixModel) {
+            document.getElementById("pixai-model").value = _savedPixModel;
+          }
 
           // 角色专属NAI提示词弹窗事件监听器
 
@@ -56401,6 +57536,12 @@ const ivTags = {
 
               document.getElementById("my-persona").value =
                 chat.settings.myPersona;
+              // ★ Use Global Persona toggle ★
+              const _ugpToggle = document.getElementById('use-global-persona-toggle');
+              if (_ugpToggle) {
+                _ugpToggle.checked = chat.settings.useGlobalPersona || false;
+                onUseGlobalPersonaToggle(_ugpToggle.checked);
+              }
               document.getElementById("my-avatar-preview").src =
                 chat.settings.myAvatar ||
                 (isGroup ? defaultMyGroupAvatar : defaultAvatar);
@@ -56953,6 +58094,15 @@ const ivTags = {
 
               chat.settings.myPersona =
                 document.getElementById("my-persona").value;
+              // ★ Save useGlobalPersona & sync if enabled ★
+              const _saveUgpToggle = document.getElementById('use-global-persona-toggle');
+              if (_saveUgpToggle) {
+                chat.settings.useGlobalPersona = _saveUgpToggle.checked;
+                if (chat.settings.useGlobalPersona) {
+                  const _ap = state.personaPresets.find(p => p.id === state.globalSettings.activePersonaId);
+                  if (_ap) chat.settings.myPersona = _ap.description || '';
+                }
+              }
               chat.settings.myAvatar =
                 document.getElementById("my-avatar-preview").src;
               const checkedBooks = document.querySelectorAll(
