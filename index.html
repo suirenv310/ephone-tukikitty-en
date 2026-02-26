@@ -1538,23 +1538,42 @@
               </div>
             </div>
           </div>
-          <!-- 4.5. Pollinations image generation card (new) -->
+          <!-- 4.5. App Image Generation card -->
           <div class="moe-card">
             <div class="moe-card-header">
-              <span class="icon">🌸</span>
-              <h3>Pollinations Image Generation</h3>
+              <span class="icon">🖼️</span>
+              <h3>App Image Generation</h3>
             </div>
             <div class="moe-card-body">
               <div class="form-group">
-                <label>API Key (optional, for advanced features / no watermark)</label>
-                <input
-                  type="password"
-                  id="pollinations-api-key"
-                  placeholder="Bearer ..."
-                  class="moe-input"
-                />
-                <p style="font-size: 12px; color: #888; margin-top: 5px">
-                  * If left blank, the free public API will be used (may include watermark or be limited).
+                <label>Provider</label>
+                <select id="app-image-provider" class="moe-input">
+                  <option value="pollinations">🌸 Pollinations.ai</option>
+                  <option value="cf-worker-ai">⚡ Cloudflare Worker AI</option>
+                </select>
+              </div>
+
+              <!-- Pollinations settings -->
+              <div id="pollinations-settings-group">
+                <div class="form-group" style="margin-top:8px">
+                  <label>Pollinations API Key <span style="font-size:11px;color:#888">(optional, removes watermark)</span></label>
+                  <input
+                    type="password"
+                    id="pollinations-api-key"
+                    placeholder="sk_..."
+                    class="moe-input"
+                  />
+                </div>
+              </div>
+
+              <!-- Cloudflare Worker AI settings -->
+              <div id="cf-worker-ai-group" style="display:none">
+                <p style="font-size:12px;color:#888;margin-top:8px">
+                  Uses your Cloudflare Worker to generate images with Stable Diffusion XL (free).<br>
+                  Requires <b>AI binding</b> enabled in Cloudflare Workers dashboard.
+                </p>
+                <p style="font-size:12px;color:var(--accent-color)">
+                  Worker URL is taken from the CORS Proxy setting above.
                 </p>
               </div>
             </div>
@@ -22848,6 +22867,13 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             novelaiEnabled ? "block" : "none";
           document.getElementById("pollinations-api-key").value =
             state.apiConfig.pollinationsApiKey || "";
+          // Load app image provider
+          const _savedImgProvider = localStorage.getItem("app-image-provider") || "pollinations";
+          document.getElementById("app-image-provider").value = _savedImgProvider;
+          document.getElementById("pollinations-settings-group").style.display =
+            _savedImgProvider === "pollinations" ? "block" : "none";
+          document.getElementById("cf-worker-ai-group").style.display =
+            _savedImgProvider === "cf-worker-ai" ? "block" : "none";
 
           // 2. 更新后台活动相关的开关和输入框
           document.getElementById("background-activity-switch").checked =
@@ -54783,6 +54809,29 @@ const ivTags = {
             nologo = false,
           } = options;
 
+          // ── Cloudflare Worker AI path ──
+          const _appImgProvider = localStorage.getItem("app-image-provider") || "pollinations";
+          if (_appImgProvider === "cf-worker-ai") {
+            const _workerBase = (() => {
+              const p = (localStorage.getItem("api-cors-proxy") || "").trim();
+              if (!p || p.endsWith("?") || p.endsWith("=")) return "";
+              return p.replace(/\/+$/, "");
+            })();
+            if (!_workerBase) throw new Error("Cloudflare Worker URL not configured in CORS Proxy setting.");
+            const _aiUrl = `${_workerBase}/ai-image?prompt=${encodeURIComponent(prompt)}&width=${width}&height=${height}`;
+            console.log(`[Global Image Gen] CF Worker AI: ${_aiUrl}`);
+            const _aiResp = await fetch(_aiUrl);
+            if (!_aiResp.ok) throw new Error(`CF Worker AI failed: ${_aiResp.status}`);
+            const _aiBlob = await _aiResp.blob();
+            return await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(_aiBlob);
+            });
+          }
+
+          // ── Pollinations path (default) ──
           console.log(
             `[Global Image Gen] Prompt: ${prompt}, Options:`,
             options,
@@ -54806,19 +54855,24 @@ const ivTags = {
 
               // 1. === 有 API Key 的情况 ===
               if (pollApiKey) {
-                const primaryUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${queryParams}&key=${pollApiKey}`;
-                console.log(
-                  `[Global Image Gen] 使用 API Key 请求: ${primaryUrl}`,
-                );
+                const directUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${queryParams}&key=${pollApiKey}`;
+                // Route through Worker proxy if configured (fixes CORS/530)
+                const _pollProxy = (() => {
+                  const p = (localStorage.getItem("api-cors-proxy") || "").trim();
+                  if (!p || p.endsWith("?") || p.endsWith("=")) return "";
+                  return p.replace(/\/+$/, "");
+                })();
+                const fetchUrl = _pollProxy
+                  ? `${_pollProxy}/?url=${encodeURIComponent(directUrl)}`
+                  : directUrl;
+                console.log(`[Global Image Gen] API Key path → ${fetchUrl}`);
 
-                const response = await fetch(primaryUrl, { method: "GET" });
-
+                const response = await fetch(fetchUrl, { method: "GET" });
                 if (!response.ok) {
                   throw new Error(`API Key 请求失败: ${response.status}`);
                 }
 
                 const blob = await response.blob();
-                // 将 Blob 转为 Base64 以便存储和持久化加载 (解决 blob:null 报错问题)
                 return await new Promise((resolve, reject) => {
                   const reader = new FileReader();
                   reader.onloadend = () => resolve(reader.result);
@@ -56331,6 +56385,8 @@ const ivTags = {
               state.apiConfig.pollinationsApiKey = document
                 .getElementById("pollinations-api-key")
                 .value.trim();
+              localStorage.setItem("app-image-provider",
+                document.getElementById("app-image-provider").value);
 
               // Save API CORS proxy
               const _apiProxySelect = document.getElementById("api-cors-proxy").value;
@@ -56435,6 +56491,17 @@ const ivTags = {
             .addEventListener("change", (e) => {
               document.getElementById("api-custom-proxy-group").style.display =
                 e.target.value === "custom" ? "block" : "none";
+            });
+
+          // App image provider dropdown — show/hide settings groups
+          document
+            .getElementById("app-image-provider")
+            .addEventListener("change", (e) => {
+              const v = e.target.value;
+              document.getElementById("pollinations-settings-group").style.display =
+                v === "pollinations" ? "block" : "none";
+              document.getElementById("cf-worker-ai-group").style.display =
+                v === "cf-worker-ai" ? "block" : "none";
             });
 
           document
