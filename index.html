@@ -1255,14 +1255,14 @@
               <div class="form-group" style="margin-top:10px">
                 <label>CORS Proxy <span style="font-size:11px;color:#888">(needed when deployed to web)</span></label>
                 <select id="api-cors-proxy" class="moe-input">
-                  <option value="">None (local / server-side proxy)</option>
-                  <option value="https://corsproxy.io/?">corsproxy.io (recommended)</option>
-                  <option value="custom">Custom...</option>
+                  <option value="">None (local only)</option>
+                  <option value="https://corsproxy.io/?">corsproxy.io (prepend style)</option>
+                  <option value="custom">Custom Cloudflare Worker...</option>
                 </select>
               </div>
               <div id="api-custom-proxy-group" class="form-group" style="display:none">
-                <label>Custom CORS Proxy URL</label>
-                <input type="text" id="api-custom-proxy-url" class="moe-input" placeholder="https://your-proxy.com/?"/>
+                <label>Cloudflare Worker URL <span style="font-size:11px;color:#888">(no trailing slash)</span></label>
+                <input type="text" id="api-custom-proxy-url" class="moe-input" placeholder="https://my-worker.username.workers.dev"/>
               </div>
               <button id="fetch-models-btn" class="moe-btn-secondary">
                 📡 Fetch Model List
@@ -17160,11 +17160,26 @@ Hide the fact that you accidentally poisoned Wang Qiang with sleeping pills. You
         }
 
         // Apply CORS proxy if configured
+        // Supports two formats:
+        //   Reverse proxy (Cloudflare Worker): "https://my-worker.workers.dev"
+        //     → replaces Gemini domain, e.g. https://my-worker.workers.dev/v1beta/models/...
+        //   Prepend proxy (corsproxy.io etc): "https://corsproxy.io/?"
+        //     → prepends + encodes, e.g. https://corsproxy.io/?https%3A%2F%2F...
         const _geminiBase = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${getRandomValue(apiKey)}`;
-        const _apiCorsProxy = localStorage.getItem("api-cors-proxy") || "";
-        const _geminiUrl = _apiCorsProxy
-          ? _apiCorsProxy + encodeURIComponent(_geminiBase)
-          : _geminiBase;
+        const _apiCorsProxy = (localStorage.getItem("api-cors-proxy") || "").trim();
+        let _geminiUrl;
+        if (!_apiCorsProxy) {
+          _geminiUrl = _geminiBase;
+        } else if (_apiCorsProxy.endsWith("?") || _apiCorsProxy.endsWith("=")) {
+          // Prepend-style proxy (corsproxy.io, etc.)
+          _geminiUrl = _apiCorsProxy + encodeURIComponent(_geminiBase);
+        } else {
+          // Reverse proxy (Cloudflare Worker) — replace domain
+          _geminiUrl = _geminiBase.replace(
+            "https://generativelanguage.googleapis.com",
+            _apiCorsProxy.replace(/\/+$/, "")
+          );
+        }
 
         return {
           url: _geminiUrl,
