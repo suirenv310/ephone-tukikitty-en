@@ -58,7 +58,7 @@ let clawState = {
 async function initClawMachineData() {
   const count = await db.clawMachineDolls.count();
   if (count === 0) {
-    console.log("初始化默认娃娃图片...");
+    console.log("Initialize default doll images...");
     const dollObjects = DEFAULT_DOLL_IMAGES.map((url) => ({ url: url }));
     await db.clawMachineDolls.bulkAdd(dollObjects);
   }
@@ -69,7 +69,7 @@ async function openClawMachine() {
   const modal = document.getElementById("claw-machine-modal");
   modal.classList.add("visible");
   updateClawBalanceDisplay();
-  await resetClawMachine(); // 重置并生成新娃娃
+  await resetClawMachine(); // Reset and generate new dolls
   initJoystick();
 }
 
@@ -79,8 +79,8 @@ function updateClawBalanceDisplay() {
   ).toFixed(2);
 }
 
-// ★★★ 核心修改：渲染实时统计饼图 ★★★
-// 这个函数现在不读配置表，而是读取 #doll-pool 里的实际元素
+// ★★★ Core modification: Render real-time statistics pie chart ★★★
+// This function now reads the actual elements in #doll-pool instead of the configuration table
 function renderRealTimeStats() {
   const pieChart = document.getElementById("prob-pie-chart");
   const legendEl = document.getElementById("prob-legend");
@@ -633,7 +633,7 @@ async function processImageQueue() {
   // 标记为“正在处理中”，锁上开关
   isProcessingImage = true;
   console.log(
-    `队列开始处理，当前有 ${imageGenerationQueue.length} 个图片生成任务。`,
+    `Queue processing started, currently ${imageGenerationQueue.length} image generation tasks.`,
   );
 
   // 只要队列里还有任务，就一直循环
@@ -641,7 +641,7 @@ async function processImageQueue() {
     // 从队列的头部取出一个任务
     const task = imageGenerationQueue.shift();
 
-    console.log(`正在为 "${task.item.name}" 生成图片...`);
+    console.log(`Generating image for "${task.item.name}"...`);
 
     try {
       // 根据任务类型，调用对应的图片处理函数
@@ -653,13 +653,13 @@ async function processImageQueue() {
       }
     } catch (error) {
       // 即使单个任务失败，也要打印错误并继续处理下一个任务
-      console.error(`生成 "${task.item.name}" 的图片时发生意外错误:`, error);
+      console.error(`Error occurred while generating image for "${task.item.name}":`, error);
     }
   }
 
   // 所有任务都处理完了，标记为“已完成”，解开开关，等待下一次任务
   isProcessingImage = false;
-  console.log("图片生成队列已处理完毕。");
+  console.log("Image generation queue has been processed.");
 }
 
 /**
@@ -690,7 +690,7 @@ function selectGenericImagePrompt(productName) {
   }
 
   console.log(
-    `为“${productName}”匹配到分类: ${matchedTemplate.englishCategory}`,
+    `Matched category for "${productName}": ${matchedTemplate.englishCategory}`,
   );
 
   const finalPrompt = matchedTemplate.prompt.replace(
@@ -709,7 +709,7 @@ async function generateAndLoadImage(prompt) {
 
       // 1. 获取 API Key (从全局状态获取)
       const pollApiKey = state.apiConfig.pollinationsApiKey;
-      console.log(`正在使用 API Key: ${pollApiKey}`);
+      console.log(`Using API Key: ${pollApiKey}`);
 
       // 2. 构建基础 URL
       let primaryUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?width=1024&height=640&seed=${seed}&model=flux`;
@@ -717,14 +717,14 @@ async function generateAndLoadImage(prompt) {
       // === 分支 A: 如果有 API Key，使用 fetch 发送带 Header 的请求 ===
       if (pollApiKey) {
         primaryUrl += `&key=${pollApiKey}`;
-        console.log(`使用带Key的URL: ${primaryUrl}`);
-        console.log("正在使用 Pollinations API Key 生成图片...");
+        console.log(`Using URL with API Key: ${primaryUrl}`);
+        console.log("Generating image using Pollinations API Key...");
         const response = await fetch(primaryUrl, {
           method: "GET",
         });
 
         if (!response.ok) {
-          throw new Error(`API请求失败: ${response.status}`);
+          throw new Error(`API request failed: ${response.status}`);
         }
 
         // 获取二进制数据并转换为 Blob URL
@@ -741,11 +741,11 @@ async function generateAndLoadImage(prompt) {
           const img = new Image();
           img.src = url;
           img.onload = () => resolve(url);
-          img.onerror = () => reject(new Error(`URL加载失败: ${url}`));
+          img.onerror = () => reject(new Error(`URL loading failed: ${url}`));
         });
 
       const imageUrl = await loadImage(primaryUrl).catch(async () => {
-        console.warn(`主URL加载失败，尝试备用URL for: ${prompt}`);
+        console.warn(`Primary URL loading failed, trying fallback URL for: ${prompt}`);
         const fallbackUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=640&seed=${seed}`;
         return await loadImage(fallbackUrl);
       });
@@ -754,7 +754,7 @@ async function generateAndLoadImage(prompt) {
       return imageUrl;
     } catch (error) {
       // 如果彻底失败（Fetch失败 或 Image加载失败）
-      console.error(`图片生成失败，将在5秒后重试。错误: ${error.message}`);
+      console.error(`Image generation failed, will retry in 5 seconds. Error: ${error.message}`);
       // 等待5秒钟，然后循环继续，开始下一次尝试 (无限重试机制)
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }
@@ -780,11 +780,11 @@ async function generateAndLoadImage(prompt) {
           const img = new Image();
           img.src = url;
           img.onload = () => resolve(url);
-          img.onerror = () => reject(new Error(`URL加载失败: ${url}`));
+          img.onerror = () => reject(new Error(`URL loading failed: ${url}`));
         });
 
       const imageUrl = await loadImage(primaryUrl).catch(async () => {
-        console.warn(`主URL加载失败，尝试备用URL for: ${prompt}`);
+        console.warn(`Primary URL loading failed, trying fallback URL for: ${prompt}`);
         const fallbackUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=640&seed=${seed}`;
         return await loadImage(fallbackUrl);
       });
@@ -793,7 +793,7 @@ async function generateAndLoadImage(prompt) {
       return imageUrl;
     } catch (error) {
       // 如果主域名和备用域名都失败了...
-      console.error(`图片生成彻底失败，将在5秒后重试。错误: ${error.message}`);
+      console.error(`Image generation failed completely, will retry in 5 seconds. Error: ${error.message}`);
       // 等待5秒钟，然后循环会继续，开始下一次尝试
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }
@@ -812,12 +812,12 @@ async function processProductImage(product) {
       // 如果这个商品数据中自带了专属的 imagePrompt (通常来自AI生成)，就优先使用它！
       imagePrompt = product.imagePrompt;
       console.log(
-        `正在为桃宝商品“${product.name}”使用AI提供的专属提示词进行生图...`,
+        `Generating image for Taobao product "${product.name}" using AI-provided prompt...`,
       );
     } else {
       // 否则（比如是手动添加的、或者旧数据），就回退到通用模板匹配方案
       imagePrompt = selectGenericImagePrompt(product.name);
-      console.log(`正在为桃宝商品“${product.name}”匹配通用提示词进行生图...`);
+      console.log(`Generating image for Taobao product "${product.name}" using generic prompt...`);
     }
 
     // 2. 调用全局统一的 Pollinations 生图函数
@@ -843,7 +843,7 @@ async function processProductImage(product) {
       }
     }
   } catch (error) {
-    console.error(`处理商品 "${product.name}" 图片时失败:`, error);
+    console.error(`Failed to process image for Taobao product "${product.name}":`, error);
     const cardElement = document.querySelector(
       `.product-card[data-product-id="${product.id}"]`,
     );
@@ -852,7 +852,7 @@ async function processProductImage(product) {
         ".product-image-container",
       );
       if (imageContainer) {
-        imageContainer.innerHTML = `<span>图片<br>加载失败</span>`;
+        imageContainer.innerHTML = `<span>Image<br>loading failed</span>`;
       }
     }
   }
@@ -869,11 +869,11 @@ async function processFoodImage(food) {
     if (food.imagePrompt && food.imagePrompt.trim() !== "") {
       // 如果这个美食数据中自带了专属的 imagePrompt，就优先使用它！
       imagePrompt = food.imagePrompt;
-      console.log(`正在为“${food.name}”使用AI提供的专属提示词进行生图...`);
+      console.log(`Generating image for "${food.name}" using AI-provided prompt...`);
     } else {
       // 否则（比如是手动添加的、或者旧数据），就回退到通用模板匹配方案
       imagePrompt = selectGenericImagePrompt(food.name);
-      console.log(`正在为“${food.name}”匹配通用提示词进行生图...`);
+      console.log(`Generating image for "${food.name}" using generic prompt...`);
     }
 
     // 2. 调用全局统一的 Pollinations 生图函数
@@ -900,7 +900,7 @@ async function processFoodImage(food) {
     }
   } catch (error) {
     // 理论上很难触发，但作为保险
-    console.error(`处理美食 "${food.name}" 图片时失败:`, error);
+    console.error(`Failed to process image for "${food.name}":`, error);
     const cardElement = document.querySelector(
       `.product-card[data-food-id="${food.id}"]`,
     );
@@ -909,7 +909,7 @@ async function processFoodImage(food) {
         ".product-image-container",
       );
       if (imageContainer) {
-        imageContainer.innerHTML = `<span>图片<br>加载失败</span>`;
+        imageContainer.innerHTML = `<span>Image<br>loading failed</span>`;
       }
     }
   }
@@ -923,7 +923,7 @@ async function processFoodImage(food) {
 async function generateImageForProduct(productName) {
   // 1. 调用新函数，根据商品名智能选择一个提示词（不再需要API！）
   const imagePrompt = selectGenericImagePrompt(productName);
-  console.log(`为“${productName}”选定的提示词:`, imagePrompt);
+  console.log(`Selected prompt for "${productName}":`, imagePrompt);
 
   // 2. 调用已具备“无限重试”功能的核心图片生成函数
   // 这个函数会一直尝试，直到成功返回一个图片URL
@@ -939,7 +939,7 @@ async function generateImageForProduct(productName) {
     // 理论上，由于 generateAndLoadImage 是无限循环，代码不会执行到这里。
     // 但为了代码健壮性，我们仍然保留一个最终的备用方案。
     console.error(
-      `[终极捕获] 为 "${productName}" 生成图片时发生不可预知的错误:`,
+      `[Ultimate Catch] An unexpected error occurred while generating image for "${productName}":`,
       error,
     );
     return getRandomDefaultProductImage();
@@ -1327,19 +1327,19 @@ function playNotificationSound() {
       // 2. 优化错误提示，现在能更准确地反映问题
       if (error.name === "NotAllowedError") {
         console.warn(
-          "播放消息提示音失败：用户需要先与页面进行一次交互（如点击）才能自动播放音频。",
+          "Failed to play notification sound: User interaction with the page (e.g., a click) is required before audio can be played automatically.",
         );
       } else {
-        // 对于其他错误（比如我们这次遇到的），直接打印错误详情
+        // For other errors (like the one we encountered this time), directly print the error details
         console.error(
-          `播放消息提示音失败 (${error.name}): ${error.message}`,
+          `Failed to play notification sound (${error.name}): ${error.message}`,
           "URL:",
           soundUrl,
         );
       }
     });
   } catch (error) {
-    console.error("创建提示音Audio对象时出错:", error);
+    console.error("Failed to create notification sound Audio object:", error);
   }
 }
 
@@ -1400,7 +1400,7 @@ async function updateUserBalanceAndLogTransaction(amount, description) {
   );
 
   console.log(
-    `用户钱包已更新: 金额=${amount.toFixed(2)}, 新余额=${state.globalSettings.userBalance.toFixed(2)}`,
+    `User wallet updated: amount=${amount.toFixed(2)}, new balance=${state.globalSettings.userBalance.toFixed(2)}`,
   );
 }
 /**
@@ -1509,7 +1509,7 @@ async function renderElemeFoods() {
 
     card.innerHTML = `
         <div class="product-image-container">
-            <!-- 图片或加载动画将在这里 -->
+            <!-- Image or loading spinner will be here -->
         </div>
         <div class="product-info">
             <div class="product-name" title="${food.name} · ${food.restaurant}">${food.name}</div>
@@ -1612,33 +1612,34 @@ async function handleGenerateFoodsAI() {
   }
 
   const prompt = `
-# 任务
-你是一个外卖App“饿了么”的编辑。请为我随机推荐5-8款外卖商品。
+# Task
+You are an editor for the food delivery app "Eleme". Please randomly recommend 5-8 food items.
 
-# 核心规则
-1.  **商品多样性**: 商品类型必须多样化，可以包含【美食、零食、饮料、药品、日用品】等。
-2.  **名称诱人**: 商品名称要听起来就很好。
-3.  **格式铁律**: 你的回复【必须且只能】是一个严格的JSON数组，每个对象代表一款商品，并包含以下字段:
-    -   \`"name"\`: 商品名称 (字符串)
-    -   \`"price"\`: 价格 (数字)
-    -   \`"restaurant"\`: 虚拟的店铺名称 (字符串)
-    -   \`"category"\`: 商品分类 (字符串, 例如: "美食", "饮品", "零食", "药品", "日用")
-    -   \`"imagePrompt"\`: 一个详细的、用于文生图AI的【英文提示词】，用于生成一张关于该商品的【诱人的产品图 (appetizing product shot)】。
+# Core Rules
+1.  **Diverse Products**: The types of products must be diverse, including [Food, Snacks, Beverages, Medicine, Daily Necessities], etc.
+2.  **Enticing Names**: The product names should sound appealing.
 
-# JSON输出格式示例:
+3.  **Strict JSON Format**: Your response **must** be a strict JSON array, with each object representing a product and containing the following fields:
+    -   \`"name"\`: Product name (string)
+    -   \`"price"\`: Price (number)
+    -   \`"restaurant"\`: Virtual restaurant name (string)
+    -   \`"category"\`: Product category (string, e.g., "Food", "Beverages", "Snacks", "Medicine", "Daily Necessities")
+    -   \`"imagePrompt"\`: A detailed English prompt for text-to-image AI, used to generate an appetizing product shot for the item.
+
+# JSON Output Format Example:
 [
   {
-    "name": "多肉葡萄奶盖茶",
+    "name": "Fresh Grape Cheese Tea",
     "price": 22.0,
-    "restaurant": "奈雪的茶",
-    "category": "饮品",
+    "restaurant": "Naixue's Tea",
+    "category": "Beverages",
     "imagePrompt": "A cup of grape cheese foam tea, with fresh grape pulp, product shot, minimalist, vibrant, delicious and appetizing, commercial photography"
   },
   {
-    "name": "布洛芬缓释胶囊",
+    "name": "Ibuprofen Sustained-Release Capsules",
     "price": 15.5,
-    "restaurant": "家门口药房",
-    "category": "药品",
+    "restaurant": "Local Pharmacy",
+    "category": "Medicine",
     "imagePrompt": "A box of Ibuprofen sustained-release capsules, clean medical product shot, minimalist, on a white background, professional photography"
   }
 ]`;
@@ -1665,7 +1666,7 @@ async function handleGenerateFoodsAI() {
           },
         };
     const response = await fetch(requestData.url, requestData.options);
-    if (!response.ok) throw new Error(`API请求失败: ${await response.text()}`);
+    if (!response.ok) throw new Error(`API request failed: ${await response.text()}`);
     const data = await response.json();
     const rawContent = isGemini
       ? data.candidates[0].content.parts[0].text
@@ -1715,28 +1716,28 @@ async function handleSearchFoodsAI() {
   }
 
   const prompt = `
-# 任务
-你是一个外卖App“饿了么”的搜索引擎。请根据用户提供的【搜索关键词】，为Ta创作一个包含5-8件相关外卖商品的列表。
+# Task
+You are a search engine for the food delivery app "Eleme". Please create a list of 5-8 relevant food items based on the user's provided [search keyword].
 
-# 用户搜索的关键词:
+# User's search keyword:
 "${searchTerm}"
 
-# 核心规则
-1.  **高度相关**: 所有商品都必须与用户的搜索关键词 "${searchTerm}" 紧密相关。
-2.  **格式铁律**: 你的回复【必须且只能】是一个严格的JSON数组，每个对象代表一款商品，并包含以下字段:
-    -   \`"name"\`: 商品名称
-    -   \`"price"\`: 价格 (数字)
-    -   \`"restaurant"\`: 虚拟的店铺名称
-    -   \`"category"\`: 商品分类 (例如: "美食", "饮品", "零食", "药品", "日用")
-    -   \`"imagePrompt"\`: 一个详细的、用于文生图AI的【英文提示词】，用于生成一张关于“${searchTerm}”的【诱人的产品图 (appetizing product shot)】。
+# Core Rules
+1.  **Highly Relevant**: All products must be closely related to the user's search keyword "${searchTerm}".
+2.  **Strict JSON Format**: Your response **must** be a strict JSON array, with each object representing a product and containing the following fields:
+    -   \`"name"\`: Product name (string)
+    -   \`"price"\`: Price (number)
+    -   \`"restaurant"\`: Virtual restaurant name (string)
+    -   \`"category"\`: Product category (string, e.g., "Food", "Beverages", "Snacks", "Medicine", "Daily Necessities")
+    -   \`"imagePrompt"\`: A detailed English prompt for text-to-image AI, used to generate an appetizing product shot for the item.
 
-# JSON输出格式示例:
+# JSON Output Format Example:
 [
   {
-    "name": "经典意式肉酱面",
+    "name": "Classic Italian Bolognese Pasta",
     "price": 42.0,
-    "restaurant": "街角意面馆",
-    "category": "美食",
+    "restaurant": "Corner Pasta House",
+    "category": "Food",
     "imagePrompt": "A bowl of classic Italian bolognese pasta, food photography, close-up, delicious and appetizing, garnished with basil leaves, high detail"
   }
 ]`;
@@ -1764,7 +1765,7 @@ async function handleSearchFoodsAI() {
         };
 
     const response = await fetch(requestData.url, requestData.options);
-    if (!response.ok) throw new Error(`API请求失败: ${await response.text()}`);
+    if (!response.ok) throw new Error(`API request failed: ${await response.text()}`);
 
     const data = await response.json();
     const rawContent = isGemini
@@ -1931,7 +1932,7 @@ async function handleOrderForChar(foodId) {
     // 4. 扣除用户余额
     await updateUserBalanceAndLogTransaction(
       -food.price,
-      `为 ${char.name} 点外卖: ${food.name}`,
+      `Order delivery for ${char.name}: ${food.name}`,
     );
 
     // 5. 创建外卖订单记录
@@ -1946,8 +1947,8 @@ async function handleOrderForChar(foodId) {
     await sendElemeOrderNotificationToChar(targetCharId, food, remark);
 
     await showCustomAlert(
-      "下单成功！",
-      `已为“${char.name}”点好外卖，并已通过私信通知对方啦！`,
+      "Order Placed Successfully!",
+      `You have successfully placed an order for "${char.name}" and notified them via private message!`,
     );
     renderChatList();
   }
@@ -1965,13 +1966,13 @@ async function openCharSelectorForEleme() {
     const confirmBtn = document.getElementById("confirm-share-target-btn");
     const cancelBtn = document.getElementById("cancel-share-target-btn");
 
-    titleEl.textContent = "要为谁点单？";
+    titleEl.textContent = "Who do you want to order for?";
     listEl.innerHTML = "";
 
     const singleChats = Object.values(state.chats).filter((c) => !c.isGroup);
 
     if (singleChats.length === 0) {
-      alert("你还没有任何可以点单的好友哦。");
+      alert("You don't have any friends to order for yet.");
       modal.classList.remove("visible");
       resolve(null);
       return;
@@ -2009,7 +2010,7 @@ async function openCharSelectorForEleme() {
         cleanup();
         resolve(selectedRadio.value);
       } else {
-        alert("请选择一个点单对象！");
+        alert("Please select a recipient!");
       }
     };
 
@@ -2028,15 +2029,15 @@ async function sendElemeOrderNotificationToChar(targetChatId, food, remark) {
   if (!chat) return;
 
   // 准备给AI看的文本，现在包含了备注信息
-  const textContentForAI = `[系统提示：用户给你点了一份来自“${food.restaurant}”的外卖“${food.name}”，并备注说：“${
-    remark || "无"
-  }”。请根据你的人设对此作出回应。]`;
+  const textContentForAI = `[System Prompt: The user has ordered a delivery from "${food.restaurant}" for you: "${food.name}", with the remark: "${
+    remark || "None"
+  }". Please respond according to your character.]`;
 
   // 准备要渲染成卡片的数据 (payload)
   const notificationPayload = {
     foodName: food.name,
     foodImageUrl: food.imageUrl,
-    senderName: state.qzoneSettings.nickname || "我",
+    senderName: state.qzoneSettings.nickname || "Me",
     remark: remark || "", // 将备注保存到payload中
   };
 
@@ -2046,7 +2047,7 @@ async function sendElemeOrderNotificationToChar(targetChatId, food, remark) {
     type: "eleme_order_notification",
     timestamp: Date.now(),
     // content 字段现在用于AI理解上下文，而不是UI渲染
-    content: `我给你点了份外卖：${food.name} `,
+    content: `I have ordered a delivery for you: ${food.name} `,
     payload: notificationPayload,
   };
   chat.history.push(notificationMessage);
@@ -2064,10 +2065,10 @@ async function sendElemeOrderNotificationToChar(targetChatId, food, remark) {
   await db.chats.put(chat);
 
   if (state.activeChatId !== targetChatId) {
-    showNotification(targetChatId, "你收到了一份外卖！");
+    showNotification(targetChatId, "You have received a delivery!");
   }
 
-  // 主动触发AI回应
+  // Actively trigger AI response
   openChat(targetChatId);
 }
 
@@ -2088,13 +2089,13 @@ function switchTaobaoView(viewId) {
   } else if (viewId === "cart-view") {
     renderTaobaoCart();
   } else if (viewId === "eleme-view") {
-    // <-- 新增的判断
+    // <-- Newly added condition
     renderElemeFoods();
   }
 }
 
 /**
- * 渲染购物车页面
+ * Render the shopping cart page
  */
 async function renderTaobaoCart() {
   const listEl = document.getElementById("cart-item-list");
@@ -2105,7 +2106,7 @@ async function renderTaobaoCart() {
 
   if (cartItems.length === 0) {
     listEl.innerHTML =
-      '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">购物车空空如也~</p>';
+      '<p style="text-align:center; color: var(--text-secondary); padding: 50px 0;">Your cart is empty~</p>';
     checkoutBar.style.display = "none";
     updateCartBadge(0);
     return;
@@ -2145,14 +2146,14 @@ async function renderTaobaoCart() {
   document.getElementById("cart-total-price").textContent =
     `¥ ${totalPrice.toFixed(2)}`;
   const checkoutBtn = document.getElementById("checkout-btn");
-  checkoutBtn.textContent = `结算(${totalItems})`;
-  checkoutBtn.dataset.totalPrice = totalPrice; // 把总价存起来，方便结算时用
+  checkoutBtn.textContent = `Checkout(${totalItems})`;
+  checkoutBtn.dataset.totalPrice = totalPrice; // Store the total price for checkout
 
   updateCartBadge(totalItems);
 }
 
 /**
- * 更新购物车图标上的角标数量
+ * Update the badge count on the shopping cart icon
  */
 function updateCartBadge() {
   const badge = document.getElementById("cart-item-count-badge");
@@ -2168,7 +2169,7 @@ function updateCartBadge() {
 }
 
 /**
- * 处理加入购物车的逻辑
+ * Handle adding items to the cart
  */
 async function handleAddToCart(productId) {
   const existingItem = await db.taobaoCart
@@ -2176,16 +2177,16 @@ async function handleAddToCart(productId) {
     .equals(productId)
     .first();
   if (existingItem) {
-    // 如果已存在，则数量+1
+    // If the item already exists, increase the quantity by 1
     await db.taobaoCart.update(existingItem.id, {
       quantity: existingItem.quantity + 1,
     });
   } else {
-    // 如果不存在，则新增
+    // If the item does not exist, add a new entry
     await db.taobaoCart.add({ productId: productId, quantity: 1 });
   }
-  await showCustomAlert("成功", "宝贝已加入购物车！");
-  updateCartBadge(); // 更新角标
+  await showCustomAlert("Success", "The item has been added to your cart!");
+  updateCartBadge(); // Update the badge
 }
 
 /**
@@ -2236,7 +2237,7 @@ async function openProductDetail(productId) {
         <img src="${product.imageUrl}" class="product-image" alt="${product.name}">
         <h2 class="product-name">${product.name}</h2>
         <p class="product-price">${product.price.toFixed(2)}</p>
-        <p style="color: #888; font-size: 13px;">店铺: ${product.store || "桃宝自营"}</p>
+        <p style="color: #888; font-size: 13px;">Store: ${product.store || "Taobao Official Store"}</p>
     `;
 
   // 渲染评价区域
@@ -2254,22 +2255,22 @@ async function openProductDetail(productId) {
     generateBtn.style.display = "none";
   } else {
     reviewsListEl.innerHTML =
-      '<p style="text-align: center; color: var(--text-secondary); font-size: 13px;">还没有人评价哦~</p>';
+      '<p style="text-align: center; color: var(--text-secondary); font-size: 13px;">No reviews yet~</p>';
     generateBtn.style.display = "block";
   }
 
-  // 重新绑定“生成评价”按钮的事件 (防止重复绑定)
+  // Rebind the "Generate Reviews" button event (to prevent duplicate bindings)
   const newGenerateBtn = generateBtn.cloneNode(true);
   generateBtn.parentNode.replaceChild(newGenerateBtn, generateBtn);
   newGenerateBtn.addEventListener("click", () =>
     generateProductReviews(productId),
   );
 
-  // 强制重置按钮并重新绑定事件
+  // Force reset the button and rebind the event
   // 先克隆按钮以清除旧事件监听器
   const newAddToCartBtn = actionBtn.cloneNode(true);
 
-  newAddToCartBtn.textContent = "加入购物车";
+  newAddToCartBtn.textContent = "Add to Cart";
   // 为新按钮绑定正确的“加入购物车”逻辑
   newAddToCartBtn.onclick = async () => {
     await handleAddToCart(productId);
@@ -2290,10 +2291,10 @@ async function openProductDetail(productId) {
  * @param {number} productId - 商品的ID
  */
 async function generateProductReviews(productId) {
-  await showCustomAlert("请稍候...", "正在召唤买家秀大军...");
+  await showCustomAlert("Please wait...", "Calling in the buyer reviews...");
   const { proxyUrl, apiKey, model } = state.apiConfig;
   if (!proxyUrl || !apiKey || !model) {
-    alert("请先配置API！");
+    alert("Please configure the API first!");
     return;
   }
 
@@ -2301,28 +2302,28 @@ async function generateProductReviews(productId) {
   if (!product) return;
 
   const prompt = `
-# 任务
-你是一位专业的电商评论生成器。请你为以下商品生成3-5条风格各异的模拟买家评价。
+# Task
+You are a professional e-commerce review generator. Please generate 3–5 simulated buyer reviews with different styles for the following product.
 
-# 商品信息
-- 名称: ${product.name}
-- 价格: ${product.price}元
-- 分类: ${product.category || "未分类"}
+# Product Information
+- Name: ${product.name}
+- Price: ${product.price} CNY
+- Category: ${product.category || "Uncategorized"}
 
-# 核心规则
-1.  **风格多样**: 生成的评论应包含不同风格，例如：
-    -   **好评**: 详细夸赞商品的某个优点。
-    -   **中评/追评**: 描述使用一段时间后的感受，可能提到一些小瑕疵。
-    -   **差评**: 吐槽商品的某个缺点，但语气要像真实买家。
-    -   **搞笑评论**: 写一些幽默风趣的评论。
-    -   **简洁评论**: 例如“好评”、“还行”、“物流很快”。
-2.  **昵称真实**: 评论的作者昵称 ("author") 必须是随机的、生活化的、符合购物App用户习惯的。例如：“匿名用户”、“小王不吃香菜”、“可乐爱好者”。
-3.  **格式铁律**: 你的回复【必须且只能】是一个严格的JSON数组，每个对象代表一条评论，并包含 "author" 和 "text" 两个字段。
+# Core Rules
+1.  **Diverse Styles**: The generated reviews should include different styles, such as:
+    -   **Positive**: Praise a specific advantage of the product in detail.
+    -   **Neutral/Follow-up**: Describe the experience after using the product for a while, possibly mentioning minor flaws.
+    -   **Negative**: Critique a specific disadvantage of the product, but in a realistic buyer tone.
+    -   **Humorous**: Write some funny and witty reviews.
+    -   **Concise**: For example, "Great!", "It's okay", "Fast delivery".
+2.  **Realistic Nicknames**: The author nicknames ("author") must be random, lifelike, and consistent with typical shopping app users. For example: "Anonymous", "Xiao Wang doesn't eat cilantro", "Cola Lover".
+3.  **Strict JSON Format**: Your response **must and only** be a strict JSON array, with each object representing a review and containing "author" and "text" fields.
 
-# JSON输出格式示例:
+# JSON output format example:
 [
-  { "author": "匿名用户", "text": "物流很快，包装也很好，宝贝跟描述的一样，好评！" },
-  { "author": "是小张呀", "text": "有点色差，不过还能接受。先用用看，过段时间再来追评。" }
+  { "author": "Anonymous", "text": "Fast delivery, well-packaged, and the product matches the description. Great!" },
+  { "author": "Xiao Zhang", "text": "Slight color difference, but acceptable. Will use it for a while and then update the review." }
 ]
 `;
   try {
@@ -2352,7 +2353,7 @@ async function generateProductReviews(productId) {
           }),
         });
 
-    if (!response.ok) throw new Error(`API请求失败: ${await response.text()}`);
+    if (!response.ok) throw new Error(`API request failed: ${await response.text()}`);
 
     const data = await response.json();
     const rawContent = isGemini
@@ -2362,20 +2363,20 @@ async function generateProductReviews(productId) {
     const newReviews = JSON.parse(cleanedContent);
 
     if (Array.isArray(newReviews) && newReviews.length > 0) {
-      // 将AI生成的评价保存到商品数据中
+      // Save the AI-generated reviews to the product data
       await db.taobaoProducts.update(productId, { reviews: newReviews });
       await showCustomAlert(
-        "生成成功！",
-        `已成功生成 ${newReviews.length} 条评价。`,
+        "Generation Successful!",
+        `Successfully generated ${newReviews.length} reviews.`,
       );
-      // 重新打开详情页，刷新显示
+      // Reopen the product detail page to refresh the display
       await openProductDetail(productId);
     } else {
-      throw new Error("AI返回的数据格式不正确。");
+      throw new Error("AI returned data in an incorrect format.");
     }
   } catch (error) {
-    console.error("生成商品评价失败:", error);
-    await showCustomAlert("生成失败", `发生错误: ${error.message}`);
+    console.error("Failed to generate product reviews:", error);
+    await showCustomAlert("Generation Failed", `An error occurred: ${error.message}`);
   }
 }
 
@@ -2390,15 +2391,15 @@ async function handleCheckout() {
 
   const currentBalance = state.globalSettings.userBalance || 0;
   if (currentBalance < totalPrice) {
-    alert("余额不足！请先去“我的”页面充值。");
+    alert("Insufficient balance! Please recharge on the 'My' page first.");
     return;
   }
 
   const confirmed = await showCustomConfirm(
-    "确认支付",
-    `本次将花费 ¥${totalPrice.toFixed(2)}，确定要结算吗？`,
+    "Confirm Payment",
+    `This purchase will cost ¥${totalPrice.toFixed(2)}. Are you sure you want to proceed?`,
     {
-      confirmText: "立即支付",
+      confirmText: "Pay Now",
     },
   );
 
@@ -2410,37 +2411,37 @@ async function handleCheckout() {
     const productsInCart = await Promise.all(productPromises);
     const validProducts = productsInCart.filter(Boolean);
 
-    let description = "购买商品: ";
+    let description = "Purchase items: ";
     const itemNames = validProducts.map((p) => `“${p.name}”`);
     if (itemNames.length > 2) {
       description +=
-        itemNames.slice(0, 2).join("、") + ` 等${itemNames.length}件商品`;
+        itemNames.slice(0, 2).join("、") + ` and ${itemNames.length - 2} other items`;
     } else {
       description += itemNames.join("、");
     }
 
     await updateUserBalanceAndLogTransaction(-totalPrice, description);
 
-    // 为每个订单创建物流历史起点
+    // Create initial logistics history for each order
     const newOrders = cartItems.map((item, index) => ({
       productId: item.productId,
       quantity: item.quantity,
-      timestamp: Date.now() + index, // 订单创建时间
-      status: "已付款，等待发货",
-      // 我们不再需要在数据库里存 logisticsHistory，因为它是动态模拟的
+      timestamp: Date.now() + index, // Order creation time
+      status: "Paid, waiting for shipment",
+      // We no longer need to store logisticsHistory in the database, as it is dynamically simulated
     }));
 
     await db.taobaoOrders.bulkAdd(newOrders);
     await db.taobaoCart.clear();
     await renderTaobaoCart();
 
-    alert("支付成功！宝贝正在火速打包中~");
+    alert("Payment successful! Your items are being packed quickly~");
     switchTaobaoView("orders-view");
   }
 }
 
 /**
- * 渲染商品列表，按需生成并永久保存图片
+ * Render product list, generate and permanently save images as needed
  */
 async function renderTaobaoProducts(category = null) {
   const gridEl = document.getElementById("product-grid");
@@ -2457,7 +2458,7 @@ async function renderTaobaoProducts(category = null) {
 
   if (productsToRender.length === 0) {
     gridEl.innerHTML =
-      '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary);">还没有商品哦，点击右上角“+”添加吧！</p>';
+      '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary);">No products available. Click the "+" button in the top right corner to add some!</p>';
     return;
   }
 
@@ -2468,7 +2469,7 @@ async function renderTaobaoProducts(category = null) {
 
     card.innerHTML = `
         <div class="product-image-container">
-            <!-- 图片或加载动画将在这里 -->
+            <!-- Image or loading animation will be here -->
         </div>
         <div class="product-info">
             <div class="product-name">${product.name}</div>
@@ -2503,7 +2504,7 @@ async function renderTaobaoOrders() {
 
   if (orders.length === 0) {
     listEl.innerHTML =
-      '<p style="text-align: center; color: var(--text-secondary);">还没有任何订单记录</p>';
+      '<p style="text-align: center; color: var(--text-secondary);">No orders yet</p>';
     return;
   }
 
@@ -2527,7 +2528,7 @@ async function renderTaobaoOrders() {
 }
 
 /**
- * 渲染“我的”页面的余额
+ * Render "My" page balance
  */
 function renderTaobaoBalance() {
   const balance = state.globalSettings.userBalance || 0;
@@ -2536,23 +2537,24 @@ function renderTaobaoBalance() {
 }
 
 /**
- * 打开添加商品的方式选择弹窗
+ * Open the modal to choose how to add a product
  */
 function openAddProductChoiceModal() {
   document.getElementById("add-product-choice-modal").classList.add("visible");
 }
 
 /**
- * 打开手动添加/编辑商品的弹窗
+ * Open the modal to manually add/edit a product
  */
 function openProductEditor(productId = null) {
   currentEditingProductId = productId;
   const modal = document.getElementById("product-editor-modal");
   const titleEl = document.getElementById("product-editor-title");
 
-  // 1. 恢复输入框默认提示 (因为饿了么可能会改它)
+  // 1. Restore default placeholder for the input field (because Eleme might change it)
   document.getElementById("product-category-input").placeholder =
-    "例如：衣服, 零食...";
+    "e.g., Clothing, Snacks...";
+
 
   // 2. ★★★ 核心修复：重新绑定保存按钮 ★★★
   // 使用克隆大法清除之前可能绑定的“饿了么”保存事件或重复的“桃宝”保存事件
@@ -2564,7 +2566,7 @@ function openProductEditor(productId = null) {
   newSaveBtn.addEventListener("click", saveProduct);
 
   if (productId) {
-    titleEl.textContent = "编辑商品";
+    titleEl.textContent = "Edit Product";
     // (异步) 加载现有商品数据
     db.taobaoProducts.get(productId).then((product) => {
       if (product) {
@@ -2576,8 +2578,8 @@ function openProductEditor(productId = null) {
       }
     });
   } else {
-    titleEl.textContent = "添加新商品";
-    // 清空输入框
+    titleEl.textContent = "Add New Product";
+    // Clear input fields
     document.getElementById("product-name-input").value = "";
     document.getElementById("product-price-input").value = "";
     document.getElementById("product-image-input").value = "";
@@ -2587,7 +2589,7 @@ function openProductEditor(productId = null) {
 }
 
 /**
- * 保存手动添加或编辑的商品
+ * Save manually added or edited product
  */
 async function saveProduct() {
   const name = document.getElementById("product-name-input").value.trim();
@@ -2600,24 +2602,24 @@ async function saveProduct() {
     .value.trim();
 
   if (!name || isNaN(price) || price <= 0) {
-    alert("请填写所有必填项（名称、有效价格）！");
+    alert("Please fill in all required fields (Name, Valid Price)!");
     return;
   }
 
-  // 如果用户没有提供图片链接，保存一个空字符串。
-  // 新的渲染逻辑会自动检测到空链接并触发AI生图。
+  // If the user did not provide an image URL, save an empty string.
+  // The new rendering logic will automatically detect the empty URL and trigger AI image generation.
   if (!imageUrl) {
-    imageUrl = ""; // 设置为空，让渲染器去处理
+    imageUrl = ""; // Set to empty, let the renderer handle it
   }
 
   const productData = { name, price, imageUrl, category };
 
   if (currentEditingProductId) {
     await db.taobaoProducts.update(currentEditingProductId, productData);
-    alert("商品已更新！");
+    alert("Product updated!");
   } else {
     await db.taobaoProducts.add(productData);
-    alert("新商品已添加！");
+    alert("New product added!");
   }
 
   document.getElementById("product-editor-modal").classList.remove("visible");
@@ -2626,7 +2628,7 @@ async function saveProduct() {
 }
 
 /**
- * 保存手动添加的美食
+ * Save manually added food item
  */
 async function saveFoodItem() {
   const name = document.getElementById("product-name-input").value.trim();
@@ -2639,14 +2641,14 @@ async function saveFoodItem() {
     .value.trim();
 
   if (!name || isNaN(price) || price <= 0) {
-    alert("请填写美食名称和有效价格！");
+    alert("Please fill in all required fields (Name, Valid Price)!");
     return;
   }
 
-  // 如果用户没有提供图片链接，保存一个空字符串。
-  // 这样新的渲染逻辑就会自动检测到并触发AI生图。
+  // If the user did not provide an image URL, save an empty string.
+  // The new rendering logic will automatically detect the empty URL and trigger AI image generation.
   if (!imageUrl) {
-    imageUrl = ""; // 设置为空，让渲染器去处理
+    imageUrl = ""; // Set to empty, let the renderer handle it
   }
   // ★★★ 修改结束 ★★★
 
@@ -2654,11 +2656,11 @@ async function saveFoodItem() {
     name,
     price,
     imageUrl,
-    restaurant: restaurant || "私房小厨",
+    restaurant: restaurant || "Private Kitchen",
   };
 
   await db.elemeFoods.add(foodData);
-  alert("新美食已添加！");
+  alert("New food item added!");
 
   document.getElementById("product-editor-modal").classList.remove("visible");
   await renderElemeFoods();
@@ -2680,7 +2682,7 @@ async function handleAddFromLink() {
   const nameMatch = text.match(/「(.+?)」/);
 
   if (!nameMatch || !nameMatch[1]) {
-    alert("无法识别商品名称！请确保粘贴了包含「商品名」的完整分享文案。");
+    alert("Unable to recognize product name! Please ensure you have pasted the complete share text containing the 「product name」.");
     return;
   }
 
@@ -2688,38 +2690,38 @@ async function handleAddFromLink() {
   document.getElementById("add-from-link-modal").classList.remove("visible");
 
   const priceStr = await showCustomPrompt(
-    `商品: ${name}`,
-    "请输入价格 (元):",
+    `Product: ${name}`,
+    "Please enter the price (CNY):",
     "",
     "number",
   );
   if (priceStr === null) return;
   const price = parseFloat(priceStr);
   if (isNaN(price) || price <= 0) {
-    alert("请输入有效的价格！");
+    alert("Please enter a valid price!");
     return;
   }
 
   let imageUrl = await showCustomPrompt(
-    `商品: ${name}`,
-    "请输入图片链接 (URL, 可选，留空则由AI生成):",
+    `Product: ${name}`,
+    "Please enter the image URL (optional, leave blank for AI generation):",
   );
   if (imageUrl === null) return;
 
-  // 1. 如果用户没有输入图片链接
+  // 1. If the user did not enter an image URL
   if (!imageUrl || !imageUrl.trim()) {
     try {
       // 就调用我们的AI生图函数
       imageUrl = await generateImageForProduct(name);
     } catch (e) {
-      console.error("调用生图函数时发生意外错误:", e);
+      console.error("An unexpected error occurred while calling the AI image generation function:", e);
       imageUrl = getRandomDefaultProductImage();
     }
   }
 
   const category = await showCustomPrompt(
-    `商品: ${name}`,
-    "请输入分类 (可选):",
+    `Product: ${name}`,
+    "Please enter the category (optional):",
   );
 
   await db.taobaoProducts.add({
@@ -2729,51 +2731,51 @@ async function handleAddFromLink() {
     category: category || "",
   });
   await renderTaobaoProducts();
-  alert("商品已通过链接添加成功！");
+  alert("Product added successfully via link!");
 }
 
 /**
- * 根据用户搜索触发AI生成商品
+ * Trigger AI to generate products based on user search
  */
 async function handleSearchProductsAI() {
   const searchTerm = productSearchInput.value.trim();
   if (!searchTerm) {
-    alert("请输入你想搜索的商品！");
+    alert("Please enter the product you want to search for!");
     return;
   }
 
   await showCustomAlert(
-    "请稍候...",
-    `AI正在为你寻找关于“${searchTerm}”的灵感...`,
+    "Please wait...",
+    `AI is searching for inspiration related to "${searchTerm}"...`,
   );
   const { proxyUrl, apiKey, model } = state.apiConfig;
   if (!proxyUrl || !apiKey || !model) {
-    alert("请先配置API！");
+    alert("Please configure the API first!");
     return;
   }
 
   const prompt = `
-# 任务
-你是一个虚拟购物App“桃宝”的搜索引擎。请根据用户提供的【搜索关键词】，为Ta创作一个包含5-8件相关商品的列表。
+# Task
+You are the search engine for a virtual shopping app "Taobao". Based on the user's provided [search keywords], create a list of 5-8 related products.
 
-# 用户搜索的关键词:
+# User's search keywords:
 "${searchTerm}"
 
-# 核心规则
-1.  **高度相关**: 所有商品都必须与用户的搜索关键词 "${searchTerm}" 紧密相关。
-2.  **商品多样性**: 即使是同一个主题，也要尽量展示不同款式、功能或角度的商品。
-3.  **格式铁律**: 你的回复【必须且只能】是一个严格的JSON数组，每个对象代表一件商品，【必须】包含以下字段:
-    -   \`"name"\`: 商品名称
-    -   \`"price"\`: 价格 (数字)
-    -   \`"category"\`: 商品分类
-    -   \`"imagePrompt"\`: 一个详细的、用于文生图AI的【英文提示词】，描述这张商品的【产品展示图 (product shot)】。风格要求【干净、简约、纯色或渐变背景 (clean, minimalist, solid color background)】。
+# Core Rules
+1.  **Highly Relevant**: All products must be closely related to the user's search keywords "${searchTerm}".
+2.  **Product Diversity**: Even for the same theme, try to showcase different styles, functions, or angles of the products.
+3.  **Strict Format**: Your response **must** be a strict JSON array, with each object representing a product, and **must** include the following fields:
+    -   \`"name"\`: Product name
+    -   \`"price"\`: Price (number)
+    -   \`"category"\`: Product category
+    -   \`"imagePrompt"\`: A detailed English prompt for text-to-image AI, describing the product shot. Style requirements: clean, minimalist, solid color or gradient background.
 
-# JSON输出格式示例:
+# JSON output format example:
 [
   {
-    "name": "赛博朋克风发光数据线",
+    "name": "Cyberpunk Style Glowing Data Cable",
     "price": 69.9,
-    "category": "数码配件",
+    "category": "Digital Accessories",
     "imagePrompt": "A glowing cyberpunk style data cable, product shot, on a dark tech background, neon lights, high detail"
   }
 ]`;
@@ -2804,7 +2806,7 @@ async function handleSearchProductsAI() {
 
     const response = await fetch(requestData.url, requestData.options);
 
-    if (!response.ok) throw new Error(`API请求失败: ${await response.text()}`);
+    if (!response.ok) throw new Error(`API request failed: ${await response.text()}`);
 
     const data = await response.json();
     const rawContent = isGemini
@@ -2816,21 +2818,21 @@ async function handleSearchProductsAI() {
     if (Array.isArray(newProducts) && newProducts.length > 0) {
       displayAiGeneratedProducts(
         newProducts,
-        `AI为你找到了关于“${searchTerm}”的宝贝`,
+        `AI found the following products related to "${searchTerm}"`,
       );
     } else {
-      throw new Error("AI没有找到相关的商品。");
+      throw new Error("AI did not find any related products.");
     }
   } catch (error) {
-    console.error("AI搜索商品失败:", error);
-    await showCustomAlert("搜索失败", `发生错误: ${error.message}`);
+    console.error("AI product search failed:", error);
+    await showCustomAlert("Search Failed", `An error occurred: ${error.message}`);
   }
 }
 
 /**
- * UI函数：在弹窗中显示AI生成的商品列表，并异步加载图片
- * @param {Array} products - AI生成的商品对象数组
- * @param {string} title - 弹窗的标题
+ * UI function: Display AI-generated product list in a modal and asynchronously load images
+ * @param {Array} products - Array of AI-generated product objects
+ * @param {string} title - Title of the modal
  */
 function displayAiGeneratedProducts(products, title) {
   const modal = document.getElementById("ai-generated-products-modal");
@@ -2845,10 +2847,10 @@ function displayAiGeneratedProducts(products, title) {
     card.className = "product-card";
     card.id = `ai-product-${index}`;
 
-    // 在放入HTML属性前，先对JSON字符串进行转义，防止引号冲突
-    // 1. 将商品对象转换为JSON字符串
+    // Before inserting into HTML attributes, escape the JSON string to prevent quote conflicts
+    // 1. Convert the product object to a JSON string
     const productJsonString = JSON.stringify(product);
-    // 2. 将字符串中的单引号替换为HTML实体编码
+    // 2. Replace single quotes in the string with HTML entity encoding
     const safeProductJsonString = productJsonString.replace(/'/g, "&#39;");
 
     card.innerHTML = `
@@ -2859,12 +2861,12 @@ function displayAiGeneratedProducts(products, title) {
             <div class="product-name">${product.name}</div>
             <div class="product-price">${product.price.toFixed(2)}</div>
         </div>
-        <button class="add-to-my-page-btn" data-product='${safeProductJsonString}'>+ 添加到我的桃宝</button>
+        <button class="add-to-my-page-btn" data-product='${safeProductJsonString}'>+ Add to My Taobao</button>
     `;
     gridEl.appendChild(card);
 
-    // 调用异步函数加载图片
-    // 这个函数会在后台默默生图，成功后再更新这张卡片
+    // Call the asynchronous function to load images
+    // This function will silently generate images in the background and update the card upon success
     loadAndDisplayAiProductImage(product, card);
   });
 
@@ -2892,58 +2894,58 @@ async function loadAndDisplayAiProductImage(productData, cardElement) {
       },
     );
 
-    // 2. 将生成好的图片URL【回写】到商品数据中，方便“添加到主页”时使用
+    // 2. Write back the generated image URL to the product data for later use when adding to the homepage
     productData.imageUrl = imageUrl;
     const addButton = cardElement.querySelector(".add-to-my-page-btn");
     if (addButton) {
       addButton.dataset.product = JSON.stringify(productData);
     }
 
-    // 3. 更新卡片UI，用生成的图片替换掉加载动画
-    //    再次检查卡片是否还存在于页面上，防止用户过早关闭弹窗导致错误
+    // 3. Update the card UI, replacing the loading animation with the generated image
+    //    Check again if the card still exists on the page to prevent errors if the user closes the modal early
     if (document.body.contains(imageContainer)) {
       imageContainer.innerHTML = `<img src="${imageUrl}" class="product-image" alt="${productData.name}">`;
     }
   } catch (error) {
-    // 理论上，因为 generateAndLoadImage 是无限重试，这里很难被触发
-    // 但为了代码健壮性，我们仍然处理这个万一
-    console.error(`为商品 "${productData.name}" 生成图片失败:`, error);
+    // In theory, because generateAndLoadImage retries indefinitely, this is unlikely to be triggered
+    // But for code robustness, we still handle this just in case
+    console.error(`Failed to generate image for product "${productData.name}":`, error);
     if (document.body.contains(imageContainer)) {
-      imageContainer.innerHTML = `<span>图片加载失败</span>`;
+      imageContainer.innerHTML = `<span>Image failed to load</span>`;
     }
   }
 }
 
 /**
- * 触发AI【随机】生成商品，并在弹窗中显示
+ * Trigger AI to [randomly] generate products and display them in a modal
  */
 async function handleGenerateProductsAI() {
-  await showCustomAlert("请稍候...", "正在请求AI生成一批有趣的商品...");
+  await showCustomAlert("Please wait...", "Requesting AI to generate a batch of interesting products...");
   const { proxyUrl, apiKey, model } = state.apiConfig;
   if (!proxyUrl || !apiKey || !model) {
-    alert("请先配置API！");
+    alert("Please configure the API first!");
     return;
   }
 
   const prompt = `
-# 任务
-你是一个虚拟购物App“桃宝”的商品策划师。请你创作一个包含5-8件商品的列表。
+# Task
+You are a product planner for a virtual shopping app "Taobao". Please create a list of 5-8 products.
 
-# 核心规则
-1.  **商品多样性**: 商品必须有趣、多样，可以包含服装、零食、家居用品、虚拟物品等。
-2.  **分类清晰**: 为每件商品设置一个合理的分类。
-3.  **格式铁律**: 你的回复【必须且只能】是一个严格的JSON数组，每个对象代表一件商品，【必须】包含以下字段:
-    -   \`"name"\`: 商品名称 (字符串)
-    -   \`"price"\`: 价格 (数字)
-    -   \`"category"\`: 商品分类 (字符串)
-    -   \`"imagePrompt"\`: 一个详细的、用于文生图AI的【英文提示词】，描述这张商品的【产品展示图 (product shot)】。风格要求【干净、简约、纯色或渐变背景 (clean, minimalist, solid color background)】。
+# Core Rules
+1.  **Product Diversity**: Products must be interesting and diverse, including clothing, snacks, home goods, virtual items, etc.
+2.  **Clear Categorization**: Assign a reasonable category to each product.
+3.  **Strict Format**: Your response **must and only** be a strict JSON array, with each object representing a product, **must** include the following fields:
+    -   \`"name"\`: Product name (string)
+    -   \`"price"\`: Price (number)
+    -   \`"category"\`: Product category (string)
+    -   \`"imagePrompt"\`: A detailed English prompt for text-to-image AI, describing the product shot. Style requirements: clean, minimalist, solid color or gradient background.
 
-# JSON输出格式示例:
+# JSON Output Format Example:
 [
   {
-    "name": "会发光的蘑菇小夜灯",
+    "name": "Glowing Mushroom Night Light",
     "price": 49.9,
-    "category": "家居",
+    "category": "Home",
     "imagePrompt": "A glowing mushroom-shaped night light, minimalist, product shot, studio lighting, simple gradient background, high detail, photorealistic"
   }
 ]`;
@@ -2974,7 +2976,7 @@ async function handleGenerateProductsAI() {
 
     const response = await fetch(requestData.url, requestData.options);
 
-    if (!response.ok) throw new Error(`API请求失败: ${await response.text()}`);
+    if (!response.ok) throw new Error(`API request failed: ${await response.text()}`);
 
     const data = await response.json();
     const rawContent = isGemini
@@ -2984,13 +2986,13 @@ async function handleGenerateProductsAI() {
     const newProducts = JSON.parse(cleanedContent);
 
     if (Array.isArray(newProducts) && newProducts.length > 0) {
-      displayAiGeneratedProducts(newProducts, "AI随机生成了以下宝贝");
+      displayAiGeneratedProducts(newProducts, "AI randomly generated the following products");
     } else {
-      throw new Error("AI返回的数据格式不正确。");
+      throw new Error("AI returned data in an incorrect format.");
     }
   } catch (error) {
-    console.error("AI生成商品失败:", error);
-    await showCustomAlert("生成失败", `发生错误: ${error.message}`);
+    console.error("AI failed to generate products:", error);
+    await showCustomAlert("Generation Failed", `An error occurred: ${error.message}`);
   }
 }
 
@@ -3003,43 +3005,43 @@ async function handleBuyProduct(productId) {
 
   const currentBalance = state.globalSettings.userBalance || 0;
   if (currentBalance < product.price) {
-    alert("余额不足，先去“我的”页面充点钱吧！");
+    alert("Insufficient balance, please top up in the 'My' page first!");
     return;
   }
 
   const confirmed = await showCustomConfirm(
-    "确认购买",
-    `确定要花费 ¥${product.price.toFixed(2)} 购买“${product.name}”吗？`,
-    { confirmText: "立即支付" },
+    "Confirm Purchase",
+    `Are you sure you want to spend ¥${product.price.toFixed(2)} to buy "${product.name}"?`,
+    { confirmText: "Pay Now" },
   );
 
   if (confirmed) {
-    // 1. 扣除余额
+    // 1. Deduct balance
     state.globalSettings.userBalance -= product.price;
     await db.globalSettings.put(state.globalSettings);
 
-    // 2. 创建订单
+    // 2. Create order
     const newOrder = {
       productId: productId,
       timestamp: Date.now(),
-      status: "已付款，等待发货",
+      status: "Paid, waiting for shipment",
     };
     await db.taobaoOrders.add(newOrder);
 
-    // 模拟物流更新
+    // Simulate logistics update
     setTimeout(async () => {
       const orderToUpdate = await db.taobaoOrders
         .where({ timestamp: newOrder.timestamp })
         .first();
       if (orderToUpdate) {
         await db.taobaoOrders.update(orderToUpdate.id, {
-          status: "已发货，运输中",
+          status: "Shipped, in transit",
         });
       }
-    }, 1000 * 10); // 10秒后更新为已发货
+    }, 1000 * 10); // Update to "Shipped" after 10 seconds
 
-    alert("购买成功！你可以在“我的订单”中查看物流信息。");
-    renderTaobaoBalance(); // 刷新余额显示
+    alert("Purchase successful! You can check the logistics information in 'My Orders'.");
+    renderTaobaoBalance(); // Refresh balance display
   }
 }
 
@@ -3047,9 +3049,9 @@ async function handleBuyProduct(productId) {
  * 长按商品时显示操作菜单
  */
 async function showProductActions(productId) {
-  const choice = await showChoiceModal("商品操作", [
-    { text: "✏️ 编辑商品", value: "edit" },
-    { text: "🗑️ 删除商品", value: "delete" },
+  const choice = await showChoiceModal("Product Actions", [
+    { text: "✏️ Edit Product", value: "edit" },
+    { text: "🗑️ Delete Product", value: "delete" },
   ]);
 
   if (choice === "edit") {
@@ -3057,8 +3059,8 @@ async function showProductActions(productId) {
   } else if (choice === "delete") {
     const product = await db.taobaoProducts.get(productId);
     const confirmed = await showCustomConfirm(
-      "确认删除",
-      `确定要删除商品“${product.name}”吗？`,
+      "Confirm Deletion",
+      `Are you sure you want to delete the product "${product.name}"?`,
       {
         confirmButtonClass: "btn-danger",
       },
@@ -3066,7 +3068,7 @@ async function showProductActions(productId) {
     if (confirmed) {
       await db.taobaoProducts.delete(productId);
       await renderTaobaoProducts();
-      alert("商品已删除。");
+      alert("Product has been deleted.");
     }
   }
 }
@@ -3076,9 +3078,9 @@ async function showProductActions(productId) {
  * @param {number} foodId - 美食的ID
  */
 async function showFoodActions(foodId) {
-  const choice = await showChoiceModal("操作", [
-    { text: "✏️ 编辑", value: "edit" },
-    { text: "🗑️ 删除", value: "delete" },
+  const choice = await showChoiceModal("Food Actions", [
+    { text: "✏️ Edit", value: "edit" },
+    { text: "🗑️ Delete", value: "delete" },
   ]);
 
   if (choice === "edit") {
@@ -3088,16 +3090,16 @@ async function showFoodActions(foodId) {
     const food = await db.elemeFoods.get(foodId);
     if (!food) return;
     const confirmed = await showCustomConfirm(
-      "确认删除",
-      `确定要删除“${food.name}”吗？`,
+      "Confirm Deletion",
+      `Are you sure you want to delete "${food.name}"?`,
       {
         confirmButtonClass: "btn-danger",
       },
     );
     if (confirmed) {
       await db.elemeFoods.delete(foodId);
-      await renderElemeFoods(); // 重新渲染列表
-      await showCustomAlert("删除成功", "该美食已从列表中移除。");
+      await renderElemeFoods(); // Re-render the list
+      await showCustomAlert("Deletion Successful", "The food item has been removed from the list.");
     }
   }
 }
@@ -3133,7 +3135,7 @@ async function updateUserBalanceAndLogTransaction(amount, description) {
   );
 
   console.log(
-    `用户钱包已更新: 金额=${amount.toFixed(2)}, 新余额=${state.globalSettings.userBalance.toFixed(2)}`,
+    `User wallet updated: Amount=${amount.toFixed(2)}, New balance=${state.globalSettings.userBalance.toFixed(2)}`,
   );
 }
 /**
@@ -3144,17 +3146,17 @@ async function handleDeleteTransaction(transactionId) {
   // 1. 在弹出确认框之前，先从数据库获取这条记录的详细信息
   const transaction = await db.userWalletTransactions.get(transactionId);
   if (!transaction) {
-    await showCustomAlert("错误", "找不到该条交易记录，可能已被删除。");
+    await showCustomAlert("Error", "The transaction record could not be found, it may have been deleted.");
     return;
   }
 
   // 根据记录类型，生成动态的、更清晰的提示信息
-  const actionText = transaction.type === "income" ? "扣除" : "返还";
-  const confirmMessage = `确定要删除这条【${
-    transaction.type === "income" ? "收入" : "支出"
-  }】记录吗？<br><br>此操作会将 <strong>¥${transaction.amount.toFixed(2)}</strong> 从您的余额中**${actionText}**。`;
+  const actionText = transaction.type === "income" ? "deduct" : "refund";
+  const confirmMessage = `Are you sure you want to delete this ${
+    transaction.type === "income" ? "income" : "expense"
+  } record?<br><br>This action will <strong>${actionText}</strong> <strong>¥${transaction.amount.toFixed(2)}</strong> from your balance.`;
 
-  const confirmed = await showCustomConfirm("确认删除", confirmMessage, {
+  const confirmed = await showCustomConfirm("Confirm Deletion", confirmMessage, {
     confirmButtonClass: "btn-danger",
   });
 
@@ -3189,10 +3191,10 @@ async function handleDeleteTransaction(transactionId) {
     // 5. 操作成功后，刷新UI
     await renderBalanceDetails();
 
-    await showCustomAlert("操作成功", "该条记录已删除，余额已更新。");
+    await showCustomAlert("Operation Successful", "The transaction record has been deleted and the balance has been updated.");
   } catch (error) {
-    console.error("删除交易记录时出错:", error);
-    await showCustomAlert("操作失败", `发生错误: ${error.message}`);
+    console.error("Error deleting transaction record:", error);
+    await showCustomAlert("Operation Failed", `An error occurred: ${error.message}`);
   }
 }
 
@@ -3254,7 +3256,7 @@ async function renderBalanceDetails() {
 async function openLogisticsView(orderId) {
   const order = await db.taobaoOrders.get(orderId);
   if (!order) {
-    alert("找不到该订单！");
+    alert("Order not found!");
     return;
   }
 
@@ -3273,21 +3275,21 @@ async function openLogisticsView(orderId) {
  */
 async function renderLogisticsView(order) {
   const contentArea = document.getElementById("logistics-content-area");
-  contentArea.innerHTML = "加载中...";
+  contentArea.innerHTML = "Loading...";
 
   const product = await db.taobaoProducts.get(order.productId);
   if (!product) {
-    contentArea.innerHTML = "无法加载商品信息。";
+    contentArea.innerHTML = "Unable to load product information.";
     return;
   }
 
-  // 渲染顶部的商品信息卡片
+  // Render the top product information card
   contentArea.innerHTML = `
         <div class="logistics-product-summary">
             <img src="${product.imageUrl}" class="product-image">
             <div class="info">
                 <div class="name">${product.name} (x${order.quantity})</div>
-                <div class="status" id="logistics-main-status">查询中...</div>
+                <div class="status" id="logistics-main-status">Loading...</div>
             </div>
         </div>
         <div class="logistics-timeline" id="logistics-timeline-container"></div>
@@ -3301,21 +3303,21 @@ async function renderLogisticsView(order) {
 
   // 准备一些随机城市名，让物流看起来更真实
   const cities = [
-    "东莞",
-    "广州",
-    "长沙",
-    "武汉",
-    "郑州",
-    "北京",
-    "上海",
-    "成都",
-    "西安",
+    "Dongguan",
+    "Guangzhou",
+    "Changsha",
+    "Wuhan",
+    "Zhengzhou",
+    "Beijing",
+    "Shanghai",
+    "Chengdu",
+    "Xi'an",
   ];
   const startCity = getRandomItem(cities);
   let nextCity = getRandomItem(cities.filter((c) => c !== startCity));
   const userCity =
     getRandomItem(cities.filter((c) => c !== startCity && c !== nextCity)) ||
-    "您的城市";
+    "Your city";
 
   // --- 这就是模拟物流的核心 ---
   let cumulativeDelay = 0;

@@ -54817,18 +54817,26 @@ const ivTags = {
               if (!p || p.endsWith("?") || p.endsWith("=")) return "";
               return p.replace(/\/+$/, "");
             })();
-            if (!_workerBase) throw new Error("Cloudflare Worker URL not configured in CORS Proxy setting.");
-            const _aiUrl = `${_workerBase}/ai-image?prompt=${encodeURIComponent(prompt)}&width=${width}&height=${height}`;
-            console.log(`[Global Image Gen] CF Worker AI: ${_aiUrl}`);
-            const _aiResp = await fetch(_aiUrl);
-            if (!_aiResp.ok) throw new Error(`CF Worker AI failed: ${_aiResp.status}`);
-            const _aiBlob = await _aiResp.blob();
-            return await new Promise((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onloadend = () => resolve(reader.result);
-              reader.onerror = reject;
-              reader.readAsDataURL(_aiBlob);
-            });
+            if (_workerBase) {
+              try {
+                const _aiUrl = `${_workerBase}/ai-image?prompt=${encodeURIComponent(prompt)}&width=${width}&height=${height}`;
+                console.log(`[Global Image Gen] CF Worker AI: ${_aiUrl}`);
+                const _aiResp = await fetch(_aiUrl);
+                if (!_aiResp.ok) throw new Error(`CF Worker AI failed: ${_aiResp.status}`);
+                const _aiBlob = await _aiResp.blob();
+                return await new Promise((resolve, reject) => {
+                  const reader = new FileReader();
+                  reader.onloadend = () => resolve(reader.result);
+                  reader.onerror = reject;
+                  reader.readAsDataURL(_aiBlob);
+                });
+              } catch (_cfErr) {
+                console.warn(`[Global Image Gen] CF Worker AI failed (${_cfErr.message}), falling back to Pollinations...`);
+                // fall through to Pollinations path below
+              }
+            } else {
+              console.warn(`[Global Image Gen] CF Worker URL not configured, falling back to Pollinations...`);
+            }
           }
 
           // ── Pollinations path (default) ──
@@ -54910,7 +54918,10 @@ const ivTags = {
 
               return await fetchToBase64(primaryUrl).catch(async () => {
                 console.warn(`[Global Image Gen] 主接口失败，尝试备用接口...`);
-                const fallbackUrl = `https://gen.pollinations.ai/image/${encodedPrompt}?${queryParams}`;
+                // Retry primary with a fresh seed as fallback
+                const retrySeed = Math.floor(Math.random() * 100000);
+                const retryParams = queryParams.replace(/seed=\d+/, `seed=${retrySeed}`);
+                const fallbackUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${retryParams}`;
                 return await fetchToBase64(fallbackUrl);
               });
             } catch (error) {
