@@ -54840,15 +54840,36 @@ const ivTags = {
           }
 
           // ── Pollinations path (default) ──
-          console.log(
-            `[Global Image Gen] Prompt: ${prompt}, Options:`,
-            options,
-          );
+          console.log(`[Global Image Gen] Prompt: ${prompt}, Options:`, options);
+
+          // Compute proxy once (outside retry loop)
+          const _imgProxy = (() => {
+            const p = (localStorage.getItem("api-cors-proxy") || "").trim();
+            if (!p || p.endsWith("?") || p.endsWith("=")) return "";
+            return p.replace(/\/+$/, "");
+          })();
+
+          // Helper: fetch URL → base64, routing through Worker proxy if configured
+          const fetchToBase64 = async (url) => {
+            const fetchUrl = _imgProxy
+              ? `${_imgProxy}/?url=${encodeURIComponent(url)}`
+              : url;
+            const resp = await fetch(fetchUrl);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const blob = await resp.blob();
+            return await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            });
+          };
+
+          let _failCount = 0;
 
           while (true) {
             try {
               const encodedPrompt = encodeURIComponent(prompt);
-              // 尝试获取全局 state，如果不存在则为 null
               const currentApiConfig =
                 window.state && window.state.apiConfig
                   ? window.state.apiConfig
@@ -54857,29 +54878,21 @@ const ivTags = {
                 ? currentApiConfig.pollinationsApiKey
                 : null;
 
-              // 构建基础参数
-              let queryParams = `width=${width}&height=${height}&seed=${seed}&model=${model}`;
+              // Rotate model after repeated failures: flux (0-2) → turbo (3+)
+              const _modelToUse = _failCount >= 3 ? "turbo" : model;
+              const _seed = Math.floor(Math.random() * 100000);
+              let queryParams = `width=${width}&height=${height}&seed=${_seed}&model=${_modelToUse}`;
               if (nologo) queryParams += "&nologo=true";
 
-              // 1. === 有 API Key 的情况 ===
+              // 1. === API Key path ===
               if (pollApiKey) {
                 const directUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${queryParams}&key=${pollApiKey}`;
-                // Route through Worker proxy if configured (fixes CORS/530)
-                const _pollProxy = (() => {
-                  const p = (localStorage.getItem("api-cors-proxy") || "").trim();
-                  if (!p || p.endsWith("?") || p.endsWith("=")) return "";
-                  return p.replace(/\/+$/, "");
-                })();
-                const fetchUrl = _pollProxy
-                  ? `${_pollProxy}/?url=${encodeURIComponent(directUrl)}`
+                const fetchUrl = _imgProxy
+                  ? `${_imgProxy}/?url=${encodeURIComponent(directUrl)}`
                   : directUrl;
                 console.log(`[Global Image Gen] API Key path → ${fetchUrl}`);
-
                 const response = await fetch(fetchUrl, { method: "GET" });
-                if (!response.ok) {
-                  throw new Error(`API Key 请求失败: ${response.status}`);
-                }
-
+                if (!response.ok) throw new Error(`API Key 请求失败: ${response.status}`);
                 const blob = await response.blob();
                 return await new Promise((resolve, reject) => {
                   const reader = new FileReader();
@@ -54889,45 +54902,35 @@ const ivTags = {
                 });
               }
 
-              // 2. === None API Key (公开接口) 的情况 ===
-              // 如果配置了 Cloudflare Worker，通过 Worker 中转解决 401/CORS
-              const _imgProxy = (() => {
-                const p = (localStorage.getItem("api-cors-proxy") || "").trim();
-                if (!p || p.endsWith("?") || p.endsWith("=")) return "";
-                return p.replace(/\/+$/, "");
-              })();
-
-              const fetchToBase64 = async (url) => {
-                const fetchUrl = _imgProxy
-                  ? `${_imgProxy}/?url=${encodeURIComponent(url)}`
-                  : url;
-                const resp = await fetch(fetchUrl);
-                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-                const blob = await resp.blob();
-                return await new Promise((resolve, reject) => {
-                  const reader = new FileReader();
-                  reader.onloadend = () => resolve(reader.result);
-                  reader.onerror = reject;
-                  reader.readAsDataURL(blob);
-                });
-              };
-
-              // 当前正式 endpoint: image.pollinations.ai/prompt/
+              // 2. === No API Key path ===
               const primaryUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${queryParams}`;
-              console.log(`[Global Image Gen] proxy=${_imgProxy || "none"} url=${primaryUrl}`);
-
-              return await fetchToBase64(primaryUrl).catch(async () => {
-                console.warn(`[Global Image Gen] 主接口失败，尝试备用接口...`);
-                // Retry primary with a fresh seed as fallback
-                const retrySeed = Math.floor(Math.random() * 100000);
-                const retryParams = queryParams.replace(/seed=\d+/, `seed=${retrySeed}`);
-                const fallbackUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${retryParams}`;
-                return await fetchToBase64(fallbackUrl);
-              });
-            } catch (error) {
-              console.error(
-                `[Global Image Gen] 生成失败，5秒后自动重试... 错误: ${error.message}`,
+              console.log(
+                `[Global Image Gen] attempt=${_failCount + 1} model=${_modelToUse} proxy=${_imgProxy || "none"} url=${primaryUrl}`,
               );
+              return await fetchToBase64(primaryUrl);
+
+            } catch (error) {
+              _failCount++;
+              console.error(
+                `[Global Image Gen] 生成失败 (attempt ${_failCount}), 5秒后重试... 错误: ${error.message}`,
+              );
+
+              // After 5 failures (~25s), use picsum.photos as a real-photo placeholder
+              // so the UI shows something while pollinations is down
+              if (_failCount >= 5) {
+                try {
+                  const _picsumSeed = encodeURIComponent(prompt)
+                    .replace(/[^a-z0-9]/gi, "")
+                    .slice(0, 24) || "product";
+                  const _picsumUrl = `https://picsum.photos/seed/${_picsumSeed}/${width}/${height}`;
+                  console.warn(`[Global Image Gen] Pollinations down, using picsum placeholder: ${_picsumUrl}`);
+                  return await fetchToBase64(_picsumUrl);
+                } catch (_picsumErr) {
+                  console.warn(`[Global Image Gen] picsum also failed, resetting and retrying pollinations...`);
+                  _failCount = 0; // reset counter so we keep trying
+                }
+              }
+
               await new Promise((resolve) => setTimeout(resolve, 5000));
             }
           }
