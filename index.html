@@ -7360,8 +7360,9 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
             >
               <option value="">❌ Direct (no proxy)</option>
               <option value="https://corsproxy.io/?" selected>
-                ✅ corsproxy.io (Recommended)
+                corsproxy.io (free, limited size)
               </option>
+              <option value="cf-worker">⚡ Cloudflare Worker (recommended)</option>
               <option value="https://api.allorigins.win/raw?url=">
                 allorigins.win
               </option>
@@ -7370,8 +7371,8 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
               </option>
               <option value="custom">🔧 Custom Proxy</option>
             </select>
-            <small style="color: #e74c3c; display: block; margin-top: 8px">
-              ⚠️ Running locally will encounter CORS issues; a proxy is required. Recommended: corsproxy.io
+            <small style="color: #888; display: block; margin-top: 8px">
+              ⚡ Cloudflare Worker uses the URL set in API Connection → CORS Proxy. No size limits.
             </small>
           </div>
 
@@ -7487,11 +7488,15 @@ lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer
             <label style="color:#333">🌐 CORS Proxy Settings</label>
             <select id="pai-cors-proxy" class="moe-input">
               <option value="">❌ Direct (no proxy)</option>
-              <option value="https://corsproxy.io/?" selected>✅ corsproxy.io (Recommended)</option>
+              <option value="https://corsproxy.io/?" selected>corsproxy.io (free, limited size)</option>
+              <option value="cf-worker">⚡ Cloudflare Worker (recommended)</option>
               <option value="https://api.allorigins.win/raw?url=">allorigins.win</option>
               <option value="https://cors-anywhere.herokuapp.com/">cors-anywhere (requires activation)</option>
               <option value="custom">🔧 Custom Proxy</option>
             </select>
+            <small style="color:#888; display:block; margin-top:6px">
+              ⚡ Cloudflare Worker uses the URL set in API Connection → CORS Proxy. No size limits.
+            </small>
           </div>
           <div id="pai-custom-proxy-group" class="form-group" style="display:none">
             <label style="color:#333">Custom Proxy URL</label>
@@ -22212,8 +22217,21 @@ console.log(`[System] Database for user ${userId} has been loaded`);
          */
         function buildPixAIProxiedUrl(baseUrl, corsProxy, customProxyUrl) {
           if (!corsProxy || corsProxy === "") return baseUrl;
-          const proxy = corsProxy === "custom" ? (customProxyUrl || "") : corsProxy;
-          return proxy + encodeURIComponent(baseUrl);
+          if (corsProxy === "custom") {
+            const proxy = customProxyUrl || "";
+            return proxy ? proxy + encodeURIComponent(baseUrl) : baseUrl;
+          }
+          if (corsProxy === "cf-worker") {
+            // Use the global Cloudflare Worker URL (set in API Connection → CORS Proxy)
+            // Worker properly adds CORS headers to all responses (incl. 429/5xx errors)
+            const workerBase = (() => {
+              const p = (localStorage.getItem("api-cors-proxy") || "").trim();
+              if (!p || p.endsWith("?") || p.endsWith("=")) return "";
+              return p.replace(/\/+$/, "");
+            })();
+            return workerBase ? `${workerBase}/?url=${encodeURIComponent(baseUrl)}` : baseUrl;
+          }
+          return corsProxy + encodeURIComponent(baseUrl);
         }
 
         /**
@@ -22543,7 +22561,17 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             : "https://image.novelai.net/ai/generate-image";
 
           let corsProxy = settings.cors_proxy;
-          if (corsProxy === "custom") corsProxy = settings.custom_proxy_url || "";
+          if (corsProxy === "custom") {
+            corsProxy = settings.custom_proxy_url || "";
+          } else if (corsProxy === "cf-worker") {
+            // Use global Cloudflare Worker URL (API Connection → CORS Proxy)
+            const _wBase = (() => {
+              const p = (localStorage.getItem("api-cors-proxy") || "").trim();
+              if (!p || p.endsWith("?") || p.endsWith("=")) return "";
+              return p.replace(/\/+$/, "");
+            })();
+            corsProxy = _wBase ? _wBase + "/?url=" : "";
+          }
           if (corsProxy) apiUrl = corsProxy + encodeURIComponent(apiUrl);
 
           const isChrome = /Chrome/.test(navigator.userAgent) && !/Edg/.test(navigator.userAgent);
@@ -22768,9 +22796,17 @@ console.log(`[System] Database for user ${userId} has been loaded`);
 
             let corsProxy = settings.cors_proxy;
 
-            // If a custom proxy is selected, use the custom URL
+            // Resolve proxy value
             if (corsProxy === "custom") {
               corsProxy = settings.custom_proxy_url || "";
+            } else if (corsProxy === "cf-worker") {
+              // Use global Cloudflare Worker URL (API Connection → CORS Proxy)
+              const _wBase = (() => {
+                const p = (localStorage.getItem("api-cors-proxy") || "").trim();
+                if (!p || p.endsWith("?") || p.endsWith("=")) return "";
+                return p.replace(/\/+$/, "");
+              })();
+              corsProxy = _wBase ? _wBase + "/?url=" : "";
             }
 
             // If a proxy is set, prepend it to the API URL
@@ -30539,12 +30575,17 @@ ${libraryList}
 
                         let corsProxy = settings.cors_proxy;
 
-                        // 如果选择了自定义代理，使用自定义URL
                         if (corsProxy === "custom") {
                           corsProxy = settings.custom_proxy_url || "";
+                        } else if (corsProxy === "cf-worker") {
+                          const _wBase = (() => {
+                            const p = (localStorage.getItem("api-cors-proxy") || "").trim();
+                            if (!p || p.endsWith("?") || p.endsWith("=")) return "";
+                            return p.replace(/\/+$/, "");
+                          })();
+                          corsProxy = _wBase ? _wBase + "/?url=" : "";
                         }
 
-                        // 如果有代理，添加到URL前面
                         if (corsProxy && corsProxy !== "") {
                           apiUrl = corsProxy + encodeURIComponent(apiUrl);
                         }
@@ -30981,12 +31022,17 @@ ${libraryList}
 
                     let corsProxy = settings.cors_proxy;
 
-                    // 如果选择了自定义代理，使用自定义URL
                     if (corsProxy === "custom") {
                       corsProxy = settings.custom_proxy_url || "";
+                    } else if (corsProxy === "cf-worker") {
+                      const _wBase = (() => {
+                        const p = (localStorage.getItem("api-cors-proxy") || "").trim();
+                        if (!p || p.endsWith("?") || p.endsWith("=")) return "";
+                        return p.replace(/\/+$/, "");
+                      })();
+                      corsProxy = _wBase ? _wBase + "/?url=" : "";
                     }
 
-                    // 如果有代理，添加到URL前面
                     if (corsProxy && corsProxy !== "") {
                       apiUrl = corsProxy + encodeURIComponent(apiUrl);
                     }
