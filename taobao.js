@@ -2865,9 +2865,8 @@ function displayAiGeneratedProducts(products, title) {
     `;
     gridEl.appendChild(card);
 
-    // Call the asynchronous function to load images
-    // This function will silently generate images in the background and update the card upon success
-    loadAndDisplayAiProductImage(product, card);
+    // Stagger image generation calls to avoid concurrent API rate limits (e.g. PixAI 429)
+    setTimeout(() => loadAndDisplayAiProductImage(product, card), index * 2500);
   });
 
   modal.classList.add("visible");

@@ -55043,18 +55043,33 @@ const ivTags = {
               while (_pixAttempt < 3) {
                 try {
                   const _pixSettings = getPixAISettings();
+                  // If a Cloudflare Worker URL is configured as the global CORS proxy,
+                  // use it for PixAI too — the Worker adds CORS headers to ALL responses
+                  // (including 429/error codes), while corsproxy.io does not.
+                  const _globalWorker = (() => {
+                    const p = (localStorage.getItem("api-cors-proxy") || "").trim();
+                    if (!p || p.endsWith("?") || p.endsWith("=")) return "";
+                    return p.replace(/\/+$/, "");
+                  })();
+                  if (_globalWorker) {
+                    // Use Worker ?url= style: worker/?url=ENCODED_API_URL
+                    _pixSettings.cors_proxy = _globalWorker + "/?url=";
+                    _pixSettings.custom_proxy_url = "";
+                  }
                   // Prepend quality boosters from PixAI settings if configured
                   const _pixPos = _pixSettings.default_positive
                     ? `${prompt}, ${_pixSettings.default_positive}`
                     : prompt;
                   const _pixNeg = _pixSettings.default_negative || "";
                   const _pixModel = localStorage.getItem("pixai-model") || "1935090615918113018";
-                  console.log(`[Global Image Gen] PixAI attempt ${_pixAttempt + 1}, model: ${_pixModel}`);
+                  console.log(`[Global Image Gen] PixAI attempt ${_pixAttempt + 1}, model: ${_pixModel}, proxy: ${_pixSettings.cors_proxy}`);
                   return await generatePixAIImage(_pixPos, _pixNeg, _pixSettings, _pixModel);
                 } catch (_pixErr) {
                   _pixAttempt++;
-                  console.error(`[Global Image Gen] PixAI attempt ${_pixAttempt} failed: ${_pixErr.message}`);
-                  if (_pixAttempt < 3) await new Promise((r) => setTimeout(r, 3000));
+                  // Rate limit: wait longer before retry
+                  const _pixDelay = _pixErr.message.includes("429") ? 12000 : 3000;
+                  console.error(`[Global Image Gen] PixAI attempt ${_pixAttempt} failed (${_pixErr.message}), retrying in ${_pixDelay / 1000}s...`);
+                  if (_pixAttempt < 3) await new Promise((r) => setTimeout(r, _pixDelay));
                 }
               }
               console.warn("[Global Image Gen] PixAI failed after 3 attempts, falling back to Pollinations...");
