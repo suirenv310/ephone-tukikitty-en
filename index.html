@@ -54865,6 +54865,8 @@ const ivTags = {
             });
           };
 
+          // Model rotation order: cycle through these when pollinations fails
+          const _modelRotation = ["flux", "turbo", "flux-realism", "any-dark", "flux-anime"];
           let _failCount = 0;
 
           while (true) {
@@ -54878,8 +54880,8 @@ const ivTags = {
                 ? currentApiConfig.pollinationsApiKey
                 : null;
 
-              // Rotate model after repeated failures: flux (0-2) → turbo (3+)
-              const _modelToUse = _failCount >= 3 ? "turbo" : model;
+              // Rotate through different models on each failure
+              const _modelToUse = _modelRotation[_failCount % _modelRotation.length] || model;
               const _seed = Math.floor(Math.random() * 100000);
               let queryParams = `width=${width}&height=${height}&seed=${_seed}&model=${_modelToUse}`;
               if (nologo) queryParams += "&nologo=true";
@@ -54905,7 +54907,7 @@ const ivTags = {
               // 2. === No API Key path ===
               const primaryUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?${queryParams}`;
               console.log(
-                `[Global Image Gen] attempt=${_failCount + 1} model=${_modelToUse} proxy=${_imgProxy || "none"} url=${primaryUrl}`,
+                `[Global Image Gen] attempt=${_failCount + 1} model=${_modelToUse} proxy=${_imgProxy || "none"}`,
               );
               return await fetchToBase64(primaryUrl);
 
@@ -54915,19 +54917,30 @@ const ivTags = {
                 `[Global Image Gen] 生成失败 (attempt ${_failCount}), 5秒后重试... 错误: ${error.message}`,
               );
 
-              // After 5 failures (~25s), use picsum.photos as a real-photo placeholder
-              // so the UI shows something while pollinations is down
-              if (_failCount >= 5) {
+              // After cycling all pollinations models, try prompt-aware alternatives
+              if (_failCount >= _modelRotation.length) {
+                // Priority 1: Cloudflare Worker AI — uses SDXL, generates relevant images from prompt
+                if (_imgProxy) {
+                  try {
+                    const _aiUrl = `${_imgProxy}/ai-image?prompt=${encodeURIComponent(prompt)}&width=${width}&height=${height}`;
+                    console.warn(`[Global Image Gen] Pollinations down → CF Worker AI: ${_aiUrl}`);
+                    return await fetchToBase64(_aiUrl);
+                  } catch (_cfErr) {
+                    console.warn(`[Global Image Gen] CF Worker AI failed (${_cfErr.message})`);
+                  }
+                }
+
+                // Priority 2: picsum — unrelated photos, absolute last resort
                 try {
                   const _picsumSeed = encodeURIComponent(prompt)
                     .replace(/[^a-z0-9]/gi, "")
                     .slice(0, 24) || "product";
                   const _picsumUrl = `https://picsum.photos/seed/${_picsumSeed}/${width}/${height}`;
-                  console.warn(`[Global Image Gen] Pollinations down, using picsum placeholder: ${_picsumUrl}`);
+                  console.warn(`[Global Image Gen] Last resort picsum: ${_picsumUrl}`);
                   return await fetchToBase64(_picsumUrl);
                 } catch (_picsumErr) {
-                  console.warn(`[Global Image Gen] picsum also failed, resetting and retrying pollinations...`);
-                  _failCount = 0; // reset counter so we keep trying
+                  console.warn(`[Global Image Gen] All fallbacks exhausted, restarting retry loop...`);
+                  _failCount = 0; // reset and keep retrying pollinations
                 }
               }
 
