@@ -1550,6 +1550,8 @@
                 <select id="app-image-provider" class="moe-input">
                   <option value="pollinations">🌸 Pollinations.ai</option>
                   <option value="cf-worker-ai">⚡ Cloudflare Worker AI</option>
+                  <option value="novelai">🎨 NovelAI (Image Gen settings)</option>
+                  <option value="pixai">🤖 PixAI (Image Gen settings)</option>
                 </select>
               </div>
 
@@ -1574,6 +1576,28 @@
                 </p>
                 <p style="font-size:12px;color:var(--accent-color)">
                   Worker URL is taken from the CORS Proxy setting above.
+                </p>
+              </div>
+
+              <!-- NovelAI settings info -->
+              <div id="novelai-appgen-group" style="display:none">
+                <p style="font-size:12px;color:#888;margin-top:8px">
+                  Uses your <b>NovelAI API key</b> and model from the Image Generation settings.<br>
+                  Positive/negative prompt boosters from those settings are applied automatically.
+                </p>
+                <p style="font-size:12px;color:var(--accent-color)">
+                  Falls back to Pollinations.ai if NovelAI is unavailable.
+                </p>
+              </div>
+
+              <!-- PixAI settings info -->
+              <div id="pixai-appgen-group" style="display:none">
+                <p style="font-size:12px;color:#888;margin-top:8px">
+                  Uses your <b>PixAI API key</b> and model from the Image Generation settings.<br>
+                  Positive/negative prompt boosters from those settings are applied automatically.
+                </p>
+                <p style="font-size:12px;color:var(--accent-color)">
+                  Falls back to Pollinations.ai if PixAI is unavailable.
                 </p>
               </div>
             </div>
@@ -22427,6 +22451,174 @@ console.log(`[System] Database for user ${userId} has been loaded`);
           return null;
         }
 
+        /**
+         * NovelAI image generation — headless version (no DOM side effects).
+         * Reuses all NovelAI settings from localStorage/getNovelAISettings().
+         * @param {string} positivePrompt
+         * @param {string} negativePrompt
+         * @returns {Promise<string>} base64 data URL
+         */
+        async function generateNAIImageFromPrompt(positivePrompt, negativePrompt) {
+          const apiKey = localStorage.getItem("novelai-api-key") || "";
+          const model = localStorage.getItem("novelai-model") || "nai-diffusion-4-5-full";
+          if (!apiKey) throw new Error("NovelAI API Key not configured.");
+
+          const settings = getNovelAISettings();
+          const [width, height] = settings.resolution.split("x").map(Number);
+          const negPrompt = negativePrompt || settings.default_negative || "";
+
+          let requestBody;
+          if (model.includes("nai-diffusion-4")) {
+            requestBody = {
+              input: positivePrompt,
+              model,
+              action: "generate",
+              parameters: {
+                params_version: 3,
+                width, height,
+                scale: settings.cfg_scale,
+                sampler: settings.sampler,
+                steps: settings.steps,
+                seed: settings.seed === -1 ? Math.floor(Math.random() * 9999999999) : settings.seed,
+                n_samples: 1,
+                ucPreset: settings.uc_preset,
+                qualityToggle: settings.quality_toggle,
+                autoSmea: false,
+                dynamic_thresholding: false,
+                controlnet_strength: 1,
+                legacy: false,
+                add_original_image: true,
+                cfg_rescale: 0,
+                noise_schedule: "karras",
+                legacy_v3_extend: false,
+                skip_cfg_above_sigma: null,
+                use_coords: false,
+                legacy_uc: false,
+                normalize_reference_strength_multiple: true,
+                inpaintImg2ImgStrength: 1,
+                characterPrompts: [],
+                v4_prompt: {
+                  caption: { base_caption: positivePrompt, char_captions: [] },
+                  use_coords: false,
+                  use_order: true,
+                },
+                v4_negative_prompt: {
+                  caption: { base_caption: negPrompt, char_captions: [] },
+                  legacy_uc: false,
+                },
+                negative_prompt: negPrompt,
+                deliberate_euler_ancestral_bug: false,
+                prefer_brownian: true,
+              },
+            };
+          } else {
+            requestBody = {
+              input: positivePrompt,
+              model,
+              action: "generate",
+              parameters: {
+                width, height,
+                scale: settings.cfg_scale,
+                sampler: settings.sampler,
+                steps: settings.steps,
+                seed: settings.seed === -1 ? Math.floor(Math.random() * 9999999999) : settings.seed,
+                n_samples: 1,
+                ucPreset: settings.uc_preset,
+                qualityToggle: settings.quality_toggle,
+                sm: settings.smea,
+                sm_dyn: settings.smea_dyn,
+                dynamic_thresholding: false,
+                controlnet_strength: 1,
+                legacy: false,
+                add_original_image: false,
+                cfg_rescale: 0,
+                noise_schedule: "native",
+                negative_prompt: negPrompt,
+              },
+            };
+          }
+
+          let apiUrl = model.includes("nai-diffusion-4")
+            ? "https://image.novelai.net/ai/generate-image-stream"
+            : "https://image.novelai.net/ai/generate-image";
+
+          let corsProxy = settings.cors_proxy;
+          if (corsProxy === "custom") corsProxy = settings.custom_proxy_url || "";
+          if (corsProxy) apiUrl = corsProxy + encodeURIComponent(apiUrl);
+
+          const isChrome = /Chrome/.test(navigator.userAgent) && !/Edg/.test(navigator.userAgent);
+          let fetchOptions = {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: "Bearer " + apiKey },
+            body: JSON.stringify(requestBody),
+          };
+          if (isChrome) {
+            const cleanHeaders = {};
+            for (const [key, value] of Object.entries(fetchOptions.headers)) {
+              cleanHeaders[key] = value.replace(/[^\x00-\xFF]/g, "");
+            }
+            fetchOptions.headers = cleanHeaders;
+          }
+
+          const response = await fetch(apiUrl, fetchOptions);
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`NovelAI API error (${response.status}): ${errorText}`);
+          }
+
+          const blobToBase64 = (blob) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+
+          const extractImageFromZip = async (blob) => {
+            if (typeof JSZip === "undefined") throw new Error("JSZip not loaded");
+            const zip = await JSZip.loadAsync(blob);
+            let imageFile = null;
+            for (const filename in zip.files) {
+              if (filename.match(/\.(png|jpg|jpeg|webp)$/i)) { imageFile = zip.files[filename]; break; }
+            }
+            if (!imageFile) throw new Error("No image found in ZIP");
+            return await blobToBase64(await imageFile.async("blob"));
+          };
+
+          const contentType = response.headers.get("content-type");
+          if (contentType && contentType.includes("text/event-stream")) {
+            const text = await response.text();
+            const lines = text.trim().split("\n");
+            let base64Data = null;
+            for (let i = lines.length - 1; i >= 0; i--) {
+              const line = lines[i].trim();
+              if (line.startsWith("data: ") && line !== "data: [DONE]") {
+                const dataContent = line.substring(6);
+                try {
+                  const jsonData = JSON.parse(dataContent);
+                  if (jsonData.event_type === "final" && jsonData.image) { base64Data = jsonData.image; break; }
+                  if (jsonData.data) { base64Data = jsonData.data; break; }
+                  if (jsonData.image) { base64Data = jsonData.image; break; }
+                } catch (e) { base64Data = dataContent; break; }
+              }
+            }
+            if (!base64Data) throw new Error("Unable to extract image data from SSE response");
+            const isPNG = base64Data.startsWith("iVBORw0KGgo");
+            const isJPEG = base64Data.startsWith("/9j/");
+            if (isPNG || isJPEG) {
+              const binaryString = atob(base64Data);
+              const bytes = new Uint8Array(binaryString.length);
+              for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+              return await blobToBase64(new Blob([bytes], { type: isPNG ? "image/png" : "image/jpeg" }));
+            }
+            const binaryString = atob(base64Data);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+            return await extractImageFromZip(new Blob([bytes]));
+          } else {
+            return await extractImageFromZip(await response.blob());
+          }
+        }
+
         // Generate NovelAI image main function (full version)
         async function generateNovelAIImage() {
           const apiKey = document
@@ -22874,6 +23066,10 @@ console.log(`[System] Database for user ${userId} has been loaded`);
             _savedImgProvider === "pollinations" ? "block" : "none";
           document.getElementById("cf-worker-ai-group").style.display =
             _savedImgProvider === "cf-worker-ai" ? "block" : "none";
+          document.getElementById("novelai-appgen-group").style.display =
+            _savedImgProvider === "novelai" ? "block" : "none";
+          document.getElementById("pixai-appgen-group").style.display =
+            _savedImgProvider === "pixai" ? "block" : "none";
 
           // 2. 更新后台活动相关的开关和输入框
           document.getElementById("background-activity-switch").checked =
@@ -54809,8 +55005,65 @@ const ivTags = {
             nologo = false,
           } = options;
 
-          // ── Cloudflare Worker AI path ──
+          // ── Provider dispatch ──
           const _appImgProvider = localStorage.getItem("app-image-provider") || "pollinations";
+
+          // ── NovelAI path ──
+          if (_appImgProvider === "novelai") {
+            const _naiKey = localStorage.getItem("novelai-api-key") || "";
+            if (_naiKey) {
+              let _naiAttempt = 0;
+              while (_naiAttempt < 3) {
+                try {
+                  const _naiSettings = getNovelAISettings();
+                  // Prepend quality boosters from NAI settings if configured
+                  const _naiPos = _naiSettings.default_positive
+                    ? `${prompt}, ${_naiSettings.default_positive}`
+                    : prompt;
+                  const _naiNeg = _naiSettings.default_negative || "";
+                  console.log(`[Global Image Gen] NovelAI attempt ${_naiAttempt + 1}, model: ${localStorage.getItem("novelai-model") || "default"}`);
+                  return await generateNAIImageFromPrompt(_naiPos, _naiNeg);
+                } catch (_naiErr) {
+                  _naiAttempt++;
+                  console.error(`[Global Image Gen] NovelAI attempt ${_naiAttempt} failed: ${_naiErr.message}`);
+                  if (_naiAttempt < 3) await new Promise((r) => setTimeout(r, 3000));
+                }
+              }
+              console.warn("[Global Image Gen] NovelAI failed after 3 attempts, falling back to Pollinations...");
+            } else {
+              console.warn("[Global Image Gen] NovelAI API key not configured, falling back to Pollinations...");
+            }
+          }
+
+          // ── PixAI path ──
+          if (_appImgProvider === "pixai") {
+            const _pixKey = localStorage.getItem("pixai-api-key") || "";
+            if (_pixKey) {
+              let _pixAttempt = 0;
+              while (_pixAttempt < 3) {
+                try {
+                  const _pixSettings = getPixAISettings();
+                  // Prepend quality boosters from PixAI settings if configured
+                  const _pixPos = _pixSettings.default_positive
+                    ? `${prompt}, ${_pixSettings.default_positive}`
+                    : prompt;
+                  const _pixNeg = _pixSettings.default_negative || "";
+                  const _pixModel = localStorage.getItem("pixai-model") || "1935090615918113018";
+                  console.log(`[Global Image Gen] PixAI attempt ${_pixAttempt + 1}, model: ${_pixModel}`);
+                  return await generatePixAIImage(_pixPos, _pixNeg, _pixSettings, _pixModel);
+                } catch (_pixErr) {
+                  _pixAttempt++;
+                  console.error(`[Global Image Gen] PixAI attempt ${_pixAttempt} failed: ${_pixErr.message}`);
+                  if (_pixAttempt < 3) await new Promise((r) => setTimeout(r, 3000));
+                }
+              }
+              console.warn("[Global Image Gen] PixAI failed after 3 attempts, falling back to Pollinations...");
+            } else {
+              console.warn("[Global Image Gen] PixAI API key not configured, falling back to Pollinations...");
+            }
+          }
+
+          // ── Cloudflare Worker AI path ──
           if (_appImgProvider === "cf-worker-ai") {
             const _workerBase = (() => {
               const p = (localStorage.getItem("api-cors-proxy") || "").trim();
@@ -56529,6 +56782,10 @@ const ivTags = {
                 v === "pollinations" ? "block" : "none";
               document.getElementById("cf-worker-ai-group").style.display =
                 v === "cf-worker-ai" ? "block" : "none";
+              document.getElementById("novelai-appgen-group").style.display =
+                v === "novelai" ? "block" : "none";
+              document.getElementById("pixai-appgen-group").style.display =
+                v === "pixai" ? "block" : "none";
             });
 
           document
