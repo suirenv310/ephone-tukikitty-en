@@ -9,36 +9,36 @@ const bgmPlayer = document.getElementById("dating-bgm-player");
  * 打开"约会大作战"App，快速显示已保存数据
  */
 async function openDatingApp() {
-  console.log("打开约会大作战App...");
+  console.log("Open the Date A Live app...");
   showScreen("date-a-live-screen");
-  // 从数据库加载所有已保存的场景
+  // Load all saved scenes from the database
   currentDatingScenes = await db.datingScenes.toArray();
-  console.log(`从数据库加载了 ${currentDatingScenes.length} 个约会场景。`);
-  // 渲染这些场景（只会先显示文字和加载动画）
+  console.log(`Loaded ${currentDatingScenes.length} dating scenes from the database.`);
+  // Render these scenes (only display text and loading animation initially)
   renderDatingScenes();
 }
 
 /**
- * 调用AI生成新的一批约会场景，并只保存场景数据
+ * Call AI to generate a new batch of dating scenes and only save the scene data
  */
 async function refreshDatingScenes() {
   if (isGeneratingScenes) {
-    alert("正在加载中，请不要着急哦~");
+    alert("Scenes are loading, please be patient~");
     return;
   }
   isGeneratingScenes = true;
 
   const contentEl = document.getElementById("dating-scene-content");
   const loadingIndicator = document.createElement("p");
-  loadingIndicator.textContent = "AI正在构思新的约会方案...";
+  loadingIndicator.textContent = "AI is generating new dating scenes...";
   loadingIndicator.style.textAlign = "center";
   loadingIndicator.style.color = "var(--text-secondary)";
-  contentEl.innerHTML = ""; // 先清空旧场景
+  contentEl.innerHTML = ""; // Clear old scenes
   contentEl.appendChild(loadingIndicator);
 
   const { proxyUrl, apiKey, model } = state.apiConfig;
   if (!proxyUrl || !apiKey || !model) {
-    loadingIndicator.textContent = "API未配置，无法生成场景！";
+    loadingIndicator.textContent = "API not configured, unable to generate scenes!";
     loadingIndicator.style.color = "red";
     isGeneratingScenes = false;
     return;
@@ -46,25 +46,25 @@ async function refreshDatingScenes() {
 
   // Prompt保持不变
   const prompt = `
-                        # 任务
-                        你是一位顶级约会策划师，尤其擅长营造浪漫氛围。请为我策划 3-5 个适合情侣的、日常且极具浪漫情调的约会场景。
+                        # Task
+                        You are a top dating planner, especially skilled at creating a romantic atmosphere. Please plan 3-5 dating scenes suitable for couples, daily and highly romantic.
 
-                        # 核心规则
-                        1.  **场景风格**: 场景必须是现实生活中可以实现的，但要富有想象力和浪漫气息。**绝对禁止**任何黑暗、恐怖或令人不适的元素。
-                        2.  **场景多样性**: 请包含多种类型的地点，例如：
-                            -   **户外**: 公园、海边、路边小吃摊。
-                            -   **室内**: 温馨的咖啡馆、艺术展、书店。
-                            -   **住宿**: 普通的温馨酒店、电竞酒店、甚至可以来点新奇的情趣酒店。
-                        3.  **格式铁律**: 你的回复【必须且只能】是一个严格的JSON数组，直接以'['开头, 以']'结尾。
-                        4.  **内容要求**: 每个场景对象【必须】包含以下三个字段:
-                            -   \`"name"\`: (字符串) 一个充满浪漫想象的日常约会场景名称 (例如: "星空下的电竞双排夜", "微醺路边摊的夏日晚风", "私语书店的角落")。
-                            -   \`"cost"\`: (数字) 一个代表浪漫程度的虚拟花费 (例如: 288, 520, 999)。
-                            -   \`"imagePrompt"\`: (字符串) 一个用于文生图的、纯英文的、详细的【纯风景或静物】描述，用于生成场景图片。【绝对不能包含人物、情侣或任何人】。图片风格必须是【浪漫唯美的 (romantic, beautiful, aesthetic)】，可以使用 anime style, vibrant colors, soft lighting, masterpiece 等词汇来增强艺术感。
+                        # Core Rules
+                        1.  **Scene Style**: The scenes must be realizable in real life but imaginative and romantic. **Absolutely no** dark, horror, or uncomfortable elements.
+                        2.  **Scene Diversity**: Please include various types of locations, such as:
+                            -   **Outdoor**: Parks, beaches, street food stalls.
+                            -   **Indoor**: Cozy cafes, art exhibitions, bookstores.
+                            -   **Accommodation**: Ordinary cozy hotels, e-sports hotels, or even some novel themed hotels.
+                        3.  **Format Iron Rule**: Your response **must and only** be a strict JSON array, starting with '[' and ending with ']'.
+                        4.  **Content Requirements**: Each scene object **must** contain the following three fields:
+                            -   \`"name"\`: (string) A daily dating scene name full of romantic imagination (e.g., "Starry Night E-sports Duo", "Tipsy Street Food Summer Breeze", "Whispering Bookstore Corner").
+                            -   \`"cost"\`: (number) A virtual cost representing the level of romance (e.g., 288, 520, 999).
+                            -   \`"imagePrompt"\`: (string) A detailed, purely English description for text-to-image generation, focusing on **pure scenery or still life**. **Absolutely no** people, couples, or any human elements. The image style must be **romantic and beautiful (romantic, beautiful, aesthetic)**, and you can use terms like anime style, vibrant colors, soft lighting, masterpiece to enhance the artistic feel.
 
-                        # JSON输出格式示例:
+                        # JSON Output Format Example:
                         [
                             {
-                                "name": "雨后公园的七彩霓虹",
+                                "name": "Rainbow Neon in the Park After Rain",
                                 "cost": 188,
                                 "imagePrompt": "a peaceful park after rain, wet cobblestone path reflecting neon city lights, rainbow puddle, glowing lanterns on trees, beautiful, aesthetic, anime style, masterpiece, vibrant colors"
                             }
@@ -98,7 +98,7 @@ async function refreshDatingScenes() {
           }),
         });
 
-    if (!response.ok) throw new Error(`API请求失败: ${await response.text()}`);
+    if (!response.ok) throw new Error(`API request failed: ${await response.text()}`);
 
     const data = await response.json();
     const rawContent = isGemini
@@ -121,38 +121,38 @@ async function refreshDatingScenes() {
       currentDatingScenes.push(...scenesWithId);
       renderDatingScenes();
     } else {
-      throw new Error("AI返回的数据不是有效的数组。");
+      throw new Error("AI returned data is not a valid array.");
     }
   } catch (error) {
-    console.error("生成约会场景失败:", error);
-    contentEl.innerHTML = `<p style="text-align:center; color:red;">生成失败: ${error.message}</p>`;
+    console.error("Failed to generate dating scenes:", error);
+    contentEl.innerHTML = `<p style="text-align:center; color:red;">Generation failed: ${error.message}</p>`;
   } finally {
     isGeneratingScenes = false;
   }
 }
 
 /**
- * 渲染所有约会场景卡片，并异步加载图片
+ * Render all dating scene cards and asynchronously load images
  */
 function renderDatingScenes() {
   const contentEl = document.getElementById("dating-scene-content");
-  contentEl.innerHTML = ""; // 每次都清空再渲染
+  contentEl.innerHTML = ""; // Clear and re-render each time
 
   if (currentDatingScenes.length === 0) {
-    // 如果数据库是空的，显示提示并触发一次生成
+    // If the database is empty, show a prompt and trigger a generation
     if (!isGeneratingScenes) {
       contentEl.innerHTML =
-        '<p style="text-align: center; color: var(--text-secondary); padding: 50px 0;">正在为你构思浪漫的约会方案...</p>';
+        '<p style="text-align: center; color: var(--text-secondary); padding: 50px 0;">Generating romantic dating scenes for you...</p>';
       refreshDatingScenes();
     }
     return;
   }
 
-  // 核心修改：使用 forEach 立即渲染所有卡片
+  // Core modification: Use forEach to immediately render all cards
   currentDatingScenes.forEach((scene) => {
     const card = createDatingSceneCard(scene);
     contentEl.appendChild(card);
-    // 核心修改：调用新的异步函数去处理图片
+    // Core modification: Call the new asynchronous function to handle images
     loadAndDisplaySceneImage(scene);
   });
 }

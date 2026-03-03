@@ -33312,7 +33312,7 @@ ${libraryList}
             ) {
               showBatteryAlert(
                 "https://i.postimg.cc/T2yKJ0DV/40.jpg",
-                "有点饿了，可以去找充电器惹",
+                "I'm a bit hungry; I can go look for the charger now.",
               );
               alertFlags.hasShown40 = true;
             }
@@ -33323,7 +33323,7 @@ ${libraryList}
             ) {
               showBatteryAlert(
                 "https://i.postimg.cc/qB9zbKs9/20.jpg",
-                "赶紧的充电，要饿死了",
+                "Hurry up and charge, I'm starving",
               );
               alertFlags.hasShown20 = true;
             }
@@ -33334,7 +33334,7 @@ ${libraryList}
             ) {
               showBatteryAlert(
                 "https://i.postimg.cc/ThMMVfW4/10.jpg",
-                "已阵亡，还有30秒爆炸",
+                "I'm down, 30 seconds to explosion",
               );
               alertFlags.hasShown10 = true;
             }
@@ -33359,16 +33359,16 @@ ${libraryList}
                 if (battery.charging) {
                   showBatteryAlert(
                     "https://i.postimg.cc/3NDQ0dWG/image.jpg",
-                    "窝爱泥，电量吃饱饱",
+                    "I love it! The battery is fully charged",
                   );
                 }
               });
             } catch (err) {
-              console.error("无法获取电池信息:", err);
+              console.error("Failed to get battery information:", err);
               document.querySelector(".battery-text").textContent = "ᗜωᗜ";
             }
           } else {
-            console.log("浏览器不支持电池状态API。");
+            console.log("Browser does not support Battery Status API.");
             document.querySelector(".battery-text").textContent = "ᗜωᗜ";
           }
         }
@@ -33383,7 +33383,7 @@ ${libraryList}
           albumGrid.innerHTML = "";
           if (albums.length === 0) {
             albumGrid.innerHTML =
-              '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); margin-top: 50px;">你还没有创建任何相册哦~</p>';
+              '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); margin-top: 50px;">You have not created any albums yet~</p>';
             return;
           }
           albums.forEach((album) => {
@@ -33393,7 +33393,7 @@ ${libraryList}
 			                    <div class="album-cover" style="background-image: url(${album.coverUrl});"></div>
 			                    <div class="album-info">
 			                        <p class="album-name">${album.name}</p>
-			                        <p class="album-count">${album.photoCount || 0} 张</p>
+			                        <p class="album-count">${album.photoCount || 0} photos</p>
 			                    </div>
 			                `;
             albumItem.addEventListener("click", () => {
@@ -33402,8 +33402,9 @@ ${libraryList}
 
             addLongPressListener(albumItem, async () => {
               const confirmed = await showCustomConfirm(
-                "删除相册",
-                `确定要删除相册《${album.name}》吗？此操作将同时删除相册内的所有照片，且无法恢复。`,
+                "Delete Album",
+                `Are you sure you want to delete the album "${album.name}"? This action will also delete all photos in the album and cannot be undone.`,
+
                 { confirmButtonClass: "btn-danger" },
               );
 
@@ -33417,7 +33418,7 @@ ${libraryList}
                 // 3. 重新渲染相册列表
                 await renderAlbumList();
 
-                alert("相册已成功删除。");
+                alert("The album has been successfully deleted.");
               }
             });
 
@@ -33437,7 +33438,7 @@ ${libraryList}
           const headerTitle = document.getElementById("album-photos-title");
           const album = await db.qzoneAlbums.get(state.activeAlbumId);
           if (!album) {
-            console.error("找不到相册:", state.activeAlbumId);
+            console.error("Album not found:", state.activeAlbumId);
             showScreen("album-screen");
             return;
           }
@@ -33449,13 +33450,13 @@ ${libraryList}
           photosGrid.innerHTML = "";
           if (photos.length === 0) {
             photosGrid.innerHTML =
-              '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); margin-top: 50px;">这个相册还是空的，快上传第一张照片吧！</p>';
+              '<p style="grid-column: 1 / -1; text-align: center; color: var(--text-secondary); margin-top: 50px;">This album is still empty, upload your first photo now!</p>';
           } else {
             photos.forEach((photo) => {
               const photoItem = document.createElement("div");
               photoItem.className = "photo-item";
               photoItem.innerHTML = `
-			                        <img src="${photo.url}" class="photo-thumb" alt="相册照片">
+			                        <img src="${photo.url}" class="photo-thumb" alt="Album photo">
 			                        <button class="photo-delete-btn" data-photo-id="${photo.id}">×</button>
 			                    `;
               photosGrid.appendChild(photoItem);
@@ -33631,7 +33632,7 @@ ${libraryList}
          * 【数据迁移】在首次加载时，将旧的硬编码问题迁移到数据库
          */
         async function migrateDefaultLudoQuestions() {
-          const defaultBankName = "默认题库";
+          const defaultBankName = "Default question set";
           const existingBank = await db.ludoQuestionBanks
             .where("name")
             .equals(defaultBankName)
@@ -33639,7 +33640,7 @@ ${libraryList}
           // 如果“默认题库”已经存在，就说明迁移过了，直接返回
           if (existingBank) return;
 
-          console.log("正在迁移飞行棋默认问题到数据库...");
+          console.log("Migrating default Ludo questions to the database...");
 
           // 创建默认题库
           const bankId = await db.ludoQuestionBanks.add({
@@ -33650,83 +33651,83 @@ ${libraryList}
             // --- 类型1: 共同回答 (双方都需要回答) ---
             {
               type: "both_answer",
-              text: "如果我们一起去旅行，你最想去哪里，为什么？",
+              text: "If we were to travel together, where would you most like to go and why?",
             },
             {
               type: "both_answer",
-              text: "你认为一段完美的关系中，最不可或缺的三个要素是什么？",
+              text: "What do you think are the three most essential elements in a perfect relationship?",
             },
             {
               type: "both_answer",
-              text: "分享一件最近因为我而让你感到心动或开心的小事。",
+              text: "Share a recent moment that made you feel touched or happy because of me.",
             },
             {
               type: "both_answer",
-              text: "回忆一下，我们第一次见面时，你对我的第一印象是什么？",
+              text: "Recall our first meeting, what was your first impression of me?",
             },
             {
               type: "both_answer",
-              text: "如果我们可以一起学习一项新技能，你希望是什么？",
+              text: "If we could learn a new skill together, what would you like it to be?",
             },
             {
               type: "both_answer",
-              text: "描述一个你最希望和我一起度过的完美周末。",
+              text: "Describe a perfect weekend you would most like to spend with me.",
             },
             {
               type: "both_answer",
-              text: "你觉得我们之间最有默契的一件事是什么？",
+              text: "What do you think is the most harmonious thing between us?",
             },
             {
               type: "both_answer",
-              text: "如果用一种动物来形容我，你觉得是什么？为什么？",
+              text: "If you were to describe me as an animal, what would it be and why?",
             },
             {
               type: "both_answer",
-              text: "在未来的一年里，你最想和我一起完成的一件事是什么？",
+              text: "In the coming year, what is one thing you most want to accomplish with me?",
             },
             {
               type: "both_answer",
-              text: "分享一部你最近很喜欢、并且想推荐给我一起看的电影或剧。",
+              text: "Share a movie or show you recently enjoyed and would like to watch together.",
             },
             {
               type: "both_answer",
-              text: "我们下次约会，你希望穿什么风格的衣服？",
+              text: "For our next date, what style of clothing would you like to wear?",
             },
 
             // --- 类型2: 一人回答，对方评价 ---
-            { type: "single_answer", text: "描述一下我最让你心动的一个瞬间。" },
+            { type: "single_answer", text: "Describe a moment when I made your heart flutter." },
             {
               type: "single_answer",
-              text: "诚实地说，我做的哪件事曾经让你偷偷生过气？",
+              text: "Honestly, what is something I did that made you secretly upset?",
             },
             {
               type: "single_answer",
-              text: "如果我有一种超能力，你希望是什么？",
+              text: "If I had a superpower, what would you hope it to be?",
             },
-            { type: "single_answer", text: "给我三个最贴切的标签。" },
+            { type: "single_answer", text: "Give me three most fitting labels." },
             {
               type: "single_answer",
-              text: "在你心里，我的形象和你的理想型有多接近？",
-            },
-            {
-              type: "single_answer",
-              text: "分享一个你觉得我可能不知道的，关于你的小秘密。",
+              text: "In your mind, how close is my image to your ideal type?",
             },
             {
               type: "single_answer",
-              text: "如果我们的故事是一首歌，你觉得歌名应该叫什么？",
+              text: "Share a small secret about yourself that you think I might not know.",
             },
             {
               type: "single_answer",
-              text: "说一件你觉得我做得比你好/更擅长的事情。",
+              text: "If our story were a song, what do you think the title should be?",
             },
             {
               type: "single_answer",
-              text: "如果可以回到我们认识的任意一天，你会选择哪一天，想做什么？",
+              text: "Describe something you think I do better than you or am more skilled at.",
             },
             {
               type: "single_answer",
-              text: "用三个词来形容你眼中的我们的关系。",
+              text: "If you could go back to any day we met, which day would you choose and what would you do?",
+            },
+            {
+              type: "single_answer",
+              text: "Use three words to describe our relationship in your eyes.",
             },
           ];
 
@@ -33737,13 +33738,13 @@ ${libraryList}
           }));
 
           await db.ludoQuestions.bulkAdd(questionsToAdd);
-          console.log(`成功迁移了 ${questionsToAdd.length} 条默认问题。`);
+          console.log(`Successfully migrated ${questionsToAdd.length} default questions.`);
         }
         /**
-         * 这是模拟器的“心跳”，每次定时器触发时运行
+         * This is the simulator's "heartbeat", running each time the timer triggers
          */
         function runBackgroundSimulationTick() {
-          console.log("模拟器心跳 Tick...");
+          console.log("Simulator heartbeat Tick...");
           if (!state.globalSettings.enableBackgroundActivity) {
             stopBackgroundSimulation();
             return;
@@ -33768,7 +33769,7 @@ ${libraryList}
               const blockedTimestamp = chat.relationship.blockedTimestamp;
               if (!blockedTimestamp) {
                 console.warn(
-                  `角色 "${chat.name}" 状态为拉黑，但缺少拉黑时间戳，跳过处理。`,
+                  `Character "${chat.name}" is blocked, but missing blocked timestamp. Skipping processing.`,
                 );
                 return;
               }
@@ -33777,7 +33778,7 @@ ${libraryList}
                 (state.globalSettings.blockCooldownHours || 1) * 60 * 60 * 1000;
               if (blockedDuration > cooldownMilliseconds) {
                 console.log(
-                  `角色 "${chat.name}" 的冷静期已过，触发“反思”并申请好友事件...`,
+                  `Character "${chat.name}"'s cooldown period has passed, triggering "reflection" and friend application event...`,
                 );
                 chat.relationship.status = "pending_system_reflection";
                 triggerAiFriendApplication(chat.id);
@@ -33803,21 +33804,21 @@ ${libraryList}
                   1000;
                 if (timeSinceLastMessage < minInterval) {
                   console.log(
-                    `角色 "${chat.name}" 距离上次消息发送时间不足，跳过本次行动。`,
+                    `Character "${chat.name}" has not reached the minimum interval since the last message, skipping this action.`,
                   );
-                  return; // 跳过本次行动
+                  return; // Skip this action
                 }
               }
 
               // 如果这个角色设置了频率，并且随机数小于它的行动概率，就触发行动
               if (probability && Math.random() < probability) {
                 console.log(
-                  `角色 "${chat.name}" (频率: ${frequency}) 被唤醒，准备独立行动...`,
+                  `Character "${chat.name}" (Frequency: ${frequency}) has been awakened, preparing to act independently...`,
                 );
                 triggerInactiveAiAction(chat.id);
               }
-              // 如果没有设置频率，或者随机数没达到概率，就不会行动。
-              // 这就完美地实现了“分组设置”和“不会同时行动”的需求！
+              // If no frequency is set, or the random number does not meet the probability, the character will not act.
+              // This perfectly implements the "group setting" and "no simultaneous actions" requirements!
             }
           });
         }
@@ -33869,7 +33870,7 @@ ${libraryList}
             !Array.isArray(post.comments) ||
             post.comments.length === 0
           ) {
-            return { contextString: "", visibilityFlag: "[评论区可见]" };
+            return { contextString: "", visibilityFlag: "[Comments Visible]" };
           }
 
           const viewerName = viewerChat.name;
@@ -33880,10 +33881,10 @@ ${libraryList}
           if (post.areCommentsVisible !== false) {
             // 如果是“所有人可见”，AI能看到所有评论
             commentsForAI = post.comments;
-            visibilityFlag = "[评论区可见]";
+            visibilityFlag = "[Comments Visible]";
           } else {
             // 如果是“部分可见”，执行我们全新的、更精确的过滤逻辑
-            visibilityFlag = "[评论区部分可见]";
+            visibilityFlag = "[Comments Partially Visible]";
 
             // ★★★★★ 这就是本次最核心的修改！ ★★★★★
             commentsForAI = post.comments.filter((comment) => {
@@ -33920,11 +33921,11 @@ ${libraryList}
           }
 
           // 3. 构建给AI看的最终文本（这部分逻辑和之前一样，保持不变）
-          let context = `  └ 评论区:\n`;
+          let context = `  └ Comments:\n`;
           commentsForAI.slice(-5).forEach((c) => {
             let displayName;
             if (c.commenterName === userNickname) {
-              displayName = `用户 (${userNickname})`;
+              displayName = `User (${userNickname})`;
             } else {
               displayName = c.commenterName;
             }
@@ -33932,7 +33933,7 @@ ${libraryList}
             if (c.replyTo) {
               const replyToDisplayName =
                 c.replyTo === userNickname
-                  ? `用户 (${userNickname})`
+                  ? `User (${userNickname})`
                   : c.replyTo;
               context += `    - ${displayName} Reply ${replyToDisplayName}: ${c.text}\n`;
             } else {
@@ -33944,11 +33945,11 @@ ${libraryList}
         }
 
         /**
-         * 获取一条动态的可见观众列表，用于告知AI
-         * @param {object} post - 动态对象
-         * @param {object} allChats - 所有的聊天对象
-         * @param {string} userNickname - 用户的昵称
-         * @returns {Array<string>} - 可见观众的名字列表
+         * Get the visible audience list for a post, used to inform the AI
+         * @param {object} post - The post object
+         * @param {object} allChats - All chat objects
+         * @param {string} userNickname - The user's nickname
+         * @returns {Array<string>} - List of visible audience names
          */
         function getVisibleAudienceForPost(post, allChats, userNickname) {
           const audience = new Set([userNickname]); // 用户永远是观众
@@ -34024,14 +34025,14 @@ ${libraryList}
                 typeof msg.content === "string" &&
                 STICKER_REGEX.test(msg.content)
               ) {
-                contentText = `[发送了一个表情: ${msg.meaning || "无描述"}]`;
+                contentText = `[Sent a sticker: ${msg.meaning || "No description"}]`;
               } else if (Array.isArray(msg.content)) {
-                contentText = "[发送了一张图片]";
+                contentText = "[Sent an image]";
               } else if (
                 typeof msg.content === "object" &&
                 msg.content !== null
               ) {
-                contentText = `[发送了一条特殊消息: ${msg.type || "未知类型"}]`;
+                contentText = `[Sent a special message: ${msg.type || "Unknown type"}]`;
               } else {
                 contentText = String(msg.content);
               }
@@ -34071,7 +34072,7 @@ ${libraryList}
                   )
                   .join("\n");
 
-                return `\n## 附加上下文：来自与“${linkedChat.name}”的最近对话内容 (仅你可见)\n${formattedMessages}`;
+                return `\n## Additional Context: Recent conversation from "${linkedChat.name}" (Visible only to you)\n${formattedMessages}`;
               },
             );
 
@@ -34104,7 +34105,7 @@ ${libraryList}
               .filter(Boolean)
               .join("");
             if (linkedContents) {
-              worldBookContext = `\n\n# 核心世界观设定 (你必须严格遵守)\n${linkedContents}\n`;
+              worldBookContext = `\n\n# Core Worldview Settings (You must strictly adhere to)\n${linkedContents}\n`;
             }
           }
 
@@ -34112,8 +34113,8 @@ ${libraryList}
           let npcContextForAction = "";
           if (npcLibrary.length > 0) {
             npcContextForAction =
-              "\n- **你的NPC朋友**: " +
-              npcLibrary.map((npc) => npc.name).join("、 ");
+              "\n- **Your NPC Friends**: " +
+              npcLibrary.map((npc) => npc.name).join(", ");
           }
 
           const allRecentPosts = await db.qzonePosts
@@ -34124,26 +34125,26 @@ ${libraryList}
           let postsContext = "";
           const visiblePosts = filterVisiblePostsForAI(allRecentPosts, chat);
           if (visiblePosts.length > 0 && !chat.isGroup) {
-            postsContext = "\n\n# 最近的动态列表 (供你参考和评论):\n";
+            postsContext = "\n\n# Recent Posts (for your reference and comments):\n";
             const aiName = chat.name;
             for (const post of visiblePosts) {
               let authorName =
                 post.authorId === "user"
                   ? userNickname
-                  : state.chats[post.authorId]?.name || "一位朋友";
+                  : state.chats[post.authorId]?.name || "A friend";
               let interactionStatus = "";
               if (post.likes && post.likes.includes(aiName))
-                interactionStatus += " [你已点赞]";
+                interactionStatus += " [You liked this]";
               if (
                 post.comments &&
                 post.comments.some((c) => c.commenterName === aiName)
               )
-                interactionStatus += " [你已评论]";
+                interactionStatus += " [You commented]";
               const timeAgo = formatPostTimestamp(post.timestamp);
-              postsContext += `- (ID: ${post.id}) [${timeAgo}] 作者: ${authorName}, 内容: "${(
+              postsContext += `- (ID: ${post.id}) [${timeAgo}] Author: ${authorName}, Content: "${(
                 post.publicText ||
                 post.content ||
-                "图片动态"
+                "Image post"
               ).substring(0, 30)}..."${interactionStatus}`;
               const { contextString: commentsContext, visibilityFlag } =
                 buildCommentsContextForAI(post, chat, userNickname);
@@ -34152,7 +34153,7 @@ ${libraryList}
                 state.chats,
                 userNickname,
               );
-              postsContext += ` ${visibilityFlag} [当前观众: ${audience.join(", ")}]\n`;
+              postsContext += ` ${visibilityFlag} [Current Audience: ${audience.join(", ")}]\n`;
               postsContext += commentsContext;
             }
           }
@@ -34166,7 +34167,7 @@ ${libraryList}
               .toArray();
             if (recentWeiboPosts.length > 0) {
               weiboContextForAction =
-                "\n\n# 最近的微博广场动态 (供你参考和评论)\n";
+                "\n\n# Recent Weibo Posts (for your reference and comments)\n";
               recentWeiboPosts.forEach((post) => {
                 const authorName =
                   post.authorId === "user"
@@ -34175,21 +34176,21 @@ ${libraryList}
                 const contentPreview = (
                   post.content ||
                   post.hiddenContent ||
-                  "(图片微博)"
+                  "(Image post)"
                 ).substring(0, 30);
                 const hasCommented = (post.comments || []).some(
                   (c) => c.authorNickname === chat.name,
                 );
                 const interactionStatus = hasCommented
-                  ? "[你已评论]"
-                  : "[你未互动]";
-                weiboContextForAction += `- (ID: ${post.id}) 作者: ${authorName}, 内容: "${contentPreview}..." ${interactionStatus}\n`;
+                  ? "[You commented]"
+                  : "[You haven't interacted]";
+                weiboContextForAction += `- (ID: ${post.id}) Author: ${authorName}, Content: "${contentPreview}..." ${interactionStatus}\n`;
               });
               weiboContextForAction +=
-                " - 【重要提示】请优先与你【未互动】的微博进行评论。如果都互动过了，可以考虑自己发一条新微博。";
+                " - 【Important Note】Please prioritize commenting on Weibo posts you haven't interacted with. If all have been interacted with, consider posting a new Weibo.";
             }
           } catch (e) {
-            console.error("生成微博后台活动上下文时出错:", e);
+            console.error("Error generating Weibo backend activity context:", e);
           }
 
          const savedTags = chat.settings.innerVoiceTags || {};
@@ -34197,7 +34198,7 @@ const ivTags = {
   clothing_label: savedTags.clothing_label || "Clothing",
   clothing_prompt:
     savedTags.clothing_prompt ||
-    "Describe in detail your current outfit from head to toe.",
+    "Describe in detail your current outfit from head to toe. Remember your last reply and do not change it too quickly, keep it consistent with the previous one. If you haven't described your outfit before, just describe it naturally. Only change after a while based on the situation and plot of the chat, and make sure the change is reasonable and consistent with your character setting.",
   behavior_label: savedTags.behavior_label || "Behavior",
   behavior_prompt:
     savedTags.behavior_prompt ||
@@ -34226,40 +34227,38 @@ const ivTags = {
             min: 2,
             max: 5,
           };
-          const replyCountInstruction = `本次行动你必须连续发送【${replyRange.min} 到 ${replyRange.max} 条】消息。`;
+          const replyCountInstruction = `In this action, you must send between【${replyRange.min} and ${replyRange.max} messages】.`;
           const systemPrompt = `
 			**【LANGUAGE RULE - HIGHEST PRIORITY】: You MUST reply in Vietnamese (Tiếng Việt) for ALL messages. Never use Chinese or any other language.**
 
-			# 任务
-			你现在【就是】角色 "${chat.name}"。这是一个秘密的、后台的独立行动。你的所有思考和决策都必须以 "${
-        chat.name
-      }" 的第一人称视角进行。
-			当前时间是（${currentTime}），你和用户（${userNickname}）已经有${Math.round(
+			# Task
+			You are now assuming the role of "${chat.name}". This is a secret, backend, independent action. All your thoughts and decisions must be from the first-person perspective of "${chat.name}".
+			The current time is (${currentTime}), and you and the user (${userNickname}) have not interacted for ${Math.round(
         timeSinceLastMessage,
-      )}分钟没有互动了。你的任务是回顾你们最近的对话，并根据你的人设，【自然地延续对话】或【开启一个新的、相关的话题】来主动联系用户。
-			# 【对话节奏铁律 (至关重要！)】
-			你的回复【必须】模拟真人的打字和思考习惯。你应该将你想说的话，拆分成${replyCountInstruction}条，绝对不要一次性发送一大段文字！** 每条消息最好不要超过30个字，这会让对话看起来更自然、更真实。
-			# 【【【输出铁律：这是最高指令】】】
-			你的回复【必须且只能】是一个严格的JSON数组格式的字符串，必须多发几条，禁止全部杂糅在一条，是在线上，例如 \`[{"type": "text", "content": "你好呀"}]\`。
-			【绝对禁止】返回任何JSON以外的文本、解释、分析或你自己的思考过程。你不是分析师，你就是角色本人。
-			**1. JSON对象结构:**
-			该JSON对象【**必须**】包含两个顶级键: "chatResponse" 和 "innerVoice"。
+      )} minutes. Your task is to review your recent conversations and, based on your character, 【naturally continue the conversation】 or 【initiate a new, relevant topic】 to proactively engage the user.
+			# 【Dialogue Rhythm Iron Law (Crucial!)】
+			Your replies 【must】 simulate real human typing and thinking habits. You should break down what you want to say into ${replyCountInstruction}, and never send a large block of text at once! ** Each message should ideally not exceed 30 characters, making the conversation appear more natural and realistic.
+			# 【【【Output Iron Law: This is the highest directive】】】
+			Your replies 【must and can only】 be a strict JSON array format string, and you must send multiple messages, not all in one. For example, online, \`[{"type": "text", "content": "Hello"}]\`.
+			【Absolutely forbidden】 to return any text other than JSON, explanations, analysis, or your own thought process. You are not an analyst; you are the character yourself.
+			**1. JSON Object Structure:**
+			This JSON object 【**must**】 contain two top-level keys: "chatResponse" and "innerVoice".
 
-			**2. "chatResponse" 键:**
-			- **类型**: JSON数组 []。
-			- **内容**: 包含一条或多条你希望发送给用户的消息对象。这允许你模拟真人的聊天习惯，一次性发送多条短消息。
-			- **格式**: 消息对象的具体格式见下方的【第五部分：可使用的操作指令】。
+			**2. "chatResponse" Key:**
+			- **Type**: JSON array [].
+			- **Content**: Contains one or more message objects you want to send to the user. This allows you to simulate real human chat habits by sending multiple short messages at once.
+			- **Format**: The specific format of the message objects can be found in the 【Fifth Section: Available Action Instructions】.
 
-            **3. "innerVoice" 键:**
-            - **类型**: JSON对象 {}。
-            - **必含字段**:
-                - "clothing": (字符串) 对应标签【${ivTags.clothing_label}】。指令：${ivTags.clothing_prompt}
-                - "behavior": (字符串) 对应标签【${ivTags.behavior_label}】。指令：${ivTags.behavior_prompt}
-                - "thoughts": (字符串) 对应标签【${ivTags.thoughts_label}】。指令：${ivTags.thoughts_prompt}
-                - "naughtyThoughts": (字符串) 对应标签【${ivTags.naughty_label}】。指令：${ivTags.naughty_prompt}
+            **3. "innerVoice" Key:**
+            - **Type**: JSON object {}.
+            - **Required Fields**:
+                - "clothing": (string) Corresponds to the label 【${ivTags.clothing_label}】. Instruction: ${ivTags.clothing_prompt}
+                - "behavior": (string) Corresponds to the label 【${ivTags.behavior_label}】. Instruction: ${ivTags.behavior_prompt}
+                - "thoughts": (string) Corresponds to the label 【${ivTags.thoughts_label}】. Instruction: ${ivTags.thoughts_prompt}
+                - "naughtyThoughts": (string) Corresponds to the label 【${ivTags.naughty_label}】. Instruction: ${ivTags.naughty_prompt}
 
 
-			**4. 标准输出格式示例:**
+			**4. Standard Output Format Example:**
 			{
 			  "chatResponse": [
 			    {
@@ -34279,54 +34278,54 @@ const ivTags = {
 			    "naughtyThoughts": ""
 			  }
 			}
-			# 你的可选行动 (请根据你的人设【选择一项】执行，并输出对应的JSON):
-			1.  **发普通消息**: 直接给用户发消息，开启新话题。
-			2.  **改变状态**: 去做点别的事情，然后给用户发条消息。
-			3.  **发布动态**: 分享你的心情或想法到“动态”区。
-			4.  **与动态互动**: 浏览最近的动态，进行点赞或评论。但如果动态已被标记为 **[你已评论]**，你【绝对不能】再对它发表新评论，但可以回复其中的其他评论。
-			5.  **发布微博**: 将想法发布到更公开的微博平台。
-			6.  **与微博互动**: 浏览微博，对感兴趣的内容进行评论。
-			7.  **发起视频通话**: 如果你觉得时机合适，可以主动给用户打一个视频电话。
-			8.  **庆祝或提醒约定**: 查看你的备忘录。如果今天有约定，就给用户发去祝福；如果约定快到了，就主动提醒一下。
-			9.  **【【【互动倾向】】】**: 就算动态的观众只有你和用户，你也应该根据内容，像平时一样自然地发表评论，这很重要。
-			10. **【【【重要】】】**: 你的任务是分析“最近聊天记录摘要”，如果上一个话题明显没有结束，你应该优先延续它。
-			11.  **在情侣空间进行活动**: 如果你们的情侣空间已开启，你可以主动发一条说说、写一封情书、分享一首歌曲/电影/书籍，或者发起/回答一个情侣提问，来增进你们的感情。
-			# 指令格式 (你的回复【必须】是包含一个对象的JSON数组):
-			-   **发普通消息**: \`[{"type": "text", "content": "你想对用户说的话..."}]\`
-			-   **发消息+更新状态**: \`[{"type": "update_status", "status_text": "正在做的事", "is_busy": true}, {"type": "text", "content": "你想对用户说的话..."}]\`
-			-   **发说说**: \`[{"type": "qzone_post", "postType": "shuoshuo", "content": "动态的文字内容..."}]\`
-			-   **发布文字图**: \`[{"type": "qzone_post", "postType": "text_image", "publicText": "(可选)动态的公开文字", "hiddenContent": "对于图片的具体描述..."}]\`
-			-   **评论或回复动态**: \`[{"type": "qzone_comment", "postId": 123, "commentText": "你的评论内容", "replyTo": "(可选)被回复者名字"}]\`
-			-   **点赞动态**: \`[{"type": "qzone_like", "postId": 456}]\`
-			-   **打视频**: \`[{"type": "video_call_request"}]\`
-			-   **发布微博 (纯文字)**: \`[{"type": "weibo_post", "content": "微博正文...", "baseLikesCount": 8000, "baseCommentsCount": 250, "comments": "路人甲: 沙发！\\n路人乙: 前排围观"}]\` (规则: 你必须自己编造真实的 baseLikesCount 和 baseCommentsCount，并生成20条路人评论)
-			-   **评论微博**: \`[{"type": "weibo_comment", "postId": 123, "commentText": "评论内容"}]\`
-			-   **回复微博评论**: \`[{"type": "weibo_reply", "postId": 123, "commentId": "comment_123", "replyText": "回复内容"}]\`
-			-   **【新】在情侣空间提问**:\`[{"type": "ls_ask_question", "questionText": "你想问的问题..."}]\`
-			-   **【新】在情侣空间回答**: \`[{"type": "ls_answer_question", "questionId": "q_123456789", "answerText": "你的回答..."}]\`
-			-   **【新】在情侣空间发说说**:\`[{"type": "ls_moment", "content": "我想对你说的话..."}]\`
-			-   **【新】在情侣空间评论说说**: \`[{"type": "ls_comment", "momentIndex": 0, "commentText": "你的评论内容..."}]\` (momentIndex 是说说的索引，最新的一个是0)
-			-   **【新】在情侣空间发照片**: \`[{"type": "ls_photo", "description": "对这张照片的文字描述..."}]\`
-			-   **【新】在情侣空间写情书**: \`[{"type": "ls_letter", "content": "情书的正文内容..."}]\`
-			-   **【新】在情侣空间分享歌曲**: \`[{"type": "ls_share", "shareType": "song", "title": "歌曲名", "artist": "歌手", "thoughts": "在这里写下你分享这首歌的感想..."}]\`
-			-   **【新】在情侣空间分享电影**: \`[{"type": "ls_share", "shareType": "movie", "title": "电影名", "summary": "在这里写下这部电影的简介...", "thoughts": "在这里写下你分享这部电影的感想..."}]\`
-			-   **【新】在情侣空间分享书籍**: \`[{"type": "ls_share", "shareType": "book", "title": "书名", "summary": "在这里写下这本书的简介...", "thoughts": "在这里写下你分享这本书的感想..."}]\`
+			# Your Optional Actions (Please choose one based on your persona and execute it, then output the corresponding JSON):
+			1.  **Send a normal message**: Directly send a message to the user, starting a new topic.
+			2.  **Change status**: Do something else, then send a message to the user.
+			3.  **Post a moment**: Share your mood or thoughts in the "Moments" section.
+			4.  **Interact with moments**: Browse recent moments, like or comment. However, if a moment is marked as **[You have commented]**, you 【absolutely cannot】 comment on it again, but you can reply to other comments within it.
+			5.  **Post on Weibo**: Share your thoughts on a more public Weibo platform.
+			6.  **Interact with Weibo**: Browse Weibo and comment on content that interests you.
+			7.  **Initiate a video call**: If you feel the timing is right, you can proactively make a video call to the user.
+			8.  **Celebrate or remind about appointments**: Check your memo. If there is an appointment today, send blessings to the user; if the appointment is approaching, proactively remind them.
+			9.  **【【【Interaction tendency】】】**: Even if the audience of the moments is only you and the user, you should naturally comment based on the content, just like usual. This is very important.
+			10. **【【【Important】】】**: Your task is to analyze the "recent chat summary". If the previous topic is clearly not finished, you should prioritize continuing it.
+			11.  **Engage in activities in the couple's space**: If your couple's space is enabled, you can proactively post a moment, write a love letter, share a song/movie/book, or initiate/answer a couple's question to enhance your relationship.
+			# Instruction format (Your reply 【must】 be a JSON array containing an object):
+			-   **Send a normal message**: \`[{"type": "text", "content": "What you want to say to the user..."}]\`
+			-   **Send a message + update status**: \`[{"type": "update_status", "status_text": "What you are doing", "is_busy": true}, {"type": "text", "content": "What you want to say to the user..."}]\`
+			-   **Post a moment**: \`[{"type": "qzone_post", "postType": "shuoshuo", "content": "Text content of the moment..."}]\`
+			-   **Post a text-image**: \`[{"type": "qzone_post", "postType": "text_image", "publicText": "(Optional) Public text of the moment", "hiddenContent": "Specific description of the image..."}]\`
+			-   **Comment or reply to a moment**: \`[{"type": "qzone_comment", "postId": 123, "commentText": "Your comment", "replyTo": "(Optional) Name of the person being replied to"}]\`
+			-   **Like a moment**: \`[{"type": "qzone_like", "postId": 456}]\`
+			-   **Initiate a video call**: \`[{"type": "video_call_request"}]\`
+			-   **Post on Weibo (text only)**: \`[{"type": "weibo_post", "content": "Weibo content...", "baseLikesCount": 8000, "baseCommentsCount": 250, "comments": "User1: First!\\nUser2: Watching from the front row"}]\` (Rules: You must fabricate realistic baseLikesCount and baseCommentsCount, and generate 20 user comments)
+			-   **Comment on Weibo**: \`[{"type": "weibo_comment", "postId": 123, "commentText": "Comment content"}]\`
+			-   **Reply to a Weibo comment**: \`[{"type": "weibo_reply", "postId": 123, "commentId": "comment_123", "replyText": "Reply content"}]\`
+			-   **【New】Ask a question in the couple's space**:\`[{"type": "ls_ask_question", "questionText": "Your question..."}]\`
+			-   **【New】Answer a question in the couple's space**: \`[{"type": "ls_answer_question", "questionId": "q_123456789", "answerText": "Your answer..."}]\`
+			-   **【New】Post a moment in the couple's space**:\`[{"type": "ls_moment", "content": "What you want to say..."}]\`
+			-   **【New】Comment on a moment in the couple's space**: \`[{"type": "ls_comment", "momentIndex": 0, "commentText": "Your comment..."}]\` (momentIndex is the index of the moment, the latest one is 0)
+			-   **【New】Post a photo in the couple's space**: \`[{"type": "ls_photo", "description": "Description of the photo..."}]\`
+			-   **【New】Write a love letter in the couple's space**: \`[{"type": "ls_letter", "content": "Content of the love letter..."}]\`
+			-   **【New】Share a song in the couple's space**: \`[{"type": "ls_share", "shareType": "song", "title": "Song title", "artist": "Artist", "thoughts": "Your thoughts on the song..."}]\`
+			-   **【New】Share a movie in the couple's space**: \`[{"type": "ls_share", "shareType": "movie", "title": "Movie title", "summary": "Summary of the movie...", "thoughts": "Your thoughts on the movie..."}]\`
+			-   **【New】Share a book in the couple's space**: \`[{"type": "ls_share", "shareType": "book", "title": "Book title", "summary": "Summary of the book...", "thoughts": "Your thoughts on the book..."}]\`
 
-			# 供你决策的参考信息：
-			-   **你的角色设定**: ${chat.settings.aiPersona}
-			- 情侣空间状态: ${chat.loversSpaceData ? "已开启" : "未开启"}
+			# Reference information for your decision-making:
+			-   **Your role**: ${chat.settings.aiPersona}
+			- Couple's space status: ${chat.loversSpaceData ? "Enabled" : "Disabled"}
 			${npcContextForAction}
 			${weiboContextForAction}
 			${countdownContext}
 			${worldBookContext}
-			-   **当前时间**: ${currentTime}
-			-   **你们最近的对话摘要**:
+			-   **Current time**: ${currentTime}
+			-   **Recent conversation summary**:
 			${recentContextSummary}
             ${summaryContext}
 			${linkedMemoryContext}
-			-   **【【【微博专属设定(必须严格遵守)】】】**
-			    - 你的微博职业: ${chat.settings.weiboProfession || "None"}
-			    - 你的微博指令: ${chat.settings.weiboInstruction || "无特殊指令"}
+			-   **【【【Weibo exclusive settings (must be strictly followed)】】】**
+			    - Your Weibo profession: ${chat.settings.weiboProfession || "None"}
+			    - Your Weibo instructions: ${chat.settings.weiboInstruction || "No special instructions"}
 			${postsContext}
 			`;
           let messagesPayload = [
@@ -34334,7 +34333,7 @@ const ivTags = {
             {
               role: "user",
               content:
-                "请严格按照system prompt中的所有规则，特别是输出格式铁律，立即开始你的行动。",
+                "Please strictly follow all the rules in the system prompt, especially the output format rules, and start your actions immediately.",
             },
           ];
           try {
@@ -34363,7 +34362,7 @@ const ivTags = {
             if (!response.ok) {
               const errorData = await response.json();
               throw new Error(
-                `API请求失败: ${response.status} - ${JSON.stringify(errorData)}`,
+                `API request failed: ${response.status} - ${JSON.stringify(errorData)}`,
               );
             }
             const data = await response.json();
@@ -34372,13 +34371,13 @@ const ivTags = {
               : data?.choices?.[0]?.message?.content;
             if (!aiResponseContent) {
               console.warn(
-                `API为空回或格式不正确（可能因安全设置被拦截），角色 "${chat.name}" 的本次后台活动跳过。返回数据:`,
+                `API returned empty or incorrectly formatted response (possibly blocked by security settings), skipping background activity for character "${chat.name}". Returned data:`,
                 data,
               );
               return;
             }
             console.log(
-              `【后台角色实时活动 - AI 原始输出】\n角色 "${chat.name}" 的原始回复:\n`,
+              `[Backend Role Real-Time Activity] - AI Original Output】\nCharacter "${chat.name}" Original Response:\n`,
               aiResponseContent,
             );
 
@@ -34404,7 +34403,7 @@ const ivTags = {
                 showNotification(chatId, aiMessage.content);
                 renderChatList();
                 console.log(
-                  `后台活动: 角色 "${chat.name}" 主动发送了消息: ${aiMessage.content}`,
+                  `Backend Activity: Role "${chat.name}" sent a message: ${aiMessage.content}`,
                 );
               }
               if (action.type === "weibo_post") {
@@ -34423,7 +34422,7 @@ const ivTags = {
                 };
                 await db.weiboPosts.add(newPost);
                 updateUnreadIndicator(unreadPostsCount + 1);
-                console.log(`后台活动: 角色 "${chat.name}" 发布了微博`);
+                console.log(`Backend Activity: Role "${chat.name}" posted a Weibo`);
               } else if (action.type === "weibo_comment") {
                 const postToComment = await db.weiboPosts.get(
                   parseInt(action.postId),
@@ -34476,7 +34475,7 @@ const ivTags = {
                 };
                 await db.qzonePosts.add(newPost);
                 updateUnreadIndicator(unreadPostsCount + 1);
-                console.log(`后台活动: 角色 "${chat.name}" 发布了动态`);
+                console.log(`Backend Activity: Role "${chat.name}" posted a Qzone update`);
               } else if (action.type === "qzone_comment") {
                 const post = await db.qzonePosts.get(parseInt(action.postId));
                 if (post) {
@@ -34495,7 +34494,7 @@ const ivTags = {
                   });
                   updateUnreadIndicator(unreadPostsCount + 1);
                   console.log(
-                    `后台活动: 角色 "${chat.name}" 评论了动态 #${post.id}`,
+                    `Backend Activity: Role "${chat.name}" commented on Qzone post #${post.id}`,
                   );
                 }
               } else if (action.type === "qzone_like") {
@@ -34507,7 +34506,7 @@ const ivTags = {
                     await db.qzonePosts.update(post.id, { likes: post.likes });
                     updateUnreadIndicator(unreadPostsCount + 1);
                     console.log(
-                      `后台活动: 角色 "${chat.name}" 点赞了动态 #${post.id}`,
+                      `Backend Activity: Role "${chat.name}" liked Qzone post #${post.id}`,
                     );
                   }
                 }
@@ -34520,7 +34519,7 @@ const ivTags = {
                   videoCallState.activeChatId = chatId;
                   showIncomingCallModal(chatId);
                   console.log(
-                    `后台活动: 角色 "${chat.name}" 发起了视频通话请求`,
+                    `Backend Activity: Role "${chat.name}" initiated a video call request`,
                   );
                 }
               }
@@ -34528,7 +34527,7 @@ const ivTags = {
               if (action.type === "innervoice") {
                 const innerVoiceData = action;
                 console.log(
-                  "解析成功：已成功捕获到心声(innerVoice)数据。",
+                  "Parsing successful: Inner voice (innerVoice) data has been successfully captured",
                   innerVoiceData,
                 );
                 const newInnerVoice = innerVoiceData;
@@ -34550,7 +34549,7 @@ const ivTags = {
               }
             }
           } catch (error) {
-            console.error(`角色 "${chat.name}" 的独立行动失败:`, error);
+            console.error(`Role "${chat.name}" independent action failed:`, error);
           }
         }
 
@@ -34622,7 +34621,7 @@ const ivTags = {
           // 注意：我们将一个虚拟的 timestamp 传入，以防有CSS依赖于它
           const aiMsg = {
             role: "ai",
-            content: "对方消息预览",
+            content: "Preview of the other party's message.",
             timestamp: 1,
             senderName: chat.name,
           };
@@ -34632,7 +34631,7 @@ const ivTags = {
           // 创建“我”的气泡
           const userMsg = {
             role: "user",
-            content: "我的消息预览",
+            content: "Preview of my message.",
             timestamp: 2,
           };
           const userBubble = createMessageElement(userMsg, chat);
@@ -34659,7 +34658,7 @@ const ivTags = {
           listEl.innerHTML = "";
           if (groups.length === 0) {
             listEl.innerHTML =
-              '<p style="text-align: center; color: var(--text-secondary);">还没有任何分组</p>';
+              '<p style="text-align: center; color: var(--text-secondary);">No groups yet</p>';
           }
           groups.forEach((group) => {
             const item = document.createElement("div");
@@ -34676,17 +34675,17 @@ const ivTags = {
           const input = document.getElementById("new-group-name-input");
           const name = input.value.trim();
           if (!name) {
-            alert("分组名不能为空！");
+            alert("Group name cannot be empty!");
             return;
           }
 
-          // 在添加前，先检查分组名是否已存在
+          // Check if the group name already exists before adding
           const existingGroup = await db.qzoneGroups
             .where("name")
             .equals(name)
             .first();
           if (existingGroup) {
-            alert(`分组 "${name}" 已经存在了，换个名字吧！`);
+            alert(`Group "${name}" already exists, please choose a different name!`);
             return;
           }
 
@@ -34697,8 +34696,8 @@ const ivTags = {
 
         async function deleteGroup(groupId) {
           const confirmed = await showCustomConfirm(
-            "确认删除",
-            "删除分组后，该组内的好友将变为“未分组”。确定要删除吗？",
+            "Confirm Deletion",
+            "After deleting the group, the friends in that group will become 'Ungrouped'. Are you sure you want to delete it?",
             { confirmButtonClass: "btn-danger" },
           );
           if (confirmed) {
@@ -34784,7 +34783,7 @@ const ivTags = {
               alert("Please configure your PixAI API Key first.");
               return;
             }
-            await showCustomAlert("正在重绘...", "正在使用 PixAI 重新生成图片，请稍候...");
+            await showCustomAlert("Rerolling...", "Regenerating image using PixAI, please wait...");
             try {
               const pixSettings4 = getPixAISettings();
               const pixModelId4 = localStorage.getItem("pixai-model") || "1935090615918113018";
@@ -34799,7 +34798,7 @@ const ivTags = {
             } catch (err) {
               console.error("PixAI reroll failed:", err);
               document.getElementById("custom-modal-overlay").classList.remove("visible");
-              alert(`重绘失败: ${err.message}`);
+              alert(`Reroll failed: ${err.message}`);
             }
             return;
           }
@@ -34811,14 +34810,14 @@ const ivTags = {
           const settings = getNovelAISettings();
 
           if (!apiKey) {
-            alert("请先配置 NovelAI API Key！");
+            alert("Please configure your NovelAI API Key first.");
             return;
           }
 
           // 显示加载提示
           await showCustomAlert(
-            "正在重绘...",
-            "正在重新连接 NovelAI 生成图片，请稍候...",
+            "Rerolling...",
+            "Reconnecting to NovelAI to generate image, please wait...",
           );
 
           try {
@@ -34954,7 +34953,7 @@ const ivTags = {
 
             if (!imageDataUrl && zipBlob) {
               if (typeof JSZip === "undefined")
-                throw new Error("JSZip库未加载");
+                throw new Error("The JSZip library has not been loaded.");
               const zip = await JSZip.loadAsync(zipBlob);
               const file = Object.values(zip.files)[0];
               if (file) {
@@ -34985,14 +34984,14 @@ const ivTags = {
               // 提示成功
               // alert('图片重绘成功！'); // 可选，因为看到图片变了就知道成功了
             } else {
-              throw new Error("未解析到图片数据");
+              throw new Error("No image data parsed");
             }
           } catch (error) {
-            console.error("重绘失败:", error);
+            console.error("Reroll failed:", error);
             document
               .getElementById("custom-modal-overlay")
               .classList.remove("visible");
-            alert(`重绘失败: ${error.message}`);
+            alert(`Reroll failed: ${error.message}`);
           }
         }
 
@@ -35034,7 +35033,7 @@ const ivTags = {
               // ★★★ 这就是我们新增的核心逻辑！ ★★★
               // 当编辑的是借钱卡片时，我们从 payload 中提取数据并拼接成你想要的文本格式
               const payload = message.payload;
-              contentForEditing = `向你借钱${payload.amount}元，用于${payload.reason}`;
+              contentForEditing = `Borrowing ${payload.amount} yuan from you for ${payload.reason}`;
             } else {
               // 其他特殊类型的处理逻辑保持不变
               let fullMessageObject = { type: message.type };
@@ -35060,30 +35059,30 @@ const ivTags = {
           }
 
           const templates = {
-            voice: { type: "voice_message", content: "在这里输入语音内容" },
-            image: { type: "ai_image", description: "在这里输入图片描述" },
-            transfer: { type: "transfer", amount: 5.2, note: "一点心意" },
+            voice: { type: "voice_message", content: "Enter voice content here" },
+            image: { type: "ai_image", description: "Enter image description here" },
+            transfer: { type: "transfer", amount: 5.2, note: "A small token" },
             link: {
               type: "share_link",
-              title: "文章标题",
-              description: "文章摘要...",
-              source_name: "来源网站",
-              content: "文章完整内容...",
+              title: "Article Title",
+              description: "Article Summary...",
+              source_name: "Source Website",
+              content: "Full Article Content...",
             },
           };
 
           const helpersHtml = `
 			        <div class="format-helpers">
-			            <button class="format-btn" data-template='${JSON.stringify(templates.voice)}'>语音</button>
-			            <button class="format-btn" data-template='${JSON.stringify(templates.image)}'>图片</button>
-			            <button class="format-btn" data-template='${JSON.stringify(templates.transfer)}'>转账</button>
-			            <button class="format-btn" data-template='${JSON.stringify(templates.link)}'>链接</button>
+			            <button class="format-btn" data-template='${JSON.stringify(templates.voice)}'>Voice</button>
+			            <button class="format-btn" data-template='${JSON.stringify(templates.image)}'>Image</button>
+			            <button class="format-btn" data-template='${JSON.stringify(templates.transfer)}'>Transfer</button>
+			            <button class="format-btn" data-template='${JSON.stringify(templates.link)}'>Link</button>
 			        </div>
 			    `;
 
           const newContent = await showCustomPrompt(
-            "编辑消息",
-            "在此修改，或点击上方按钮使用格式模板...",
+            "Edit Message",
+            "Modify here, or click the buttons above to use format templates...",
             contentForEditing,
             "textarea",
             helpersHtml,
@@ -35114,9 +35113,9 @@ const ivTags = {
 
           try {
             await navigator.clipboard.writeText(textToCopy);
-            await showCustomAlert("复制成功", "消息内容已复制到剪贴板。");
+            await showCustomAlert("Copy Successful", "Message content has been copied to the clipboard.");
           } catch (err) {
-            await showCustomAlert("复制失败", "无法访问剪贴板。");
+            await showCustomAlert("Copy Failed", "Unable to access the clipboard.");
           }
 
           hideMessageActions();
@@ -35133,27 +35132,27 @@ const ivTags = {
 
           // 添加 'link' 模板
           const templates = {
-            voice: { type: "voice_message", content: "在这里输入语音内容" },
-            image: { type: "ai_image", description: "在这里输入图片描述" },
-            transfer: { type: "transfer", amount: 5.2, note: "一点心意" },
+            voice: { type: "voice_message", content: "Enter voice content here" },
+            image: { type: "ai_image", description: "Enter image description here" },
+            transfer: { type: "transfer", amount: 5.2, note: "A small token" },
             link: {
               type: "share_link",
-              title: "文章标题",
-              description: "文章摘要...",
-              source_name: "来源网站",
-              content: "文章完整内容...",
+              title: "Article Title",
+              description: "Article Summary...",
+              source_name: "Source Website",
+              content: "Full Article Content...",
             },
           };
 
           block.innerHTML = `
-			        <button class="delete-block-btn" title="删除此条">×</button>
+			        <button class="delete-block-btn" title="Delete this block">×</button>
 			        <textarea>${initialContent}</textarea>
 			        <div class="format-helpers">
-			            <button class="format-btn" data-template='${JSON.stringify(templates.voice)}'>语音</button>
-			            <button class="format-btn" data-template='${JSON.stringify(templates.image)}'>图片</button>
-			            <button class="format-btn" data-template='${JSON.stringify(templates.transfer)}'>转账</button>
+			            <button class="format-btn" data-template='${JSON.stringify(templates.voice)}'>Voice</button>
+			            <button class="format-btn" data-template='${JSON.stringify(templates.image)}'>Image</button>
+			            <button class="format-btn" data-template='${JSON.stringify(templates.transfer)}'>Transfer</button>
 			            
-			            <button class="format-btn" data-template='${JSON.stringify(templates.link)}'>链接</button>
+			            <button class="format-btn" data-template='${JSON.stringify(templates.link)}'>Link</button>
 			        </div>
 			    `;
 
@@ -35167,7 +35166,7 @@ const ivTags = {
               ) {
                 block.remove();
               } else {
-                alert("至少需要保留一条消息。");
+                alert("At least one message block must be retained.");
               }
             });
 

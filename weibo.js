@@ -20,7 +20,7 @@ let currentViewingDmsFor = null; // Used to track which character's DMs are bein
 // ===================================================================
 
 /**
- * 【微博】总入口：根据当前激活的视图，渲染对应的微博Feed
+ * [Weibo] Main Entry: Render the corresponding Weibo feed based on the currently active view.
  */
 async function renderWeiboFeeds(viewId) {
   if (viewId === "weibo-my-profile-view") {
@@ -30,11 +30,11 @@ async function renderWeiboFeeds(viewId) {
   }
 }
 /**
- * 【核心】根据ID和名字解析头像
- * 优先级：用户 -> 角色 -> NPC -> 全局路人库
+ * [Weibo] Resolve avatar based on ID and name
+ * Priority: User -> Character -> NPC -> Global passerby library
  */
 function resolveWeiboAvatar(id, name) {
-  // 1. 如果是用户
+  // 1. If it's the user
   if (id === "user" || name === state.qzoneSettings.nickname) {
     return (
       state.qzoneSettings.weiboAvatar ||
@@ -43,18 +43,18 @@ function resolveWeiboAvatar(id, name) {
     );
   }
 
-  // 2. 如果是已知角色 (Char)
+  // 2. If it's a known character (Char)
   if (state.chats[id]) {
     return state.chats[id].settings.aiAvatar || defaultAvatar;
   }
 
-  // 3. 尝试通过名字查找是否是已知角色 (兼容临时贴没有ID的情况)
+  // 3. Try to find a known character by name (compatible with temporary posts without ID)
   const foundChar = Object.values(state.chats).find((c) => c.name === name);
   if (foundChar) {
     return foundChar.settings.aiAvatar || defaultAvatar;
   }
 
-  // 4. 尝试查找是否是某个角色的NPC
+  // 4. Try to find if it's an NPC of a character
   for (const chat of Object.values(state.chats)) {
     if (chat.npcLibrary) {
       const foundNpc = chat.npcLibrary.find((n) => n.name === name);
@@ -64,18 +64,19 @@ function resolveWeiboAvatar(id, name) {
     }
   }
 
-  // 5. 【核心】如果是路人，使用全局路人头像库 (根据名字哈希获取，保证同一人头像不变)
-  // 确保 window.getAvatarForName 存在 (在你的 main-app.js 底部定义的)
+  // 5. [Core] If it's a bystander, use the global bystander avatar library (retrieve using a hash of the name to ensure the avatar remains consistent for the same person).
+  // Ensure window.getAvatarForName exists (defined at the bottom of your main-app.js)
   if (typeof window.getAvatarForName === "function") {
     return window.getAvatarForName(name);
   }
 
-  // 6. 兜底默认
+  // 6. Fallback default
   return "https://i.postimg.cc/PxZrFFFL/o-o-1.jpg";
 }
 
 /**
- * 【微博】渲染“我的主页”上的微博列表
+ * [Weibo] Render the Weibo list on "My Profile"
+
  */
 async function renderMyWeiboFeed() {
   const feedEl = document.getElementById("my-weibo-feed-list");
@@ -91,25 +92,25 @@ async function renderMyWeiboFeed() {
     return;
   }
   posts.forEach((post) => {
-    // 【核心修改】调用我们新的专属函数！
+    // [Core Modification] Call our new dedicated function!
     feedEl.appendChild(createWeiboPostElement(post));
   });
 }
 
 /**
- * 【微博】渲染“关注的人”的微博Feed (已修复卡顿问题)
+ * [Weibo] Render the Weibo feed for "Following" (Fixed lag issue)
  */
 async function renderFollowingWeiboFeed() {
   const feedEl = document.getElementById("weibo-following-feed-list");
 
-  // 【核心优化】我们不再一次性读取所有帖子，而是直接让数据库帮我们筛选和排序，速度会快很多！
+  // [Core Optimization] We no longer fetch all posts at once. Instead, we let the database filter and sort them, which is much faster!
   const posts = await db.weiboPosts
     .where("authorId")
-    .notEqual("user") // 1. 直接在数据库层面，找出作者不是'user'的帖子
-    .reverse() // 2. 让结果按倒序排列
-    .sortBy("timestamp"); // 3. 根据时间戳排序
+    .notEqual("user") // 1. Directly at the database level, find posts where the author is not 'user'
+    .reverse() // 2. Reverse the results
+    .sortBy("timestamp"); // 3. Sort by timestamp
 
-  // 后续的渲染逻辑保持不变
+  // The subsequent rendering logic remains unchanged
   feedEl.innerHTML = "";
   if (posts.length === 0) {
     feedEl.innerHTML =
@@ -121,11 +122,11 @@ async function renderFollowingWeiboFeed() {
   });
 }
 /**
- * 【修复】保存微博/动态设置到数据库
- * (修复 ReferenceError: saveQzoneSettings is not defined)
+ * [Fix] Save Weibo/Dynamic settings to the database
+ * (Fix ReferenceError: saveQzoneSettings is not defined)
  */
 async function saveQzoneSettings() {
-  // 确保 db 和 state.qzoneSettings 都存在
+  // Ensure db and state.qzoneSettings exist
   if (typeof db !== "undefined" && state && state.qzoneSettings) {
     await db.qzoneSettings.put(state.qzoneSettings);
   }
@@ -162,8 +163,8 @@ function createWeiboPostElement(post) {
     post.comments.forEach((comment) => {
       if (typeof comment !== "object" || comment === null) return;
 
-      // --- 新增：获取评论者头像 ---
-      // 传入 authorId (如果有) 和 authorNickname
+      // --- New: Retrieve commenter avatars ---
+      // Pass in authorId (if available) and authorNickname
       const commentAvatarUrl = resolveWeiboAvatar(
         comment.authorId,
         comment.authorNickname,
@@ -171,10 +172,10 @@ function createWeiboPostElement(post) {
 
       let replyHtml = "";
       if (comment.replyToNickname) {
-        replyHtml = `<span class="weibo-comment-reply-tag">回复</span><span class="reply-target-name" data-reply-to-name="${comment.replyToNickname}">${comment.replyToNickname}</span>`;
+        replyHtml = `<span class="weibo-comment-reply-tag">Reply</span><span class="reply-target-name" data-reply-to-name="${comment.replyToNickname}">${comment.replyToNickname}</span>`;
       }
 
-      // --- 修改：HTML结构加入头像 ---
+      // --- Modification: Include avatar in HTML structure ---
       commentsHtml += `
                 <div class="weibo-comment-item" data-comment-id="${comment.commentId}" data-commenter-name="${comment.authorNickname}">
                     <img src="${commentAvatarUrl}" class="weibo-comment-avatar">
@@ -183,14 +184,14 @@ function createWeiboPostElement(post) {
                         ${replyHtml}:
                         <span class="weibo-comment-text">${comment.commentText}</span>
                     </div>
-                    <button class="comment-delete-btn" title="删除此条评论">×</button>
+                    <button class="comment-delete-btn" title="Delete comment">×</button>
                 </div>`;
     });
     commentsHtml += "</div>";
   }
 
   const myNickname =
-    state.qzoneSettings.weiboNickname || state.qzoneSettings.nickname || "我";
+    state.qzoneSettings.weiboNickname || state.qzoneSettings.nickname || "Me";
   const isLiked = post.likes && post.likes.includes(myNickname);
 
   let finalAuthorAvatar, finalAuthorNickname, finalAuthorAvatarFrame;
@@ -200,7 +201,7 @@ function createWeiboPostElement(post) {
       state.qzoneSettings.avatar ||
       defaultAvatar;
     finalAuthorNickname =
-      state.qzoneSettings.weiboNickname || state.qzoneSettings.nickname || "我";
+      state.qzoneSettings.weiboNickname || state.qzoneSettings.nickname || "Me";
     finalAuthorAvatarFrame = state.qzoneSettings.weiboAvatarFrame || "";
   } else if (state.chats[post.authorId]) {
     const authorChat = state.chats[post.authorId];
@@ -214,9 +215,9 @@ function createWeiboPostElement(post) {
       authorChat.settings.aiAvatarFrame ||
       "";
   } else {
-    // --- 修改：如果是路人，使用路人库头像 ---
-    finalAuthorNickname = post.authorNickname || "未知用户";
-    finalAuthorAvatar = resolveWeiboAvatar(post.authorId, finalAuthorNickname); // 使用我们的新函数
+    // --- Modification: If it's a bystander, use the bystander avatar library ---
+    finalAuthorNickname = post.authorNickname || "Unknown User";
+    finalAuthorAvatar = resolveWeiboAvatar(post.authorId, finalAuthorNickname); // Use our new function
     finalAuthorAvatarFrame = "";
   }
 
@@ -257,22 +258,22 @@ function createWeiboPostElement(post) {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>           
                     <span>${(post.comments || []).length}</span>
                 </span>
-                <span class="weibo-action-btn generate-comments-btn" title="AI生成评论">
+                <span class="weibo-action-btn generate-comments-btn" title="AI-generated comments">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
                     </svg>
-                    <span>生成评论</span>
+                    <span>Generate Comments</span>
                 </span>
             </div>
             ${commentsHtml}
             <div class="weibo-comment-input-area">
-                <input type="text" class="weibo-comment-input" placeholder="留下你的精彩评论吧...">
-                <button class="weibo-comment-send-btn">发送</button>
+                <input type="text" class="weibo-comment-input" placeholder="Leave your wonderful comment...">
+                <button class="weibo-comment-send-btn">Send</button>
             </div>
         </div>
     `;
 
-  // 绑定发送评论按钮
+  // Bind the send comment button.
   const sendBtn = postEl.querySelector(".weibo-comment-send-btn");
   if (sendBtn) {
     sendBtn.addEventListener("click", () => {
@@ -281,61 +282,61 @@ function createWeiboPostElement(post) {
     });
   }
 
-  // 绑定AI生成评论按钮
+  // Bind the AI-generated comments button
   const generateBtn = postEl.querySelector(".generate-comments-btn");
   if (generateBtn) {
     generateBtn.addEventListener("click", () => generateWeiboComments(post.id));
   }
 
-  // 绑定点赞按钮
+  // Bind the like button
   const likeBtn = postEl.querySelector(".like-btn");
   if (likeBtn) {
     likeBtn.addEventListener("click", () => handleWeiboLike(post.id));
   }
 
-  // ★ 修改2：为评论区绑定一个全新的、功能更强大的点击事件监听器
+  // ★ Modification 2: Bind a brand new, more powerful click event listener to the comment section
   const commentSection = postEl.querySelector(".weibo-comments-container");
   if (commentSection) {
     commentSection.addEventListener("click", (e) => {
-      // 阻止事件冒泡，这是解决点击无效的核心！
+      // Stop event propagation, this is the key to solving the click issue!
       e.stopPropagation();
 
       const target = e.target;
       const commentItem = target.closest(".weibo-comment-item");
-      if (!commentItem) return; // 如果点击的不是评论区，就什么也不做
+      if (!commentItem) return; // If the click is not on a comment item, do nothing
 
       const input = postEl.querySelector(".weibo-comment-input");
 
-      // 检查点击的是否是删除按钮
+      // Check if the click is on the delete button
       if (target.closest(".comment-delete-btn")) {
         deleteWeiboComment(post.id, commentItem.dataset.commentId);
-        return; // 删除后结束
+        return; // End after deletion
       }
 
       let replyToName = "";
       const replyToId = commentItem.dataset.commentId;
 
-      // ★ 修改3：新增逻辑，判断你点击的是谁
+      // ★ Modification 3: Add logic to determine who you clicked on
       if (target.classList.contains("reply-target-name")) {
-        // 如果点击了“被回复者”的名字
+        // If you clicked on the "replied to" name
         replyToName = target.dataset.replyToName;
       } else {
-        // 否则，默认回复这条评论的作者
+        // Otherwise, default to replying to the author of this comment
         replyToName = commentItem.dataset.commenterName;
       }
 
-      // ★ 修改4：优化回复逻辑
-      // 如果正在回复同一个人，则取消回复
+      // ★ Modification 4: Optimize reply logic
+      // If you are replying to the same person, cancel the reply
       if (
         input.dataset.replyToId === replyToId &&
         input.placeholder.includes(`@${replyToName}`)
       ) {
-        input.placeholder = "留下你的精彩评论吧...";
+        input.placeholder = "Leave your wonderful comment...";
         delete input.dataset.replyToId;
         delete input.dataset.replyToNickname;
       } else {
-        // 否则，设置为新的回复目标
-        input.placeholder = `回复 @${replyToName}:`;
+        // Otherwise, set a new reply target
+        input.placeholder = `Reply @${replyToName}:`;
         input.dataset.replyToId = replyToId;
         input.dataset.replyToNickname = replyToName;
         input.focus();
@@ -354,9 +355,9 @@ async function openWeiboPublisher() {
 
   modal.dataset.mode = "weibo"; // 关键！标记为微博模式
 
-  document.getElementById("create-post-modal-title").textContent = "发微博";
+  document.getElementById("create-post-modal-title").textContent = "Post Weibo";
   document.getElementById("post-public-text").placeholder =
-    "有什么新鲜事想分享给大家？";
+    "What's new? Share it with everyone.";
 
   // 隐藏动态专属的控件
   document.getElementById("post-image-desc-group").style.display = "none";
@@ -422,7 +423,7 @@ async function handlePublishWeibo() {
         .value.trim();
       // 图片描述的检查逻辑保持不变
       if (!imageDescription) {
-        alert("为了让AI能看懂图片，请务必填写图片描述哦！");
+        alert("To help AI understand the image, please provide a description!");
         return;
       }
     }
@@ -437,7 +438,7 @@ async function handlePublishWeibo() {
   }
 
   if (!mainContent && !imageUrl) {
-    alert("微博内容不能为空哦！");
+    alert("Weibo content cannot be empty!");
     return;
   }
 
@@ -449,7 +450,7 @@ async function handlePublishWeibo() {
     authorId: "user",
     authorType: "user",
     authorNickname:
-      state.qzoneSettings.weiboNickname || state.qzoneSettings.nickname || "我",
+      state.qzoneSettings.weiboNickname || state.qzoneSettings.nickname || "Me",
     authorAvatar:
       state.qzoneSettings.weiboAvatar ||
       state.qzoneSettings.avatar ||
@@ -483,7 +484,7 @@ async function handleWeiboLike(postId) {
   const post = await db.weiboPosts.get(postId);
   if (!post) return;
 
-  const myNickname = state.qzoneSettings.nickname || "我";
+  const myNickname = state.qzoneSettings.nickname || "Me";
   if (!post.likes) post.likes = [];
 
   const likeIndex = post.likes.indexOf(myNickname);
@@ -507,7 +508,7 @@ async function handleWeiboLike(postId) {
 async function handleWeiboComment(postId, inputElement) {
   const commentText = inputElement.value.trim();
   if (!commentText) {
-    alert("评论内容不能为空！");
+    alert("Comment content cannot be empty!");
     return;
   }
 
@@ -520,7 +521,7 @@ async function handleWeiboComment(postId, inputElement) {
     commentId: "comment_" + Date.now(),
     authorId: "user",
     authorNickname:
-      state.qzoneSettings.weiboNickname || state.qzoneSettings.nickname || "我",
+      state.qzoneSettings.weiboNickname || state.qzoneSettings.nickname || "Me",
     commentText: commentText,
     timestamp: Date.now(),
   };
@@ -536,7 +537,7 @@ async function handleWeiboComment(postId, inputElement) {
 
   // 清空输入框并重置状态
   inputElement.value = "";
-  inputElement.placeholder = "留下你的精彩评论吧...";
+  inputElement.placeholder = "Leave your wonderful comment...";
   delete inputElement.dataset.replyToId;
   delete inputElement.dataset.replyToNickname;
 
@@ -1650,7 +1651,7 @@ function handleUserCommentForTempPost(postEl, inputEl) {
 
   // 如果是回复
   if (replyTo) {
-    html += ` <span style="color:#888; margin:0 2px;">回复</span> <span class="weibo-commenter-name">@${replyTo}</span>`;
+    html += ` <span style="color:#888; margin:0 2px;">Reply</span> <span class="weibo-commenter-name">@${replyTo}</span>`;
   }
 
   html += `: <span class="weibo-comment-text">${text}</span>`;
@@ -3544,7 +3545,7 @@ document.addEventListener("DOMContentLoaded", () => {
           delete input.dataset.replyTo;
         } else {
           // 设置回复
-          input.placeholder = `回复 @${commenterName}:`;
+          input.placeholder = `Reply @${commenterName}:`;
           input.dataset.replyTo = commenterName;
           input.focus();
         }
