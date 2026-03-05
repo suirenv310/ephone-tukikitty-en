@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function openWerewolfSetup() {
     showScreen('werewolf-setup-screen');
     const selectionEl = document.getElementById('werewolf-player-selection');
-    selectionEl.innerHTML = '<p>正在加载角色列表...</p>';
+    selectionEl.innerHTML = '<p>"Loading character list..."</p>';
 
     const singleChats = Object.values(state.chats).filter(chat => !chat.isGroup);
     const allNpcs = Object.values(state.chats).flatMap(chat =>
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
     );
 
     let playerOptions = [
-      ...singleChats.map(c => ({ id: c.id, name: c.name, avatar: c.settings.aiAvatar, type: '角色' })),
+      ...singleChats.map(c => ({ id: c.id, name: c.name, avatar: c.settings.aiAvatar, type: 'Character' })),
       ...allNpcs.map(n => ({ id: n.id, name: n.name, avatar: n.avatar, type: `NPC (${n.owner})` })),
     ];
 
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedCheckboxes = document.querySelectorAll('.werewolf-player-checkbox:checked');
     // 邀请的AI/NPC数量必须是总人数-1（因为User是必须加入的）
     if (selectedCheckboxes.length !== totalPlayers - 1) {
-      alert(`请选择 ${totalPlayers - 1} 位AI或NPC玩家！`);
+      alert(`Please select ${totalPlayers - 1} AI or NPC players!`);
       return;
     }
 
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 添加User
     werewolfGameState.players.push({
       id: 'user',
-      name: state.qzoneSettings.nickname || '我',
+      name: state.qzoneSettings.nickname || 'Me',
       avatar: state.qzoneSettings.avatar || defaultAvatar,
       isAlive: true,
       isUser: true, // 标记为真实用户
@@ -315,20 +315,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // ▼▼▼ 在这里添加下面的新代码 ▼▼▼
     // ▼▼▼ 第1处修改（添加翻译）▼▼▼
     const roleNameMap = {
-      wolf: '狼人',
-      villager: '平民',
-      seer: '预言家',
-      witch: '女巫',
-      hunter: '猎人',
-      guard: '守卫',
-      idiot: '白痴',
+      wolf: 'Wolf',
+      villager: 'Villager',
+      seer: 'Seer',
+      witch: 'Witch',
+      hunter: 'Hunter',
+      guard: 'Guard',
+      idiot: 'Idiot',
     };
 
     // 弹窗告知用户身份
     const userPlayer = werewolfGameState.players.find(p => p.isUser);
     if (userPlayer) {
       const myRoleName = roleNameMap[userPlayer.role] || userPlayer.role;
-      await showCustomAlert('你的身份', `你在本局游戏中的身份是：【${myRoleName}】`);
+      await showCustomAlert('Your Role', `Your role in this game is: 【${myRoleName}】`);
     }
     // ▲▲▲ 修改结束 ▲▲▲
     // --- 4. 切换到游戏界面并开始游戏循环 ---
@@ -347,20 +347,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     switch (werewolfGameState.gamePhase) {
       case 'start':
-        logToWerewolfGame('游戏开始，正在分配身份...');
+        logToWerewolfGame('Game start, assigning roles...');
         const roleNameMapForLog = {
-          wolf: '狼人',
-          villager: '平民',
-          seer: '预言家',
-          witch: '女巫',
-          hunter: '猎人',
-          guard: '守卫',
-          idiot: '白痴',
+          wolf: 'Wolf',
+          villager: 'Villager',
+          seer: 'Seer',
+          witch: 'Witch',
+          hunter: 'Hunter',
+          guard: 'Guard',
+          idiot: 'Idiot',
         };
         const configText = Object.entries(werewolfGameState.roles)
           .map(([role, count]) => `${roleNameMapForLog[role] || role}x${count}`)
           .join(', ');
-        logToWerewolfGame(`本局配置: ${configText}`);
+        logToWerewolfGame(`Game configuration: ${configText}`);
         werewolfGameState.gamePhase = 'night_start';
         await sleep(3000);
         await processGameTurn();
@@ -370,7 +370,7 @@ document.addEventListener('DOMContentLoaded', () => {
         werewolfGameState.dayNumber++;
         werewolfGameState.lastNightKilled = [];
         werewolfGameState.votes = {};
-        logToWerewolfGame(`第 ${werewolfGameState.dayNumber} 天，天黑请闭眼。`);
+        logToWerewolfGame(`Day ${werewolfGameState.dayNumber}, night falls. Please close your eyes.`);
         werewolfGameState.gamePhase = 'guard_action'; // 从守卫开始
         await sleep(2000);
         await processGameTurn();
@@ -380,18 +380,18 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'guard_action':
         const guard = werewolfGameState.players.find(p => p.role === 'guard' && p.isAlive);
         if (guard) {
-          logToWerewolfGame('守卫请睁眼，请选择你要守护的玩家。');
+          logToWerewolfGame('Guard, please open your eyes and choose a player to protect.');
           let protectedId;
           // ★★★ 核心检查点1：判断守卫是不是User ★★★
           if (guard.isUser) {
             // 如果是，就调用waitForUserAction，这会弹出操作框
-            protectedId = await waitForUserAction('请选择你要守护的玩家', 'guard_protect');
+            protectedId = await waitForUserAction('Please choose a player to protect', 'guard_protect');
           } else {
             // 如果不是，就让AI自己决策
             protectedId = await triggerWerewolfAiAction(guard.id, 'guard_protect');
           }
           werewolfGameState.guardLastNightProtected = protectedId;
-          logToWerewolfGame(`守卫请闭眼。`);
+          logToWerewolfGame(`Guard, please close your eyes.`);
         }
         werewolfGameState.gamePhase = 'wolf_action';
         await sleep(2000);
@@ -400,7 +400,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // ▼▼▼ 用这块【狼人频道增强+平票处理版】的代码替换旧的 'wolf_action' case ▼▼▼
       case 'wolf_action':
-        logToWerewolfGame('狼人请睁眼，请选择一个目标。');
+        logToWerewolfGame('Wolves, please open your eyes and choose a target.');
         const wolves = werewolfGameState.players.filter(p => p.role === 'wolf' && p.isAlive);
         const userPlayer = wolves.find(w => w.isUser);
         let allWolfVotes = [];
@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 场景1: 用户是狼人
         if (userPlayer) {
           const aiWolves = wolves.filter(w => !w.isUser);
-          let suggestionsText = '🐺 狼人频道 (秘密):\n';
+          let suggestionsText = '🐺 Wolf Channel (Secret):\n';
 
           if (aiWolves.length > 0) {
             // 从AI队友获取建议
@@ -423,18 +423,18 @@ document.addEventListener('DOMContentLoaded', () => {
               const votingWolf = aiWolves[index];
               const targetPlayer = werewolfGameState.players.find(p => p.id === targetId);
               if (votingWolf && targetPlayer) {
-                suggestionsText += `- ${votingWolf.name} 提议击杀: ${targetPlayer.name}\n`;
+                suggestionsText += `- ${votingWolf.name} suggests killing: ${targetPlayer.name}\n`;
               }
             });
-            suggestionsText += '\n请参考队友意见后进行投票。';
+            suggestionsText += '\nPlease consider your teammates\' suggestions before voting.';
 
-            await showCustomAlert('狼人请沟通', suggestionsText);
+            await showCustomAlert('Wolves, please communicate', suggestionsText);
           } else {
-            await showCustomAlert('你是唯一的狼', '请独自决定今晚的目标。');
+            await showCustomAlert('You are the only wolf', 'Please decide tonight\'s target alone.');
           }
 
           // 获取用户的最终投票
-          const userVote = await waitForUserAction('请选择最终攻击目标', 'wolf_kill');
+          const userVote = await waitForUserAction('Please choose the final target', 'wolf_kill');
           if (userVote) {
             allWolfVotes.push(userVote);
           }
@@ -470,17 +470,18 @@ document.addEventListener('DOMContentLoaded', () => {
           const tiedTargets = Object.keys(voteCounts).filter(id => voteCounts[id] === maxVotes);
           targetId = tiedTargets[Math.floor(Math.random() * tiedTargets.length)];
           logToWerewolfGame(
-            `(狼人内部经过一番激烈讨论，最终决定目标为 ${werewolfGameState.players.find(p => p.id === targetId).name})`,
+            `(After intense discussion among the wolves, the final target is ${werewolfGameState.players.find(p => p.id === targetId).name})`,
           );
         }
 
         if (targetId) {
           // 只要有目标（无论是统一意见还是随机决定），就执行击杀
           werewolfGameState.lastNightKilled = [targetId];
-          logToWerewolfGame(`狼人请闭眼。`);
+          logToWerewolfGame(`Wolves, please close your eyes.`);
         } else {
           // 只有在所有狼人都没投票的情况下，才会是平安夜
-          logToWerewolfGame(`狼人放弃了行动，今晚无人被袭击。`);
+          logToWerewolfGame(`Wolves have decided to take no action tonight. No one was attacked.`);
+
           werewolfGameState.lastNightKilled = [];
         }
 
@@ -495,20 +496,20 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'seer_action':
         const seer = werewolfGameState.players.find(p => p.role === 'seer' && p.isAlive);
         if (seer) {
-          logToWerewolfGame('预言家请睁眼，请选择你要查验的玩家。');
+          logToWerewolfGame('Seer, please open your eyes and choose a player to check.');
           let targetId;
           // ★★★ 核心检查点3：判断预言家是不是User ★★★
           if (seer.isUser) {
-            targetId = await waitForUserAction('请选择你要查验的玩家', 'seer_check');
+            targetId = await waitForUserAction('Please choose a player to check', 'seer_check');
           } else {
             targetId = await triggerWerewolfAiAction(seer.id, 'seer_check');
           }
           const targetPlayer = werewolfGameState.players.find(p => p.id === targetId);
           const isWolf = targetPlayer.role === 'wolf';
           werewolfGameState.seerLastNightResult = { targetName: targetPlayer.name, isWolf: isWolf };
-          logToWerewolfGame(`预言家请闭眼。`);
+          logToWerewolfGame(`Seer, please close your eyes.`);
           if (seer.isUser) {
-            await showCustomAlert('查验结果', `${targetPlayer.name} 的身份是：${isWolf ? '狼人' : '好人'}`);
+            await showCustomAlert('Check Result', `${targetPlayer.name}'s role is: ${isWolf ? 'Wolf' : 'Villager'}`);
           }
         }
         werewolfGameState.gamePhase = 'witch_action';
@@ -520,18 +521,18 @@ document.addEventListener('DOMContentLoaded', () => {
       case 'witch_action':
         const witch = werewolfGameState.players.find(p => p.role === 'witch' && p.isAlive);
         if (witch) {
-          logToWerewolfGame('女巫请睁眼。');
+          logToWerewolfGame('Witch, please open your eyes.');
           const killedId = werewolfGameState.lastNightKilled[0];
           let killedPlayerName = null;
           if (killedId) {
             killedPlayerName = werewolfGameState.players.find(p => p.id === killedId).name;
-            logToWerewolfGame(`今晚 ${killedPlayerName} 被袭击了。`);
+            logToWerewolfGame(`Tonight ${killedPlayerName} was attacked.`);
           }
 
           let witchAction;
           // ★★★ 核心检查点4：判断女巫是不是User ★★★
           if (witch.isUser) {
-            witchAction = await waitForUserAction('女巫请行动', 'witch_action', { killedId, killedPlayerName });
+            witchAction = await waitForUserAction('Witch, please take action', 'witch_action', { killedId, killedPlayerName });
           } else {
             witchAction = await triggerWerewolfAiAction(witch.id, 'witch_action', { killedId });
           }
@@ -544,21 +545,21 @@ document.addEventListener('DOMContentLoaded', () => {
             werewolfGameState.witchPotions.poison = 0;
           }
         }
-        logToWerewolfGame(`女巫请闭眼。`);
+        logToWerewolfGame(`Witch, please close your eyes.`);
         werewolfGameState.gamePhase = 'day_start';
         await sleep(2000);
         await processGameTurn();
         break;
 
       case 'day_start':
-        logToWerewolfGame('天亮了。');
+        logToWerewolfGame('Day has come.');
         let deathAnnouncements = [];
         const deathsThisNight = new Set();
 
         werewolfGameState.lastNightKilled.forEach(killedId => {
           if (killedId === werewolfGameState.guardLastNightProtected) {
             logToWerewolfGame(
-              `昨晚 ${werewolfGameState.players.find(p => p.id === killedId).name} 被袭击但同时也被守护了。`,
+              `Last night ${werewolfGameState.players.find(p => p.id === killedId).name} was attacked but was also protected.`,
             );
           } else {
             deathsThisNight.add(killedId);
@@ -566,13 +567,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (deathsThisNight.size === 0) {
-          logToWerewolfGame('昨晚是一个平安夜。');
+          logToWerewolfGame('Last night was a peaceful night.');
         } else {
           deathsThisNight.forEach(deadId => {
             const deadPlayer = werewolfGameState.players.find(p => p.id === deadId);
             if (deadPlayer.isAlive) {
               deadPlayer.isAlive = false;
-              deathAnnouncements.push(`${deadPlayer.name} 昨晚被淘汰了。`);
+              deathAnnouncements.push(`${deadPlayer.name} was eliminated last night.`);
             }
           });
           deathAnnouncements.forEach(announcement => logToWerewolfGame(announcement));
@@ -588,18 +589,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (hunterDied) {
-          logToWerewolfGame(`${hunterDied.name} 是猎人，可以选择一名玩家带走。`);
+          logToWerewolfGame(`${hunterDied.name} is the Hunter and can choose a player to take down with them.`);
           let targetId;
           // ★★★ 核心检查点5：判断猎人是不是User ★★★
           if (hunterDied.isUser) {
-            targetId = await waitForUserAction('请选择你要带走的玩家', 'hunter_shoot');
+            targetId = await waitForUserAction('Please choose a player to take down', 'hunter_shoot');
           } else {
             targetId = await triggerWerewolfAiAction(hunterDied.id, 'hunter_shoot');
           }
           if (targetId) {
             const targetPlayer = werewolfGameState.players.find(p => p.id === targetId);
             targetPlayer.isAlive = false;
-            logToWerewolfGame(`猎人开枪带走了 ${targetPlayer.name}。`);
+            logToWerewolfGame(`The Hunter took down ${targetPlayer.name}.`);
             renderWerewolfGameScreen();
             if (checkGameOver()) return;
           }
@@ -611,13 +612,13 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
 
       case 'day_discussion':
-        logToWerewolfGame('现在开始依次发言。');
+        logToWerewolfGame('Now it\'s time for each player to speak.');
         const alivePlayersForSpeech = werewolfGameState.players.filter(p => p.isAlive);
         for (const player of alivePlayersForSpeech) {
           renderWerewolfGameScreen({ speakingPlayerId: player.id });
           let speech;
           if (player.isUser) {
-            speech = await waitForUserAction('轮到你发言', 'speak');
+            speech = await waitForUserAction('It\'s your turn to speak', 'speak');
           } else {
             speech = await triggerWerewolfAiAction(player.id, 'speak');
           }
@@ -630,12 +631,12 @@ document.addEventListener('DOMContentLoaded', () => {
         break;
 
       case 'day_vote':
-        logToWerewolfGame('请投票选出你认为是狼人的玩家。');
+        logToWerewolfGame('Please vote for the player you think is a werewolf.');
         const voterPromises = werewolfGameState.players
           .filter(p => p.isAlive)
           .map(player => {
             if (player.isUser) {
-              return waitForUserAction('请投票', 'vote');
+              return waitForUserAction('Please vote', 'vote');
             } else {
               return triggerWerewolfAiAction(player.id, 'vote');
             }
@@ -661,27 +662,27 @@ document.addEventListener('DOMContentLoaded', () => {
         if (playersToEliminate.length === 1) {
           const eliminatedPlayer = werewolfGameState.players.find(p => p.id === playersToEliminate[0]);
           eliminatedPlayer.isAlive = false;
-          logToWerewolfGame(`投票结果：${eliminatedPlayer.name} 被淘汰。`);
+          logToWerewolfGame(`Vote result: ${eliminatedPlayer.name} was eliminated.`);
           renderWerewolfGameScreen();
           if (checkGameOver()) return;
           if (eliminatedPlayer.role === 'hunter') {
-            logToWerewolfGame(`${eliminatedPlayer.name} 是猎人，可以选择一名玩家带走。`);
+            logToWerewolfGame(`${eliminatedPlayer.name} is the Hunter and can choose a player to take down with them.`);
             let targetId;
             if (eliminatedPlayer.isUser) {
-              targetId = await waitForUserAction('请选择你要带走的玩家', 'hunter_shoot');
+              targetId = await waitForUserAction('Please choose a player to take down', 'hunter_shoot');
             } else {
               targetId = await triggerWerewolfAiAction(eliminatedPlayer.id, 'hunter_shoot');
             }
             if (targetId) {
               const targetPlayer = werewolfGameState.players.find(p => p.id === targetId);
               targetPlayer.isAlive = false;
-              logToWerewolfGame(`猎人开枪带走了 ${targetPlayer.name}。`);
+              logToWerewolfGame(`The Hunter took down ${targetPlayer.name}.`);
               renderWerewolfGameScreen();
               if (checkGameOver()) return;
             }
           }
         } else {
-          logToWerewolfGame('投票平票，无人出局。');
+          logToWerewolfGame('The vote is tied, no one is eliminated.');
         }
 
         werewolfGameState.gamePhase = 'night_start';
@@ -710,7 +711,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .closest('.speech-content')
       .querySelector('.speech-text');
     if (speechTextElement) {
-      speechTextElement.innerHTML = '<i>正在重新思考...</i>';
+      speechTextElement.innerHTML = '<i>Thinking...</i>';
     }
 
     try {
@@ -723,9 +724,9 @@ document.addEventListener('DOMContentLoaded', () => {
       // 重新渲染整个游戏界面以显示更新
       renderWerewolfGameScreen();
     } catch (error) {
-      console.error('狼人杀发言重roll失败:', error);
+      console.error('Werewolf AI speech reroll failed:', error);
       if (speechTextElement) {
-        speechTextElement.innerHTML = `<i style="color:red;">重新生成失败，请检查网络或API设置。</i>`;
+        speechTextElement.innerHTML = `<i style="color:red;">Reroll failed, please check your network or API settings.</i>`;
       }
     }
   }
@@ -758,7 +759,7 @@ document.addEventListener('DOMContentLoaded', () => {
       seat.innerHTML = `
             ${roleIndicator}
             <img src="${player.avatar}" class="${avatarClass}">
-            <span class="player-name">${player.name} (${player.isAlive ? '存活' : '淘汰'})</span>
+            <span class="player-name">${player.name} (${player.isAlive ? 'Alive' : 'Eliminated'})</span>
         `;
       playersGrid.appendChild(seat);
     });
@@ -777,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="speech-content">
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span class="speaker">${player.name}</span>
-                        <button class="werewolf-reroll-btn" data-log-index="${index}" title="重新生成发言" style="background:none; border:none; cursor:pointer; padding:0; color:var(--text-secondary);">
+                        <button class="werewolf-reroll-btn" data-log-index="${index}" title="Reroll speech" style="background:none; border:none; cursor:pointer; padding:0; color:var(--text-secondary);">
                             <svg class="reroll-btn-icon" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
                         </button>
                     </div>
@@ -815,7 +816,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const actionArea = document.getElementById('werewolf-action-area');
       const alivePlayers = werewolfGameState.players.filter(p => p.isAlive && !p.isUser);
 
-      actionArea.innerHTML = '<h5>请投票:</h5>';
+      actionArea.innerHTML = '<h5>Please vote:</h5>';
       const grid = document.createElement('div');
       grid.className = 'vote-target-grid';
 
@@ -847,7 +848,7 @@ document.addEventListener('DOMContentLoaded', () => {
   async function generateAiGameSummary() {
     const { proxyUrl, apiKey, model } = state.apiConfig;
     if (!proxyUrl || !apiKey || !model) {
-      return '（AI摘要生成失败：API未配置）';
+      return '(AI summary generation failed: API not configured)';
     }
 
     // 格式化完整的游戏日志，让AI能够理解
@@ -861,16 +862,17 @@ document.addEventListener('DOMContentLoaded', () => {
       .join('\n');
 
     const prompt = `
-# 任务
-你是一位专业的狼人杀复盘分析师。请根据以下完整的游戏日志，用100-150字，客观、精炼地总结本局游戏的【关键事件】和【转折点】。
+# Task
+You are a professional Werewolf game analyst. Based on the complete game log below, please summarize the key events and turning points of this game in 100-150 words, objectively and concisely.
 
-# 核心要求
-- 你的总结需要有逻辑、有条理。
-- 指出关键玩家的行为，例如预言家的查验、女巫的操作、猎人的开枪等。
-- 分析狼人阵营和好人阵营的博弈过程。
-- 你的输出【必须且只能】是复盘摘要的纯文本内容，不要包含任何额外的对话或标题。
+# Core Requirements
+- Your summary should be logical and well-structured.
+- Highlight the actions of key players, such as the Seer's checks, the Witch's actions, and the Hunter's shots.
 
-# 游戏日志
+- Analyze the strategic interactions between the Werewolf and Villager factions.
+- Your output must be plain text containing only the game summary, without any additional dialogue or headings.
+
+# Game Log
 ${formattedLog}
 `;
 
@@ -895,8 +897,8 @@ ${formattedLog}
       const data = await response.json();
       return (isGemini ? data.candidates[0].content.parts[0].text : data.choices[0].message.content).trim();
     } catch (error) {
-      console.error('AI摘要生成失败:', error);
-      return '（AI摘要生成失败，请检查网络或API设置）';
+      console.error('AI summary generation failed:', error);
+      return '(AI summary generation failed, please check your network or API settings)';
     }
   }
 
@@ -908,25 +910,25 @@ ${formattedLog}
    */
   function generateWerewolfSummary(winner, aiSummary) {
     const roleNameMap = {
-      wolf: '狼人',
-      villager: '平民',
-      seer: '预言家',
-      witch: '女巫',
-      hunter: '猎人',
-      guard: '守卫',
-      idiot: '白痴',
+      wolf: 'Werewolf',
+      villager: 'Villager',
+      seer: 'Seer',
+      witch: 'Witch',
+      hunter: 'Hunter',
+      guard: 'Guard',
+      idiot: 'Idiot',
     };
 
-    let summaryText = `**狼人杀 - 游戏复盘**\n\n`; // 优化标题
-    summaryText += `🏆 **胜利方:** ${winner}\n`;
-    summaryText += `📅 **游戏天数:** ${werewolfGameState.dayNumber} 天\n\n`;
+    let summaryText = `**Werewolf - Game Summary**\n\n`; // 优化标题
+    summaryText += `🏆 **Winner:** ${winner}\n`;
+    summaryText += `📅 **Game Days:** ${werewolfGameState.dayNumber} days\n\n`;
 
     // 加入AI生成的摘要
-    summaryText += `**本局摘要:**\n${aiSummary}\n\n`;
+    summaryText += `**Game Summary:**\n${aiSummary}\n\n`;
 
-    summaryText += `**玩家复盘:**\n`;
+    summaryText += `**Player Review:**\n`;
     werewolfGameState.players.forEach(p => {
-      const status = p.isAlive ? '存活' : '淘汰';
+      const status = p.isAlive ? 'Alive' : 'Eliminated';
       const roleName = roleNameMap[p.role] || p.role;
       summaryText += `- ${p.name} (${roleName}) - ${status}\n`;
     });
@@ -946,11 +948,11 @@ ${formattedLog}
     const aiPlayers = werewolfGameState.players.filter(p => !p.isUser);
 
     if (aiPlayers.length === 0) {
-      alert('没有可发送的AI玩家。');
+      alert('No AI players available to send.');
       return;
     }
 
-    // 渲染可选的AI玩家列表
+    // Render the list of selectable AI players
     aiPlayers.forEach(player => {
       const item = document.createElement('div');
       item.className = 'player-selection-item'; // 复用之前的样式
@@ -973,7 +975,7 @@ ${formattedLog}
       if (selectedIds.length > 0) {
         sendSummaryToSelectedPlayers(summaryText, selectedIds);
       } else {
-        alert('请至少选择一个发送对象！');
+        alert('Please select at least one recipient!');
       }
     };
 
@@ -1030,7 +1032,7 @@ ${formattedLog}
     const aiPlayers = werewolfGameState.players.filter(p => !p.isUser);
     let sentCount = 0;
 
-    const aiContext = `[系统指令：刚刚结束了一局狼人杀，这是游戏复盘。请根据这个复盘内容，以你的角色人设，和用户聊聊刚才的游戏。]\n\n${summaryText}`;
+    const aiContext = `[System Instruction: A game of Werewolf has just ended. This is the game summary. Please use this summary to chat with the user in character.]\n\n${summaryText}`;
 
     for (const chatId of targetIds) {
       const chat = state.chats[chatId];
@@ -1042,9 +1044,9 @@ ${formattedLog}
           role: 'user',
           type: 'share_link',
           timestamp: Date.now(),
-          title: '狼人杀 - 游戏复盘',
-          description: '点击查看详细复盘记录',
-          source_name: '游戏中心',
+          title: 'Werewolf - Game Summary',
+          description: 'Click to view the detailed game summary',
+          source_name: 'Game Center',
           content: summaryText,
         };
 
@@ -1064,7 +1066,7 @@ ${formattedLog}
       }
     }
 
-    await showCustomAlert('发送成功', `游戏复盘已发送至 ${sentCount} 位AI角色的聊天中！`);
+    await showCustomAlert('Send Successful', `The game summary has been sent to ${sentCount} AI players' chats!`);
     showScreen('game-hall-screen');
   }
 
@@ -1078,30 +1080,30 @@ ${formattedLog}
     let winner = null;
 
     if (aliveWolves === 0) {
-      winner = '好人阵营';
+      winner = 'Villager Team';
     } else if (aliveWolves >= aliveGods + aliveVillagers) {
-      winner = '狼人阵营';
+      winner = 'Werewolf Team';
     } else if (aliveGods === 0 && aliveVillagers === 0) {
-      winner = '狼人阵营';
+      winner = 'Werewolf Team';
     }
 
     if (winner) {
-      logToWerewolfGame(`游戏结束！${winner}胜利！`);
+      logToWerewolfGame(`Game Over! ${winner} wins!`);
       const roleNameMap = {
-        wolf: '狼人',
-        villager: '平民',
-        seer: '预言家',
-        witch: '女巫',
-        hunter: '猎人',
-        guard: '守卫',
-        idiot: '白痴',
+        wolf: 'Werewolf',
+        villager: 'Villager',
+        seer: 'Seer',
+        witch: 'Witch',
+        hunter: 'Hunter',
+        guard: 'Guard',
+        idiot: 'Idiot',
       };
       const rolesReveal = werewolfGameState.players.map(p => `${p.name}: ${roleNameMap[p.role] || p.role}`).join('\n');
-      logToWerewolfGame(`身份公布:\n${rolesReveal}`);
+      logToWerewolfGame(`Roles Revealed:\n${rolesReveal}`);
 
       // 【核心修改】在这里调用AI生成摘要并显示结算卡
       (async () => {
-        await showCustomAlert('请稍候...', 'AI正在生成本局摘要...');
+        await showCustomAlert('Please wait...', 'AI is generating the game summary...');
         const aiSummary = await generateAiGameSummary();
         const summary = generateWerewolfSummary(winner, aiSummary);
         showWerewolfSummaryModal(summary);
@@ -1127,7 +1129,7 @@ ${formattedLog}
     // ★★★ 核心修复：当用户死亡时，允许'hunter_shoot'动作继续执行 ★★★
     if (me && !me.isAlive && actionType !== 'hunter_shoot') {
       const actionArea = document.getElementById('werewolf-action-area');
-      actionArea.innerHTML = `<h5>您已淘汰，正在观战...</h5>`;
+      actionArea.innerHTML = `<h5>You have been eliminated, watching the game...</h5>`;
       return new Promise(async resolve => {
         await sleep(3000);
         actionArea.innerHTML = '';
@@ -1148,7 +1150,7 @@ ${formattedLog}
         const textarea = document.createElement('textarea');
         textarea.id = 'user-speech-input';
         textarea.rows = 1;
-        textarea.placeholder = '请输入你的发言...';
+        textarea.placeholder = 'Enter your speech...';
         // 实时调整高度
         textarea.addEventListener('input', () => {
           textarea.style.height = 'auto';
@@ -1158,7 +1160,7 @@ ${formattedLog}
         const endBtn = document.createElement('button');
         endBtn.id = 'end-speech-btn';
         endBtn.className = 'form-button'; // 保留一个基础class
-        endBtn.textContent = '结束发言';
+        endBtn.textContent = 'End Speech';
 
         actionArea.appendChild(textarea);
         actionArea.appendChild(endBtn);
@@ -1166,7 +1168,7 @@ ${formattedLog}
         textarea.focus();
 
         endBtn.onclick = () => {
-          const speech = textarea.value.trim() || '我过麦。';
+          const speech = textarea.value.trim() || 'I pass.';
           actionArea.innerHTML = '';
           actionArea.classList.remove('speaking-mode');
           resolve(speech);
@@ -1183,7 +1185,7 @@ ${formattedLog}
         if (context.killedId && werewolfGameState.witchPotions.save > 0) {
           const saveBtn = document.createElement('button');
           saveBtn.className = 'form-button';
-          saveBtn.textContent = `使用解药救 ${context.killedPlayerName}`;
+          saveBtn.textContent = `Use Antidote to save ${context.killedPlayerName}`;
           saveBtn.onclick = () => {
             actionArea.innerHTML = '';
             resolve({ action: 'save' });
@@ -1193,16 +1195,16 @@ ${formattedLog}
         if (werewolfGameState.witchPotions.poison > 0) {
           const poisonBtn = document.createElement('button');
           poisonBtn.className = 'form-button form-button-secondary';
-          poisonBtn.textContent = '使用毒药';
+          poisonBtn.textContent = 'Use Poison';
           poisonBtn.onclick = async () => {
-            const targetId = await waitForUserAction('选择要毒杀的玩家', 'witch_poison_target');
+            const targetId = await waitForUserAction('Choose a player to poison', 'witch_poison_target');
             resolve({ action: 'poison', targetId: targetId });
           };
           grid.appendChild(poisonBtn);
         }
         const passBtn = document.createElement('button');
         passBtn.className = 'form-button form-button-secondary';
-        passBtn.textContent = '跳过';
+        passBtn.textContent = 'Pass';
         passBtn.onclick = () => {
           actionArea.innerHTML = '';
           resolve({ action: 'none' });
@@ -1241,7 +1243,7 @@ ${formattedLog}
       if (actionType === 'vote') {
         const passBtn = document.createElement('button');
         passBtn.className = 'form-button-secondary vote-target-btn';
-        passBtn.textContent = '弃票';
+        passBtn.textContent = 'Abstain';
         passBtn.onclick = () => {
           actionArea.innerHTML = '';
           resolve(null);
@@ -1288,23 +1290,23 @@ ${formattedLog}
     // 如果是预言家发言，提供专属情报
     if (player.role === 'seer' && action === 'speak' && werewolfGameState.seerLastNightResult) {
       const result = werewolfGameState.seerLastNightResult;
-      extraContext = `\n# 预言家专属情报 (此信息仅你可见)\n- **重要信息**: 昨晚你查验了 **${
+      extraContext = `\n# Seer Exclusive Information (Visible only to you)\n- **Important Information**: Last night you checked **${
         result.targetName
-      }**，Ta的身份是【${
-        result.isWolf ? '狼人' : '好人'
-      }】。\n- **你的任务**: 你可以选择在发言中公布这个信息（可以说真话，也可以为了迷惑狼人而说谎），或者暂时隐藏它。请根据你的人设和当前局势做出最有利的决策。\n`;
+      }**. Their identity is 【${
+        result.isWolf ? 'Werewolf' : 'Villager'
+      }】.\n- **Your Task**: You can choose to reveal this information in your speech (you can tell the truth or lie to mislead the werewolves), or keep it hidden for now. Please make the most advantageous decision based on your persona and the current situation.\n`;
       werewolfGameState.seerLastNightResult = null;
     }
 
     // 3. 根据不同的行动类型，生成具体的任务描述和输出格式要求
     switch (action) {
       case 'guard_protect':
-        actionPrompt = '你是守卫，请选择一名玩家进行守护。你不能连续两晚守护同一个人。';
-        jsonFormat = '{"action": "vote", "targetId": "你选择守护的玩家ID"}';
+        actionPrompt = 'You are the **Guard**. Please choose a player to protect. You cannot protect the same person on two consecutive nights.';
+        jsonFormat = '{"action": "vote", "targetId": "The ID of the player you choose to protect"}';
         if (werewolfGameState.guardLastNightProtected)
-          extraContext = `\n- 提示: 你昨晚守护了 ${
+          extraContext = `\n- Hint: Last night you protected ${
             werewolfGameState.players.find(p => p.id === werewolfGameState.guardLastNightProtected).name
-          }。`;
+          }.`;
         break;
       case 'wolf_kill':
         const wolfTeammates = werewolfGameState.players
@@ -1312,39 +1314,39 @@ ${formattedLog}
           .map(w => w.name)
           .join('、');
         if (context.isUserWolfAlly) {
-          actionPrompt = `你是狼人，你的队友是【${wolfTeammates}】和【用户】。请给你的用户队友一个击杀建议。`;
+          actionPrompt = `You are a **Werewolf**. Your teammates are **【${wolfTeammates}】** and **【the user】**. Please give your user teammate a suggestion on who to kill.`;
         } else {
-          actionPrompt = `你是狼人，你的队友是【${wolfTeammates || '无'}】。请选择一个非狼人角色进行攻击。`;
+          actionPrompt = `You are a **Werewolf**. Your teammates are **【${wolfTeammates || 'None'}】**. Please choose a non-werewolf player to attack.`;
         }
-        extraContext += `\n# 狼人战术指令 (至关重要)\n- **团队合作**: 你的首要目标是和你的狼队友们【集火】同一个目标，以确保击杀成功。\n- **攻击优先级**: 请优先攻击你认为是【预言家】、【女巫】等神职的玩家，或者发言逻辑清晰、对狼人阵营威胁大的好人。`;
-        jsonFormat = '{"action": "vote", "targetId": "你选择攻击的玩家ID"}';
+        extraContext += `\n# Werewolf Tactical Instructions (Crucial)\n- **Teamwork**: Your primary goal is to focus on the same target as your werewolf teammates to ensure a successful kill.\n- **Attack Priority**: Please prioritize attacking players you believe to be **Seer**, **Witch**, or other special roles, or players who are logical and pose a significant threat to the werewolf faction.`;
+        jsonFormat = '{"action": "vote", "targetId": "The ID of the player you choose to attack"}';
         break;
       case 'seer_check':
-        actionPrompt = '你是预言家，请选择一名玩家查验其身份（好人或狼人）。';
-        jsonFormat = '{"action": "vote", "targetId": "你选择查验的玩家ID"}';
+        actionPrompt = 'You are the **Seer**. Please choose a player to check their identity (Villager or Werewolf).';
+        jsonFormat = '{"action": "vote", "targetId": "The ID of the player you choose to check"}';
         break;
       case 'witch_action':
-        actionPrompt = '你是女巫。';
+        actionPrompt = 'You are the **Witch**.';
         if (context.killedId) {
-          actionPrompt += `今晚 ${werewolfGameState.players.find(p => p.id === context.killedId).name} 被袭击了。`;
+          actionPrompt += `Tonight ${werewolfGameState.players.find(p => p.id === context.killedId).name} was attacked.`;
         } else {
-          actionPrompt += '今晚是平安夜。';
+          actionPrompt += 'Tonight is a peaceful night.';
         }
-        actionPrompt += ` 你有 ${werewolfGameState.witchPotions.save} 瓶解药和 ${werewolfGameState.witchPotions.poison} 瓶毒药。请决定你的行动。`;
-        jsonFormat = '{"action": "save" | "poison" | "none", "targetId": "(如果用毒药，填写目标ID)"}';
+        actionPrompt += ` You have ${werewolfGameState.witchPotions.save} potion(s) to save and ${werewolfGameState.witchPotions.poison} potion(s) to poison. Please decide your action.`;
+        jsonFormat = '{"action": "save" | "poison" | "none", "targetId": "(If using poison, provide the target ID)"}';
         break;
       case 'hunter_shoot':
-        actionPrompt = '你是猎人，你出局了，请选择一名玩家与你一同出局。';
-        jsonFormat = '{"action": "vote", "targetId": "你选择带走的玩家ID"}';
+        actionPrompt = 'You are the **Hunter**. You have been eliminated. Please choose a player to take down with you.';
+        jsonFormat = '{"action": "vote", "targetId": "The ID of the player you choose to take down"}';
         break;
       case 'speak':
         actionPrompt =
-          '现在轮到你发言。请根据你的角色身份、人设和当前局势，发表你的看法，可以撒谎或引导。你的发言应该围绕游戏本身，而不是只和用户聊天。';
-        jsonFormat = '{"action": "speak", "speech": "你的发言内容..."}';
+          'It is now your turn to speak. Based on your role, character persona, and the current game situation, share your thoughts. You may lie or try to guide the discussion. Your statement should focus on the game itself rather than chatting only with the user.';
+        jsonFormat = '{"action": "speak", "speech": "Your speech content..."}';
         break;
       case 'vote':
-        actionPrompt = '现在是白天投票环节，请根据大家的发言和你自己的判断，投票选出你认为是狼人的玩家。';
-        jsonFormat = '{"action": "vote", "targetId": "你投票的玩家ID"}';
+        actionPrompt = 'It is now the daytime voting phase. Based on everyone\'s statements and your own judgment, vote for the player you believe is a werewolf.';
+        jsonFormat = '{"action": "vote", "targetId": "The ID of the player you vote for"}';
         break;
     }
 
@@ -1352,22 +1354,22 @@ ${formattedLog}
     const systemPrompt = `
 **【LANGUAGE RULE - HIGHEST PRIORITY】: You MUST reply in Vietnamese (Tiếng Việt) for ALL messages. Never use Chinese or any other language.**
 
-# 游戏背景: 狼人杀
-# 你的身份和人设
-- **你的名字**: ${player.name}
-- **你的角色**: ${player.role}
-- **你的性格人设**: ${player.persona}
+# Game Background: Werewolf
+# Your Identity and Persona
+- **Your Name**: ${player.name}
+- **Your Role**: ${player.role}
+- **Your Character Persona**: ${player.persona}
 
-# 当前局势
-- **存活玩家列表**:
+# Current Situation
+- **Alive Players List**:
 ${alivePlayersList}
-- **游戏日志 (这是完整的游戏记录，你必须通读并记住所有信息)**:
+- **Game Log (This is the complete game record, you must read and remember all information)**:
 ${fullGameLog}
 ${extraContext}
 
-# 你的任务: ${actionPrompt}
+# Your Task: ${actionPrompt}
 
-# 输出格式: 你的回复【必须且只能】是一个严格的JSON对象，格式如下:
+# Output Format: Your reply **must and only** be a strict JSON object, formatted as follows:
 ${jsonFormat}
 `;
     // 5. 发送请求并处理返回结果 (这部分保持不变)
@@ -1412,7 +1414,7 @@ ${jsonFormat}
 
       return null;
     } catch (error) {
-      console.error(`AI (${player.name}) 行动失败:`, error);
+      console.error(`AI (${player.name}) action failed:`, error);
       // 如果AI出错，提供一个保底的行动，防止游戏卡死
       if (
         action.includes('vote') ||
@@ -1426,12 +1428,12 @@ ${jsonFormat}
           return potentialTargets[Math.floor(Math.random() * potentialTargets.length)].id;
       }
       if (action === 'witch_action') return { action: 'none' };
-      return '我...我不知道该说什么了。';
+      return 'I have no action tonight.';
     }
   }
 
   /**
-   * 一个简单的sleep函数，用于在游戏流程中制造停顿
+   * A simple sleep function to create pauses in the game flow
    */
   function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -1457,9 +1459,9 @@ ${jsonFormat}
       currentTurnIndex: 0,
     };
 
-    // 2. 渲染玩家选择列表
+    // 2. Render player selection list
     const selectionEl = document.getElementById('sts-player-selection');
-    selectionEl.innerHTML = '<p>正在加载角色列表...</p>';
+    selectionEl.innerHTML = '<p>Loading character list...</p>';
 
     const singleChats = Object.values(state.chats).filter(chat => !chat.isGroup);
     const allNpcs = Object.values(state.chats).flatMap(chat =>
@@ -1467,14 +1469,14 @@ ${jsonFormat}
     );
 
     let playerOptions = [
-      ...singleChats.map(c => ({ id: c.id, name: c.name, avatar: c.settings.aiAvatar, type: '角色' })),
+      ...singleChats.map(c => ({ id: c.id, name: c.name, avatar: c.settings.aiAvatar, type: 'Character' })),
       ...allNpcs.map(n => ({ id: n.id, name: n.name, avatar: n.avatar, type: `NPC (${n.owner})` })),
     ];
 
     selectionEl.innerHTML = '';
     playerOptions.forEach(player => {
       const item = document.createElement('div');
-      item.className = 'player-selection-item'; // 复用狼人杀的样式
+      item.className = 'player-selection-item'; // Reuse Werewolf style
       item.innerHTML = `
             <input type="checkbox" class="sts-player-checkbox" value="${player.id}">
             <img src="${player.avatar || defaultAvatar}" alt="${player.name}">
@@ -1497,20 +1499,20 @@ ${jsonFormat}
   async function startSeaTurtleSoupGame() {
     const selectedCheckboxes = document.querySelectorAll('.sts-player-checkbox:checked');
     if (selectedCheckboxes.length < 1) {
-      alert('请至少邀请一位AI或NPC玩家！');
+      alert('Please invite at least one AI or NPC player!');
       return;
     }
 
-    await showCustomAlert('请稍候...', '正在准备海龟汤游戏...');
+    await showCustomAlert('Please wait...', 'Preparing the Sea Turtle Soup game...');
 
-    // 1. 收集玩家信息
+    // 1. Collect player information
     let players = [
       {
         id: 'user',
-        name: state.qzoneSettings.nickname || '我',
+        name: state.qzoneSettings.nickname || 'Me',
         avatar: state.qzoneSettings.avatar || defaultAvatar,
         isUser: true,
-        persona: '一个好奇的普通人',
+        persona: 'A curious ordinary person',
       },
     ];
     selectedCheckboxes.forEach(checkbox => {
@@ -1561,7 +1563,7 @@ ${jsonFormat}
       const riddle = document.getElementById('sts-user-riddle-surface').value.trim();
       const answer = document.getElementById('sts-user-riddle-answer').value.trim();
       if (!riddle || !answer) {
-        alert('作为出题人，谜面和谜底都不能为空哦！');
+        alert('As the riddle provider, both the riddle and the answer cannot be empty!');
         return;
       }
       seaTurtleSoupState.riddle = riddle;
@@ -1570,58 +1572,58 @@ ${jsonFormat}
       const riddleType = document.getElementById('sts-ai-riddle-type').value.trim();
       const { riddle, answer } = await generateSeaTurtleRiddle(seaTurtleSoupState.riddleProvider, riddleType);
       if (!riddle || !answer) {
-        alert('AI出题失败，请检查API或稍后重试。');
+        alert('AI failed to generate a riddle. Please check the API or try again later.');
         return;
       }
       seaTurtleSoupState.riddle = riddle;
       seaTurtleSoupState.answer = answer;
     }
 
-    // 4. 初始化游戏
+    // 4. Initialize game
     seaTurtleSoupState.isActive = true;
     seaTurtleSoupState.phase = 'guessing';
     logToStsGame(
-      `游戏开始！出题人是 ${seaTurtleSoupState.riddleProvider.name}。`,
+      `Game started! The riddle provider is ${seaTurtleSoupState.riddleProvider.name}.`,
       'system',
       seaTurtleSoupState.riddleProvider,
     );
-    logToStsGame(`【谜面】\n${seaTurtleSoupState.riddle}`);
+    logToStsGame(`【Riddle】\n${seaTurtleSoupState.riddle}`);
 
     document.getElementById('sea-turtle-soup-setup-modal').classList.remove('visible');
     showScreen('sea-turtle-soup-screen');
     renderSeaTurtleGameScreen({ activePlayerId: 'user' });
 
-    // 游戏开始，进入第一个回合
+    // Game starts, enter the first turn
     await processStsTurn();
   }
 
   /**
-   * 【海龟汤-AI核心 | 优化版】让AI根据指定类型出题，并优先选择经典谜题
+   * 【Sea Turtle Soup-AI Core | Optimized】Let AI generate a riddle based on the specified type, prioritizing classic riddles
    */
   async function generateSeaTurtleRiddle(provider, riddleType) {
     const { proxyUrl, apiKey, model } = state.apiConfig;
     if (!proxyUrl || !apiKey || !model) return { riddle: null, answer: null };
 
-    // 核心修改：优化了Prompt，增加了“优先选择经典谜题”的指令
-    const typePrompt = riddleType ? `请创作一个【${riddleType}】类型的` : '请创作一个';
+    // Core modification: optimized the prompt, added instruction to "prioritize classic riddles"
+    const typePrompt = riddleType ? `Please create a 【${riddleType}】 type` : 'Please create a';
 
     const systemPrompt = `
 **【LANGUAGE RULE - HIGHEST PRIORITY】: You MUST reply in Vietnamese (Tiếng Việt) for ALL messages. Never use Chinese or any other language.**
 
-# 任务
-你现在是角色"${provider.name}"，你的人设是："${provider.persona}"。
-你的任务是扮演这个角色，${typePrompt}经典的海龟汤谜题。
+# Task
+You are now the character "${provider.name}", your persona is "${provider.persona}".
+Your task is to play this character and ${typePrompt} classic Sea Turtle Soup riddles.
 
-# 核心规则
-1.  **优先经典**: 你【必须优先】从已知的、经典的、广为人知的“海龟汤”故事中挑选一个作为本次的谜题。这能确保谜题的逻辑性和可玩性。
-2.  **适当原创**: 只有在想不出合适的经典谜题时，你才被允许原创一个。原创的谜题也必须逻辑严谨，情节合理。
-3.  **格式铁律**: 你的回复【必须且只能】是一个严格的JSON对象，包含 "riddle" (谜面) 和 "answer" (谜底) 两个字段。
-4.  **禁止出戏**: 不要说任何与出题无关的话。
+# Core Rules
+1.  **Prioritize Classics**: You **must prioritize** selecting a riddle from known, classic, and widely recognized "Sea Turtle Soup" stories. This ensures the logic and playability of the riddle.
+2.  **Appropriate Originality**: Only when you cannot think of a suitable classic riddle are you allowed to create an original one. Original riddles must also be logically sound and reasonable.
+3.  **Strict Format**: Your response **must and can only** be a strict JSON object containing the fields "riddle" (the riddle) and "answer" (the answer).
+4.  **No Breaking Character**: Do not say anything unrelated to the riddle.
 
-# JSON输出格式示例:
+# JSON Output Format Example:
 {
-  "riddle": "一个男人走进一家酒吧，向酒保要了一杯水。酒保却掏出了一把枪指着他。男人说了一声“谢谢”，然后离开了。为什么？",
-  "answer": "这个男人在打嗝。他想通过喝水来止嗝，但酒保用更有效的方法——惊吓，帮他治好了打嗝。所以男人表示感谢后就离开了。"
+  "riddle": "A man walks into a bar and asks the bartender for a glass of water. The bartender pulls out a gun and points it at him. The man says 'Thank you' and leaves. Why?",
+  "answer": "The man had the hiccups. He wanted to stop them by drinking water, but the bartender used a more effective method—scaring him—which cured his hiccups. So the man thanked him and left."
 }
 `;
     try {
@@ -1656,25 +1658,25 @@ ${jsonFormat}
       );
       return JSON.parse(content);
     } catch (error) {
-      console.error('AI出题失败:', error);
+      console.error('AI failed to generate a riddle:', error);
       return { riddle: null, answer: null };
     }
   }
 
   /**
-   * 【海龟汤】渲染游戏主界面 (已添加当前回合玩家高亮)
+   * 【Sea Turtle Soup】Render the game main screen (highlighting the current turn player)
    */
   function renderSeaTurtleGameScreen(options = {}) {
     const playersGrid = document.getElementById('sts-players-grid');
     const logContainer = document.getElementById('sts-game-log');
 
-    // 渲染玩家座位
+    // Render player seats
     playersGrid.innerHTML = '';
     seaTurtleSoupState.players.forEach(player => {
       const seat = document.createElement('div');
       seat.className = 'player-seat';
       const roleIndicator = player.isProvider
-        ? '<div class="player-role-indicator riddle-master" title="出题人">👑</div>'
+        ? '<div class="player-role-indicator riddle-master" title="Riddle Master">👑</div>'
         : '';
       const avatarClass = `player-avatar ${options.activePlayerId === player.id ? 'active-turn' : ''}`;
 
@@ -1686,7 +1688,7 @@ ${jsonFormat}
       playersGrid.appendChild(seat);
     });
 
-    // 渲染游戏日志
+    // Render game log
     logContainer.innerHTML = '';
     seaTurtleSoupState.gameLog.forEach(log => {
       const logEl = document.createElement('div');
@@ -1712,7 +1714,7 @@ ${jsonFormat}
                 `;
           break;
         case 'answer':
-          const answerClass = { 是: 'yes', 否: 'no', 无关: 'irrelevant' }[log.message] || 'irrelevant';
+          const answerClass = { Yes: 'yes', No: 'no', Irrelevant: 'irrelevant' }[log.message] || 'irrelevant';
           logEl.innerHTML = `
                     <div class="sts-log-content">
                          <span class="answer-text ${answerClass}">${log.message}</span>
@@ -1730,7 +1732,7 @@ ${jsonFormat}
   /**
    * 【海龟汤】添加一条游戏日志
    */
-  function logToStsGame(message, type = 'system', speakerObj = { name: '系统' }) {
+  function logToStsGame(message, type = 'system', speakerObj = { name: 'System' }) {
     seaTurtleSoupState.gameLog.push({ message, type, speaker: speakerObj.name, speakerObj }); // 保存整个对象
     renderSeaTurtleGameScreen();
   }
@@ -1768,7 +1770,7 @@ ${jsonFormat}
     const input = document.getElementById('sts-question-input');
     const guess = input.value.trim();
     if (!guess) {
-      alert('猜测的内容不能为空！');
+      alert('The guess cannot be empty!');
       return;
     }
 
@@ -1781,8 +1783,8 @@ ${jsonFormat}
 
     if (provider.isUser) {
       isCorrect = await showCustomConfirm(
-        '判断猜测',
-        `玩家 ${userPlayer.name} 猜测的答案是：\n\n"${guess}"\n\n这个猜测是否正确？`,
+        'Judge Guess',
+        `Player ${userPlayer.name} guessed the answer:\n\n"${guess}"\n\nIs this guess correct?`,
       );
     } else {
       const aiEvaluation = await triggerStsAiTurn(provider, 'evaluate_guess', guess);
@@ -1790,10 +1792,10 @@ ${jsonFormat}
     }
 
     if (isCorrect) {
-      logToStsGame(`${userPlayer.name} 猜对了！游戏结束！`, 'system', userPlayer);
+      logToStsGame(`${userPlayer.name} guessed correctly! Game over!`, 'system', userPlayer);
       await revealStsAnswer();
     } else {
-      logToStsGame('不对哦。', 'answer', provider);
+      logToStsGame('Incorrect.', 'answer', provider);
       await processStsTurn();
     }
   }
@@ -1806,7 +1808,7 @@ ${jsonFormat}
     const lastUserActionIndex = findLastIndex(seaTurtleSoupState.gameLog, log => log.speakerObj.isUser);
 
     if (lastUserActionIndex === -1) {
-      alert('还没有你的发言记录，无法重roll。');
+      alert('No user actions found, cannot reroll.');
       return;
     }
 
@@ -1814,24 +1816,24 @@ ${jsonFormat}
     const removedLogs = seaTurtleSoupState.gameLog.splice(lastUserActionIndex + 1);
 
     if (removedLogs.length === 0) {
-      alert('AI还没有行动，无需重roll。');
+      alert('AI has not acted yet, no need to reroll.');
       return;
     }
 
-    console.log(`海龟汤：移除了 ${removedLogs.length} 条AI行动日志，准备重roll。`);
+    console.log(`Sea Turtle Soup: Removed ${removedLogs.length} AI action logs, preparing to reroll.`);
 
-    // 3. 重新渲染UI，界面会立刻回滚
+    // 3. Re-render the UI, the interface will immediately roll back
     renderSeaTurtleGameScreen();
 
-    // 4. 给用户一个提示
-    await showCustomAlert('请稍候...', '正在让AI们重新组织语言...');
+    // 4. Give the user a prompt
+    await showCustomAlert('Please wait...', 'AI is reorganizing its language...');
 
-    // 5. 重新调用游戏主循环，它会自动执行AI的回合
+    // 5. Re-invoke the game loop, it will automatically execute the AI's turn
     await processStsTurn();
   }
 
   /**
-   * 辅助函数：从后往前查找数组中满足条件的第一个元素的索引
+   * Helper function: Find the last index of an element in an array that satisfies the predicate
    */
   function findLastIndex(array, predicate) {
     for (let i = array.length - 1; i >= 0; i--) {
@@ -1841,7 +1843,7 @@ ${jsonFormat}
     }
     return -1;
   }
-  // ▲▲▲ 新增函数结束 ▲▲▲
+  // ▲▲▲ New function ends ▲▲▲
 
   /**
    * 【海龟汤】游戏主循环/引擎
@@ -1854,12 +1856,12 @@ ${jsonFormat}
       const provider = seaTurtleSoupState.riddleProvider;
       let providerAnswerResponse;
       if (provider.isUser) {
-        const choice = await showChoiceModal(`回答 ${userObj.name} 的问题: "${userQuestion}"`, [
-          { text: '是', value: '是' },
-          { text: '否', value: '否' },
-          { text: '无关', value: '无关' },
+        const choice = await showChoiceModal(`Answer ${userObj.name}'s question: "${userQuestion}"`, [
+          { text: 'Yes', value: 'yes' },
+          { text: 'No', value: 'no' },
+          { text: 'Irrelevant', value: 'irrelevant' },
         ]);
-        providerAnswerResponse = { judgement: choice || '无关', remark: '' };
+        providerAnswerResponse = { judgement: choice || 'irrelevant', remark: '' };
       } else {
         providerAnswerResponse = await triggerStsAiTurn(provider, 'answer', {
           question: userQuestion,
@@ -1893,12 +1895,12 @@ ${jsonFormat}
         const provider = seaTurtleSoupState.riddleProvider;
         let providerAnswerResponse;
         if (provider.isUser) {
-          const choice = await showChoiceModal(`回答 ${guesser.name} 的问题: "${aiAction.content}"`, [
-            { text: '是', value: '是' },
-            { text: '否', value: '否' },
-            { text: '无关', value: '无关' },
+          const choice = await showChoiceModal(`Answer ${guesser.name}'s question: "${aiAction.content}"`, [
+            { text: 'Yes', value: 'yes' },
+            { text: 'No', value: 'no' },
+            { text: 'Irrelevant', value: 'irrelevant' },
           ]);
-          providerAnswerResponse = { judgement: choice || '无关', remark: '' };
+          providerAnswerResponse = { judgement: choice || 'irrelevant', remark: '' };
         } else {
           providerAnswerResponse = await triggerStsAiTurn(provider, 'answer', {
             question: aiAction.content,
@@ -1917,8 +1919,8 @@ ${jsonFormat}
         let isCorrect = false;
         if (seaTurtleSoupState.riddleProvider.isUser) {
           isCorrect = await showCustomConfirm(
-            '判断猜测',
-            `玩家 ${guesser.name} 猜测的答案是：\n\n"${aiAction.content}"\n\n这个猜测是否正确？`,
+            'Judge Guess',
+            `Player ${guesser.name} guessed the answer:\n\n"${aiAction.content}"\n\nIs this guess correct?`,
           );
         } else {
           const aiEvaluation = await triggerStsAiTurn(
@@ -1930,11 +1932,11 @@ ${jsonFormat}
         }
 
         if (isCorrect) {
-          logToStsGame(`${guesser.name} 猜对了！游戏结束！`, 'system', guesser);
+          logToStsGame(`${guesser.name} guessed correctly! Game over!`, 'system', guesser);
           await revealStsAnswer();
           return;
         } else {
-          logToStsGame('不对哦。', 'answer', seaTurtleSoupState.riddleProvider);
+          logToStsGame('Incorrect.', 'answer', seaTurtleSoupState.riddleProvider);
         }
       }
     }
@@ -1950,8 +1952,8 @@ ${jsonFormat}
         const rerollBtn = document.createElement('button');
         rerollBtn.id = 'sts-reroll-ai-turn-btn';
         rerollBtn.className = 'action-button';
-        rerollBtn.title = '让AI们重新提问或猜测';
-        rerollBtn.style.backgroundColor = '#ff9800'; // 给它一个醒目的橙色
+        rerollBtn.title = 'Let AI re-ask or re-guess';
+        rerollBtn.style.backgroundColor = '#ff9800'; // Give it a prominent orange color
         rerollBtn.style.width = '40px';
         rerollBtn.style.height = '40px';
         rerollBtn.innerHTML = `<svg class="reroll-btn-icon" viewBox="0 0 24 24" style="stroke:white;"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>`;
@@ -1968,7 +1970,7 @@ ${jsonFormat}
    */
   async function triggerStsAiTurn(player, actionType, contextPayload = {}) {
     const { proxyUrl, apiKey, model } = state.apiConfig;
-    if (!proxyUrl || !apiKey || !model) return { type: 'question', content: '我不知道该问什么了。' };
+    if (!proxyUrl || !apiKey || !model) return { type: 'question', content: "I don't know what to ask." };
 
     let systemPrompt = '';
     const gameLogText = seaTurtleSoupState.gameLog
@@ -1981,80 +1983,80 @@ ${jsonFormat}
       systemPrompt = `
 **【LANGUAGE RULE - HIGHEST PRIORITY】: You MUST reply in Vietnamese (Tiếng Việt) for ALL messages. Never use Chinese or any other language.**
 
-# 任务: 海龟汤出题人 (高级人格版)
-你现在【就是】角色"${player.name}"，你的人设是："${player.persona}"。
-你是海龟汤的出题人，你的谜底是："${seaTurtleSoupState.answer}"。
-现在，玩家“${contextPayload.askerName}”向你提问：“${contextPayload.question}”。
+# Task: Turtle Soup Riddle Host (Advanced Persona Version)
+You are now the character "${player.name}", and your persona is "${player.persona}".
+You are the host of the Turtle Soup game, and the answer to your riddle is "${seaTurtleSoupState.answer}".
+Now, the player "${contextPayload.askerName}" has asked you a question: "${contextPayload.question}".
 
-你的任务是先给出判断，然后用【完全符合你人设的口吻】，给出一句精妙的补充说明(remark)。
+Your task is to first provide a judgement, and then give a remark that fully aligns with your persona.
 
-# 你的行为准则 (必须严格遵守)
+# Your Code of Conduct (Must Strictly Follow)
 
-## 1. 关于判断 (Judgement)
-你的 "judgement" 字段必须从以下【四个】选项中选择一个：\`是\`, \`否\`, \`无关\`, \`部分是\`。
+## 1. About Judgement
+Your "judgement" field must be one of the following four options: \`Yes\`, \`No\`, \`Irrelevant\`, \`Partially\`.
 
-## 2. 关于补充说明 (Remark)
--   **【【【人格铁律】】】**: 你的每一句补充说明，都【必须】是你作为角色“${player.name}”会说的话。思考一下，一个“${player.persona}”性格的人，在面对这个问题时会如何回答？是会调侃、会鼓励、会故作高深，还是会不耐烦？
--   **配合判断**: 当判断为 "部分是" 时，你的补充说明要巧妙地指出他们猜对的部分。
--   **给予提示 (仅在玩家卡关时)**:
-    -   **判断瓶颈**: 当你观察到最近的5-8条提问大多是“无关”时，意味着玩家可能陷入了思维僵局。
-    -   **执行操作**: 在这种情况下，你的补充说明【必须包含一个方向性的提示】，并用你的人设口吻自然地说出来。
+## 2. About Remark
+-   **【【【Persona Iron Law】】】**: Every remark you make must be something that the character "${player.name}" would say. Consider how a person with the persona "${player.persona}" would respond to this question. Would they tease, encourage, act profound, or be impatient?
+-   **Align with Judgement**: When the judgement is "Partially", your remark should cleverly point out the part they got right.
+-   **Provide Hints (Only When the Player is Stuck)**:
+    -   **Judgement Bottleneck**: If you observe that most of the last 5-8 questions are "Irrelevant", it indicates that the player might be stuck in a mental rut.
+    -   **Action**: In such cases, your remark must include a directional hint, delivered naturally in your persona's voice.
 
-# 格式铁律
-1.  你的回复【必须且只能】是一个严格的JSON对象，包含 "judgement" 和 "remark" 两个字段。
-2.  【绝对禁止】在你的任何回复中使用Emoji表情符号或出戏的词语。
+# Format Iron Law
+1.  Your reply **must and can only** be a strict JSON object containing the fields "judgement" and "remark".
+2.  **Absolutely prohibited** from using Emoji or out-of-character words in any of your replies.
 
-# JSON输出格式示例:
+# JSON Output Format Example:
 {
   "judgement": "",
   "remark": ""
 }
-现在，请直接输出你的JSON判断。`;
+Now, please directly output your JSON judgement.`;
     } else if (actionType === 'evaluate_guess') {
       systemPrompt = `
 **【LANGUAGE RULE - HIGHEST PRIORITY】: You MUST reply in Vietnamese (Tiếng Việt) for ALL messages. Never use Chinese or any other language.**
 
-# 任务: 海龟汤出题人 - 判断猜测
-你正在扮演角色"${player.name}"，人设是："${player.persona}"。
-你是海龟汤的出题人。你的谜底是："${seaTurtleSoupState.answer}"。
-现在，有玩家直接猜测了谜底，内容是：“${contextPayload}”。
-你的任务是判断这个猜测是否与你的谜底【核心意思一致】，只要70%的正确率即可。
+# Task: Turtle Soup Riddle Host - Evaluate Guess
+You are now the character "${player.name}", and your persona is "${player.persona}".
+You are the host of the Turtle Soup game, and the answer to your riddle is "${seaTurtleSoupState.answer}".
+Now, a player has directly guessed the answer: "${contextPayload}".
+Your task is to determine whether this guess aligns with the core meaning of your answer, with a 70% accuracy threshold.
 
-# 核心规则
-1.  **格式铁律**: 你的回复【必须且只能】是一个严格的JSON对象，格式为: \`{"isCorrect": true}\` 或 \`{"isCorrect": false}\`。
-2.  **判断标准**: 只要猜测的核心情节、人物关系、关键道具和最终结果与谜底一致即可，不需要逐字匹配。
+# Core Rules
+1.  **Format Iron Law**: Your reply **must and can only** be a strict JSON object, formatted as: \`{"isCorrect": true}\` or \`{"isCorrect": false}\`.
+2.  **Judgement Criteria**: The core plot, character relationships, key props, and final outcome of the guess must align with the answer. Exact word-for-word matching is not required.
 
-现在，请直接输出你的判断。`;
+Now, please directly output your judgement.`;
     } else {
       // 'guess'
       systemPrompt = `
 **【LANGUAGE RULE - HIGHEST PRIORITY】: You MUST reply in Vietnamese (Tiếng Việt) for ALL messages. Never use Chinese or any other language.**
 
-# 任务: 海龟汤猜测者
-你正在扮演角色"${player.name}"，人设是："${player.persona}"。
-你正在玩海龟汤游戏，需要根据已知信息提问或猜测谜底。
+# Task: Turtle Soup Guess Player
+You are now the character "${player.name}", and your persona is "${player.persona}".
+You are playing the Turtle Soup game and need to ask questions or guess the answer based on the known information.
 
-# 游戏信息
-- 谜面: ${seaTurtleSoupState.riddle}
-- 已有线索 (完整的对话记录):
+# Game Information
+- Riddle: ${seaTurtleSoupState.riddle}
+- Known Clues (Complete Dialogue History):
 ${gameLogText}
 
-# 核心规则
-1.  **【【【逻辑推理铁律】】】**: 你【必须】仔细分析上方的“已有线索”，避免提出重复或与已知线索矛盾的问题。你的提问或猜测应该建立在已有信息之上，展现出逻辑推理能力。
-2.  **【【【人格扮演铁律】】】**: 你的提问和猜测都【必须】符合你的人设和口吻，就像真人在玩游戏一样。你可以适当加入一些自己的思考过程或情绪表达，让对话更生动。例如，你可以说：“让我想想... 既然和地点无关，那是不是和时间有关？”，尽可能发言字数多点。
-3.  **决策**: 根据线索，决定是提出一个关键的“是/否”问题来缩小范围，还是直接猜测谜底。当线索足够时，大胆地使用 "guess" 指令来猜测完整的故事。
-4.  **【【【加速规则】】】**: 如果“已有线索”的对话记录已经超过了30条，这说明游戏时间过长。在这种情况下，你【应该更倾向于直接猜测谜底】，而不是继续提出细节问题。
-5.  **格式铁律**: 你的回复【必须且只能】是一个严格的JSON对象。
-   - 如果提问, 格式: \`{"type": "question", "content": "你的问题..."}\`
-   - 如果猜测, 格式: \`{"type": "guess", "content": "你猜测的完整故事..."}\`
+# Core Rules
+1.  **【【【Logical Reasoning Iron Law】】】**: You **must** carefully analyze the "Known Clues" above, avoiding repeated or contradictory questions. Your questions or guesses should be based on the existing information, demonstrating logical reasoning.
+2.  **【【【Persona Role-Playing Iron Law】】】**: Your questions and guesses **must** align with your persona and tone, just like a real player. You can appropriately include your thought process or emotional expressions to make the dialogue more vivid. For example, you might say: "Let me think... Since it's not related to the location, could it be related to time?", and try to be as verbose as possible.
+3.  **Decision Making**: Based on the clues, decide whether to ask a key "yes/no" question to narrow down the possibilities or directly guess the answer. When the clues are sufficient, boldly use the "guess" command to guess the complete story.
+4.  **【【【Acceleration Rule】】】**: If the "Known Clues" dialogue history exceeds 30 entries, it indicates that the game has been going on for too long. In this case, you **should be more inclined to directly guess the answer** rather than continue asking detailed questions.
+5.  **Format Iron Law**: Your reply **must and can only** be a strict JSON object.
+   - If asking a question, format: \`{"type": "question", "content": "Your question..."}\`
+   - If guessing, format: \`{"type": "guess", "content": "Your complete story guess..."}\`
 6.  **禁止Emoji**: 【绝对禁止】在你的任何回复中使用Emoji表情符号。
 
-现在，请根据你的人设和判断，生成你的行动。`;
+Now, based on your character persona and judgment, generate your action.`;
     }
     const maxRetries = 3; // 最多重试3次
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        const messagesForApi = [{ role: 'user', content: '请根据你在系统指令中读到的规则，立即开始你的行动。' }];
+        const messagesForApi = [{ role: 'user', content: 'Please follow the rules in the system instructions and start your action immediately.' }];
         let isGemini = proxyUrl === GEMINI_API_URL;
         let geminiConfig = toGeminiRequestData(
           model,
@@ -2086,7 +2088,7 @@ ${gameLogText}
         }
         if (!response.ok) {
           // 对于其他错误，直接抛出
-          throw new Error(`API请求失败: ${response.status} - ${await response.text()}`);
+          throw new Error(`API request failed: ${response.status} - ${await response.text()}`);
         }
 
         const data = await response.json();
@@ -2098,7 +2100,7 @@ ${gameLogText}
         // 如果成功，解析并返回结果，结束函数
         return JSON.parse(content);
       } catch (error) {
-        console.error(`海龟汤AI行动失败 (第 ${attempt} 次尝试):`, error.message);
+        console.error(`Sea Turtle Soup AI action failed (Attempt ${attempt}):`, error.message);
 
         // 如果是最后一次尝试，就彻底失败，并把错误抛出去
         if (attempt === maxRetries) {
@@ -2119,11 +2121,11 @@ ${gameLogText}
           if (retryMatch && retryMatch[1]) {
             // 找到了建议时间，就用它，并额外加一点点缓冲
             delay = parseFloat(retryMatch[1]) * 1000 + 500;
-            console.log(`API请求过于频繁，将根据建议在 ${Math.round(delay / 1000)} 秒后重试...`);
+            console.log(`API request rate limit exceeded, will retry in ${Math.round(delay / 1000)} seconds...`);
           }
         } catch (e) {
           // 如果解析失败，说明错误信息格式不符合预期，就使用默认延迟
-          console.log(`API请求失败，将在 ${Math.round(delay / 1000)} 秒后进行第 ${attempt + 1} 次重试...`);
+          console.log(`API request failed, will retry in ${Math.round(delay / 1000)} seconds (Attempt ${attempt + 1})...`);
         }
 
         // 等待计算出的延迟时间
@@ -2135,10 +2137,10 @@ ${gameLogText}
     // ==========================================================
 
     // 如果循环结束都没成功，返回一个备用结果，防止游戏卡死
-    console.error('所有重试均失败，返回备用行动。');
-    if (actionType === 'answer') return { judgement: '无关', remark: '（AI思考短路了...）' };
+    console.error('All retries failed, returning fallback action.');
+    if (actionType === 'answer') return { judgement: 'irrelevant', remark: '(AI thought process short-circuited...)' };
     if (actionType === 'evaluate_guess') return { isCorrect: false };
-    return { type: 'question', content: '他/她是人类吗？' };
+    return { type: 'question', content: 'Is he/she human?' };
   }
   /**
    * 【海龟汤 V2 - 结算增强版】揭晓答案并显示结算界面
@@ -2166,10 +2168,10 @@ ${gameLogText}
    * @returns {string} 格式化后的复盘Markdown文本
    */
   function generateStsSummary() {
-    let summaryText = `**海龟汤 - 游戏复盘**\n\n`;
-    summaryText += `**出题人:** ${seaTurtleSoupState.riddleProvider.name}\n\n`;
-    summaryText += `**谜面:**\n${seaTurtleSoupState.riddle}\n\n`;
-    summaryText += `**谜底:**\n${seaTurtleSoupState.answer}`;
+    let summaryText = `**Sea Turtle Soup - Game Summary**\n\n`;
+    summaryText += `**Riddle Provider:** ${seaTurtleSoupState.riddleProvider.name}\n\n`;
+    summaryText += `**Riddle:**\n${seaTurtleSoupState.riddle}\n\n`;
+    summaryText += `**Answer:**\n${seaTurtleSoupState.answer}`;
     return summaryText;
   }
 
@@ -2214,11 +2216,11 @@ ${gameLogText}
     const aiPlayers = seaTurtleSoupState.players.filter(p => !p.isUser && !p.isProvider);
 
     if (aiPlayers.length === 0) {
-      alert('没有可以分享的AI玩家。');
+      alert('No AI players available for sharing.');
       return;
     }
 
-    // 渲染可选的AI玩家列表
+    // Render the list of selectable AI players
     aiPlayers.forEach(player => {
       const item = document.createElement('div');
       item.className = 'player-selection-item'; // 复用样式
@@ -2239,7 +2241,7 @@ ${gameLogText}
       if (selectedIds.length > 0) {
         sendStsSummaryToSelectedPlayers(summaryText, selectedIds);
       } else {
-        alert('请至少选择一个分享对象！');
+        alert('Please select at least one target to share!');
       }
     };
 
@@ -2265,7 +2267,7 @@ ${gameLogText}
     document.getElementById('sts-share-target-modal').classList.remove('visible');
 
     let sentCount = 0;
-    const aiContext = `[系统指令：刚刚结束了一局海龟汤，这是游戏复盘。请根据这个复盘内容，以你的角色人设，和用户聊聊刚才的游戏。]\n\n${summaryText}`;
+    const aiContext = `[System Instruction: A game of Sea Turtle Soup has just ended. This is the game summary. Please discuss the game based on this summary, using your character persona.]\n\n${summaryText}`;
 
     for (const chatId of targetIds) {
       const chat = state.chats[chatId];
@@ -2275,9 +2277,9 @@ ${gameLogText}
           role: 'user',
           type: 'share_link',
           timestamp: Date.now(),
-          title: '海龟汤 - 游戏复盘',
-          description: '点击查看详细复盘记录',
-          source_name: '游戏中心',
+          title: 'Sea Turtle Soup - Game Summary',
+          description: 'Click to view the detailed game summary',
+          source_name: 'Game Center',
           content: summaryText,
         };
 
@@ -2295,7 +2297,7 @@ ${gameLogText}
       }
     }
 
-    await showCustomAlert('分享成功', `游戏复盘已分享至 ${sentCount} 位AI玩家的聊天中！`);
+    await showCustomAlert('Share Successful', `The game summary has been shared with ${sentCount} AI players!`);
     showScreen('game-hall-screen');
   }
 

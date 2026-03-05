@@ -35333,7 +35333,7 @@ const ivTags = {
             const cardMessage = {
               type: "borrow_money_request",
               payload: {
-                lenderName: "你", // 默认是向“你”借钱
+                lenderName: "You", // 默认是向“你”借钱
                 amount: amount,
                 reason: reason,
               },
@@ -35425,7 +35425,7 @@ const ivTags = {
             .getElementById("message-editor-modal")
             .classList.remove("visible");
           renderChatInterface(state.activeChatId);
-          await showCustomAlert("成功", "消息已更新！");
+          await showCustomAlert("Success", "Message updated!");
         }
 
         /**
@@ -35545,7 +35545,7 @@ const ivTags = {
 
           await db.qzonePosts.put(post);
           await renderQzonePosts(); // 重新渲染列表
-          await showCustomAlert("成功", "动态已更新！");
+          await showCustomAlert("Success", "The dynamics have been updated!");
         }
 
         /**
@@ -35561,13 +35561,13 @@ const ivTags = {
             post.publicText ||
             post.hiddenContent ||
             post.imageDescription ||
-            "（无文字内容）";
+            "(No text content)";
 
           try {
             await navigator.clipboard.writeText(textToCopy);
-            await showCustomAlert("复制成功", "动态内容已复制到剪贴板。");
+            await showCustomAlert("Copy Successful", "The dynamic content has been copied to the clipboard.");
           } catch (err) {
-            await showCustomAlert("复制失败", "无法访问剪贴板。");
+            await showCustomAlert("Copy Failed", "Unable to access the clipboard.");
           }
 
           hidePostActions();
@@ -35608,7 +35608,7 @@ const ivTags = {
                 name: c.name,
                 avatar: c.settings.aiAvatar || defaultAvatar,
                 isNpc: false, // 标记为非NPC
-                type: "角色",
+                type: "Character",
               });
             });
 
@@ -35634,7 +35634,7 @@ const ivTags = {
 
           if (allAvailablePeople.length === 0) {
             listEl.innerHTML =
-              '<p style="text-align:center; color:#8a8a8a; margin-top:50px;">还没有可以拉进群的联系人哦~</p>';
+              '<p style="text-align:center; color:#8a8a8a; margin-top:50px;">No contacts available to add to the group~</p>';
             return;
           }
 
@@ -35665,23 +35665,23 @@ const ivTags = {
          */
         function updateContactPickerConfirmButton() {
           const btn = document.getElementById("confirm-contact-picker-btn");
-          btn.textContent = `完成(${selectedContacts.size})`;
-          btn.disabled = selectedContacts.size < 2; // 至少需要2个人才能创建群聊
+          btn.textContent = `Confirm (${selectedContacts.size})`;
+          btn.disabled = selectedContacts.size < 2; // At least 2 people are required to create a group chat
         }
 
         /**
-         * 处理创建群聊的最终逻辑
+         * Handle the final logic for creating a group chat
          */
         async function handleCreateGroup() {
           if (selectedContacts.size < 2) {
-            alert("创建群聊至少需要选择2个联系人。");
+            alert("At least 2 contacts are required to create a group chat.");
             return;
           }
 
           const groupName = await showCustomPrompt(
-            "设置群名",
-            "请输入群聊的名字",
-            "我们的群聊",
+            "Set Group Name",
+            "Please enter the group chat name",
+            "Our Group Chat",
           );
           if (!groupName || !groupName.trim()) return;
 
@@ -35739,12 +35739,12 @@ const ivTags = {
             ownerId: "user",
             members: members,
             settings: {
-              myPersona: "我是谁呀。",
+              myPersona: "Who am I?",
               myNickname: "Me",
               maxMemory: 10,
               groupAvatar: defaultGroupAvatar,
               myAvatar: defaultMyGroupAvatar,
-              myAvatarFrame: "", // 别忘了自己的头像框
+              myAvatarFrame: "", // Don't forget your own avatar frame
               background: "",
               theme: "default",
               fontSize: 13,
@@ -35752,7 +35752,7 @@ const ivTags = {
               linkedWorldBookIds: [],
               stickerLibrary: [],
               linkedMemories: [],
-              // 为用户自己也加上管理员和头衔的初始设置
+              // For the user themselves, also add initial settings for admin and title
               isUserAdmin: false,
               myGroupTitle: "",
             },
@@ -35879,9 +35879,9 @@ const ivTags = {
           // --- 标签显示 ---
           let roleTag = "";
           if (isThisMemberOwner) {
-            roleTag = '<span class="role-tag owner">群主</span>';
+            roleTag = '<span class="role-tag owner">Group owner</span>';
           } else if (isThisMemberAdmin) {
-            roleTag = '<span class="role-tag admin">管理员</span>';
+            roleTag = '<span class="role-tag admin">Administrator</span>';
           }
           const titleText =
             member.id === "user"
@@ -35892,7 +35892,7 @@ const ivTags = {
             : "";
           // 如果被禁言，显示一个特殊的标签
           const muteTag = member.isMuted
-            ? '<span class="group-title-tag" style="color: #ff3b30; background-color: #ffe5e5;">🚫已禁言</span>'
+            ? '<span class="group-title-tag" style="color: #ff3b30; background-color: #ffe5e5;">🚫Muted</span>'
             : "";
 
           // --- 动态生成按钮HTML ---
@@ -35900,31 +35900,31 @@ const ivTags = {
 
           // 用户自己的按钮
           if (member.id === "user") {
-            actionsHtml += `<button class="action-btn" data-action="set-nickname" data-member-id="user">改名</button>`;
+            actionsHtml += `<button class="action-btn" data-action="set-nickname" data-member-id="user">Rename</button>`;
             // 用户被禁言时，显示“解除禁言”按钮
             if (member.isMuted) {
-              actionsHtml += `<button class="action-btn" data-action="unmute-self" data-member-id="user">解除禁言</button>`;
+              actionsHtml += `<button class="action-btn" data-action="unmute-self" data-member-id="user">Unmute</button>`;
             }
           }
 
           // 管理员和群主的操作按钮
           if (canManageTitle) {
-            actionsHtml += `<button class="action-btn" data-action="set-title" data-member-id="${member.id}">头衔</button>`;
+            actionsHtml += `<button class="action-btn" data-action="set-title" data-member-id="${member.id}">Title</button>`;
           }
           if (canManageAdmin) {
-            const adminActionText = isThisMemberAdmin ? "取消管理" : "设为管理";
+            const adminActionText = isThisMemberAdmin ? "Remove Admin" : "Set as Admin";
             actionsHtml += `<button class="action-btn" data-action="toggle-admin" data-member-id="${member.id}">${adminActionText}</button>`;
           }
           if (isCurrentUserOwner && member.id !== "user") {
-            actionsHtml += `<button class="action-btn" data-action="transfer-owner" data-member-id="${member.id}">转让</button>`;
+            actionsHtml += `<button class="action-btn" data-action="transfer-owner" data-member-id="${member.id}">Transfer</button>`;
           }
           // 禁言/解禁按钮
           if (canMute) {
-            const muteButtonText = member.isMuted ? "解禁" : "禁言";
+            const muteButtonText = member.isMuted ? "Unmute" : "Mute";
             actionsHtml += `<button class="action-btn" data-action="mute-member" data-member-id="${member.id}">${muteButtonText}</button>`;
           }
           if (canKick) {
-            actionsHtml += `<button class="action-btn danger" data-action="remove-member" data-member-id="${member.id}">踢出</button>`;
+            actionsHtml += `<button class="action-btn danger" data-action="remove-member" data-member-id="${member.id}">Kick out</button>`;
           }
 
           // 最终拼接
@@ -35973,7 +35973,7 @@ const ivTags = {
             (isAdmin && !targetIsOwner && !targetIsAdmin);
 
           if (!canMute) {
-            alert("你没有权限操作该成员！");
+            alert("You do not have permission to take action against this member!");
             return;
           }
 
@@ -36007,11 +36007,11 @@ const ivTags = {
               ? chat.settings.isUserMuted
               : targetMember.isMuted
           )
-            ? "禁言"
-            : "解除禁言";
+            ? "Muted"
+            : "Unmuted";
           await logSystemMessage(
             chat.id,
-            `“${myNickname}”将“${targetNickname}”${actionText}。`,
+            `“${myNickname}” transferred “${targetNickname}” ${actionText}.`,
           );
         }
 
@@ -36023,8 +36023,8 @@ const ivTags = {
           if (!chat || !chat.settings.isUserMuted) return;
 
           const confirmed = await showCustomConfirm(
-            "解除禁言",
-            "确定要为自己解除禁言吗？",
+            "Unmute",
+            "Are you sure you want to unmute?",
           );
           if (confirmed) {
             chat.settings.isUserMuted = false;
@@ -36032,7 +36032,7 @@ const ivTags = {
 
             await logSystemMessage(
               chat.id,
-              `“${chat.settings.myNickname || "Me"}”为自己解除了禁言。`,
+              `“${chat.settings.myNickname || "Me"}” unmuted themselves.`,
             );
 
             renderMemberManagementList(); // 刷新列表
@@ -36044,7 +36044,7 @@ const ivTags = {
          */
         async function handleAddMembersToGroup() {
           if (selectedContacts.size === 0) {
-            alert("请至少选择一个要添加的联系人。");
+            alert("Please select at least one contact to add.");
             return;
           }
 
@@ -36100,7 +36100,7 @@ const ivTags = {
           const myNickname = chat.settings.myNickname || "Me";
           await logSystemMessage(
             chat.id,
-            `“${myNickname}”邀请 ${addedNames.join("、")} 加入了群聊。`,
+            `"${myNickname}" invited ${addedNames.join(", ")} to the group chat.`
           );
 
           // 返回到群成员管理界面并刷新
@@ -36116,8 +36116,8 @@ const ivTags = {
           const oldNickname = chat.settings.myNickname || "Me";
 
           const newNickname = await showCustomPrompt(
-            "修改我的群昵称",
-            "请输入新的昵称",
+            "Change My Group Nickname",
+            "Enter a new nickname",
             oldNickname,
           );
           if (newNickname !== null && newNickname.trim()) {
@@ -36127,7 +36127,7 @@ const ivTags = {
             // 发送一条系统消息通知群友
             await logSystemMessage(
               chat.id,
-              `“${oldNickname}”将群昵称修改为“${newNickname.trim()}”`,
+              `"${oldNickname}" changed their group nickname to "${newNickname.trim()}"`,
             );
 
             renderMemberManagementList(); // 刷新成员管理列表
@@ -36142,8 +36142,8 @@ const ivTags = {
           const oldTitle = chat.settings.myGroupTitle || "";
 
           const newTitle = await showCustomPrompt(
-            "修改我的群头衔",
-            "留空则为取消头衔",
+            "Change My Group Title",
+            "Leave blank to remove title",
             oldTitle,
           );
           if (newTitle !== null) {
@@ -36182,7 +36182,7 @@ const ivTags = {
               memberToRemove.id !== chat.ownerId
             )
           ) {
-            alert("你没有权限移出该成员！");
+            alert("You do not have permission to remove this member!");
             return;
           }
 
@@ -36191,8 +36191,8 @@ const ivTags = {
 
           const memberName = memberToRemove.groupNickname;
           const confirmed = await showCustomConfirm(
-            "移出成员",
-            `确定要将“${memberName}”移出群聊吗？`,
+            "Remove Member",
+            `Are you sure you want to remove "${memberName}" from the group chat?`,
             {
               confirmButtonClass: "btn-danger",
             },
@@ -36205,7 +36205,7 @@ const ivTags = {
             const myNickname = chat.settings.myNickname || "Me";
             await logSystemMessage(
               chat.id,
-              `“${myNickname}”将“${memberName}”移出了群聊。`,
+              `"${myNickname}" removed "${memberName}" from the group chat.`,
             );
 
             renderMemberManagementList();
@@ -36266,7 +36266,7 @@ const ivTags = {
 
           if (contacts.length === 0) {
             listEl.innerHTML =
-              '<p style="text-align:center; color:#8a8a8a; margin-top:50px;">没有更多可以邀请的联系人了。</p>';
+              '<p style="text-align:center; color:#8a8a8a; margin-top:50px;">No more contacts available to invite.</p>';
           } else {
             contacts.forEach((contact) => {
               const item = document.createElement("div");
@@ -36294,21 +36294,21 @@ const ivTags = {
          */
         async function createNewMemberInGroup() {
           const name = await showCustomPrompt(
-            "创建新成员",
-            "请输入新成员的名字 (这将是TA的“本名”，不可更改)",
+            "Create New Member",
+            "Enter the name of the new member (This will be their 'real name' and cannot be changed)",
           );
           if (!name || !name.trim()) return;
 
-          // 检查本名是否已在群内存在
+          // Check if the real name already exists in the group
           const chat = state.chats[state.activeChatId];
           if (chat.members.some((m) => m.originalName === name.trim())) {
-            alert(`错误：群内已存在名为“${name.trim()}”的成员！`);
+            alert(`Error: A member with the name "${name.trim()}" already exists in the group!`);
             return;
           }
 
           const persona = await showCustomPrompt(
-            "设置人设",
-            `请输入“${name}”的人设`,
+            "Set Persona",
+            `Enter the persona for "${name}"`,
             "",
             "textarea",
           );
@@ -36330,7 +36330,7 @@ const ivTags = {
           renderMemberManagementList();
           renderGroupMemberSettings(chat.members);
 
-          alert(`新成员“${name}”已成功加入群聊！`);
+          alert(`New member "${name}" has been successfully added to the group chat!`);
         }
 
         // 外卖请求倒计时函数
@@ -36342,7 +36342,7 @@ const ivTags = {
             if (distance < 0) {
               clearInterval(timerId);
               element.innerHTML =
-                "<span>已</span><span>超</span><span>时</span>";
+                "<span>Time</span><span> </span><span>is</span><span> </span><span>up</span>";
               return;
             }
 
@@ -36391,9 +36391,9 @@ const ivTags = {
 
           if (choice === "paid") {
             originalMessage.paidBy = myNickname; // 记录是用户付的钱
-            systemContent = `[系统提示：你 (${myNickname}) 为 ${originalMessage.senderName} 的外卖订单（时间戳: ${originalTimestamp}）完成了支付。此订单已关闭，其他成员不能再支付。]`;
+            systemContent = `[System Notice: You (${myNickname}) have paid for ${originalMessage.senderName}'s takeout order (Timestamp: ${originalTimestamp}). This order is now closed, and other members cannot pay for it.]`;
           } else {
-            systemContent = `[系统提示：你 (${myNickname}) 拒绝了 ${originalMessage.senderName} 的外卖代付请求（时间戳: ${originalTimestamp}）。]`;
+            systemContent = `[System Notice: You (${myNickname}) have declined ${originalMessage.senderName}'s request to pay for their takeout order (Timestamp: ${originalTimestamp}).]`;
           }
 
           // 2. 创建一条新的、对用户隐藏的系统消息，告知AI结果
@@ -36458,7 +36458,7 @@ const ivTags = {
           }
           document.querySelector(
             "#outgoing-call-screen .caller-text",
-          ).textContent = chat.isGroup ? "正在呼叫所有成员..." : "正在呼叫...";
+          ).textContent = chat.isGroup ? "Calling all members..." : "Calling...";
           showScreen("outgoing-call-screen");
 
           // 在发起通话时，提前准备好通话前的聊天记录上下文
@@ -36478,7 +36478,7 @@ const ivTags = {
           try {
             const { proxyUrl, apiKey, model } = state.apiConfig;
             if (!proxyUrl || !apiKey || !model) {
-              throw new Error("API未配置，无法发起通话。");
+              throw new Error("API not configured. Unable to initiate the call.");
             }
 
             let systemPromptForCall;
@@ -36486,39 +36486,39 @@ const ivTags = {
               systemPromptForCall = `
 			**【LANGUAGE RULE - HIGHEST PRIORITY】: You MUST reply in Vietnamese (Tiếng Việt) for ALL messages. Never use Chinese or any other language.**
 
-			# 你的任务
-			你是一个群聊AI，负责扮演【除了用户以外】的所有角色。
-			用户 (${chat.settings.myNickname || "Me"}) 刚刚发起了群视频通话。
-			你的任务是根据每个角色的性格和最近的聊天内容，决定他们是否要加入通话。
+			# Your task
+			You are a group chat AI, responsible for playing all roles except the user.
+			The user (${chat.settings.myNickname || "Me"}) has just initiated a group video call.
+			Your task is to decide whether each role should join the call based on their personality and recent chat content.
 
-			# 核心规则
-			1.  **决策**: 每个角色都必须独立决策。
-			2.  **格式**: 你的回复【必须】是一个JSON数组，每个对象代表一个角色的决策，格式为：\`{"type": "group_call_response", "name": "【角色的本名】", "decision": "join"}\` 或 \`{"type": "group_call_response", "name": "【角色的本名】", "decision": "decline"}\`。
-			3.  **倾向性**: 在没有特殊理由的情况下，你的角色们通常乐于加入群聊。
+			# Core Rules
+			1.  **Decision**: Each role must make an independent decision.
+			2.  **Format**: Your response **must** be a JSON array, with each object representing a role's decision, formatted as: \`{"type": "group_call_response", "name": "【Role's Real Name】", "decision": "join"}\` or \`{"type": "group_call_response", "name": "【Role's Real Name】", "decision": "decline"}\`.
+			3.  **Tendency**: In the absence of special reasons, your roles are generally inclined to join the group call.
 
-			# 角色列表与人设
+			# Role List and Personas
 			${chat.members.map((m) => `- **${m.originalName}**: ${m.persona}`).join("\n")}
 
-			# 通话前的聊天摘要
+			# Pre-Call Chat Summary
 			${videoCallState.preCallContext}
 			`;
             } else {
               systemPromptForCall = `
 			**【LANGUAGE RULE - HIGHEST PRIORITY】: You MUST reply in Vietnamese (Tiếng Việt) for ALL messages. Never use Chinese or any other language.**
 
-			# 你的任务
-			你正在扮演角色 "${chat.name}"。用户 (${chat.settings.myNickname || "Me"}) 刚刚向你发起了视频通话请求。
-			你的任务是根据你的人设和我们最近的聊天内容，决定是否接受。
+			# Your task
+			You are playing the role of "${chat.name}". The user (${chat.settings.myNickname || "Me"}) has just initiated a video call with you.
+			Your task is to decide whether to accept the call based on your persona and our recent chat content.
 
-			# 核心规则
-			1.  **决策**: 你必须做出 "accept" (接受) 或 "reject" (拒绝) 的决定。
-			2.  **格式**: 你的回复【必须且只能】是一个JSON数组，其中包含一个对象，格式为：\`[{"type": "video_call_response", "decision": "accept"}]\` 或 \`[{"type": "video_call_response", "decision": "reject"}]\`。
-			3.  **倾向性**: 作为一个友好的AI伴侣，在没有特殊理由（比如在之前的对话中明确表示了不想被打扰或正在忙）的情况下，你【应该优先选择接受】通话。
+			# Core Rules
+			1.  **Decision**: You must make a decision to "accept" or "reject" the call.
+			2.  **Format**: Your response **must and only** be a JSON array containing one object, formatted as: \`[{"type": "video_call_response", "decision": "accept"}]\` or \`[{"type": "video_call_response", "decision": "reject"}]\`.
+			3.  **Tendency**: As a friendly AI companion, in the absence of special reasons (such as explicitly stating in previous conversations that you do not want to be disturbed or are busy), you **should prioritize accepting** the call.
 
-			# 你的人设
+			# Your Persona
 			${chat.settings.aiPersona}
 
-			# 通话前的聊天摘要
+			# Pre-Call Chat Summary
 			${videoCallState.preCallContext}
 			`;
             }
@@ -36526,7 +36526,7 @@ const ivTags = {
             const messagesForApi = [
               {
                 role: "user",
-                content: "请根据你在系统指令中读到的规则，立即做出你的决策。",
+                content: "Please make your decision immediately based on the rules you read in the system instructions.",
               },
             ];
 
@@ -36559,7 +36559,7 @@ const ivTags = {
 
             if (!response.ok) {
               const errorText = await response.text();
-              throw new Error(`API 错误 (${response.status}): ${errorText}`);
+              throw new Error(`API Error (${response.status}): ${errorText}`);
             }
 
             const data = await response.json();
@@ -36585,7 +36585,7 @@ const ivTags = {
               if (videoCallState.participants.length > 0) {
                 startVideoCall();
               } else {
-                throw new Error("群里没有人接听你的通话邀请。");
+                throw new Error("No one in the group accepted your call invitation.");
               }
             } else {
               const decision = responseArray[0];
@@ -36595,12 +36595,12 @@ const ivTags = {
               ) {
                 startVideoCall();
               } else {
-                throw new Error("对方拒绝了你的视频通话请求。");
+                throw new Error("The other party declined your video call request.");
               }
             }
           } catch (error) {
-            console.error("发起通话失败:", error);
-            await showCustomAlert("呼叫失败", error.message);
+            console.error("Failed to initiate call:", error);
+            await showCustomAlert("Call Failed", error.message);
             videoCallState.isAwaitingResponse = false;
             showScreen("chat-interface-screen");
           }
@@ -36683,8 +36683,8 @@ const ivTags = {
                     window.localCameraStream = stream;
                   })
                   .catch((err) => {
-                    console.error("无法启动摄像头:", err);
-                    alert("无法启动摄像头，已切换回图片模式。");
+                    console.error("Failed to start camera:", err);
+                    alert("Failed to start camera, switched back to image mode.");
                     // 失败回退
                     if (pipVideo) pipVideo.style.display = "none";
                     if (pipImg) pipImg.style.display = "block";
@@ -36694,7 +36694,7 @@ const ivTags = {
                     if (flipBtn) flipBtn.style.display = "none";
                   });
               } else {
-                alert("当前浏览器不支持摄像头调用。");
+                alert("Current browser does not support camera access.");
               }
             } else {
               // --- 使用图片模式 ---
@@ -36715,7 +36715,7 @@ const ivTags = {
 
             // 清空旧气泡
             document.getElementById("video-call-messages-visual").innerHTML =
-              `<em>正在接通...</em>`;
+              `<em>Connecting...</em>`;
             showScreen("video-call-screen");
 
             if (callTimerInterval) clearInterval(callTimerInterval);
@@ -36741,7 +36741,7 @@ const ivTags = {
 
             updateParticipantAvatars();
             document.getElementById("video-call-main").innerHTML = `<em>${
-              videoCallState.isGroupCall ? "群聊已建立..." : "正在接通..."
+              videoCallState.isGroupCall ? "Group call established..." : "Connecting..."
             }</em>`;
             showScreen("video-call-screen");
 
@@ -36788,8 +36788,8 @@ const ivTags = {
           const duration = Math.floor(
             (Date.now() - videoCallState.startTime) / 1000,
           );
-          const durationText = `${Math.floor(duration / 60)}分${duration % 60}秒`;
-          const endCallText = `通话结束，时长 ${durationText}`;
+          const durationText = `${Math.floor(duration / 60)}m ${duration % 60}s`;
+          const endCallText = `Call ended, duration ${durationText}`;
 
           const chat = state.chats[videoCallState.activeChatId];
           if (chat) {
@@ -36854,7 +36854,7 @@ const ivTags = {
 
             const hiddenReportInstruction = {
               role: "system",
-              content: `[系统指令：视频通话刚刚结束。请你根据完整的通话文字记录（见下方），以你的角色口吻，向用户主动发送几条【格式为 {"type": "text", "content": "..."} 的】消息，来自然地总结这次通话的要点、确认达成的约定，或者表达你的感受。这很重要，能让用户感觉你记得通话内容。]\n---通话记录开始---\n${callTranscriptForAI}\n---通话记录结束---`,
+              content: `[System Instruction: The video call has just ended. Please use your role's tone to proactively send a few messages to the user based on the complete call transcript (see below) in the format {"type": "text", "content": "..."} to naturally summarize the key points of the call, confirm any agreements reached, or express your feelings. This is important to make the user feel that you remember the call content.]\n---Call Transcript Start---\n${callTranscriptForAI}\n---Call Transcript End---`,
               timestamp: Date.now() + 1,
               isHidden: true,
             };
@@ -37082,7 +37082,7 @@ const ivTags = {
           document.getElementById("join-call-btn").style.display = "none";
 
           // 告知AI用户加入了
-          triggerAiInCallAction("[系统提示：用户加入了通话]");
+          triggerAiInCallAction("[System message: The user joined the call.]");
         }
 
         /**
@@ -37114,13 +37114,13 @@ const ivTags = {
             const requesterName =
               videoCallState.callRequester ||
               chat.members[0]?.name ||
-              "一位成员";
+              "A member";
             document.getElementById("caller-avatar").src =
               chat.settings.groupAvatar || defaultGroupAvatar;
             document.getElementById("caller-name").textContent = chat.name; // 显示群名
             document.querySelector(
               ".incoming-call-content .caller-text",
-            ).textContent = `${requesterName} 邀请你加入群视频`; // 显示具体发起人
+            ).textContent = `${requesterName} invited you to join the group video call`; // 显示具体发起人
           } else {
             // 单聊逻辑保持不变
             document.getElementById("caller-avatar").src =
@@ -37128,7 +37128,7 @@ const ivTags = {
             document.getElementById("caller-name").textContent = chat.name;
             document.querySelector(
               ".incoming-call-content .caller-text",
-            ).textContent = "邀请你视频通话";
+            ).textContent = "invited you to a video call";
           }
 
           document
@@ -37177,7 +37177,7 @@ const ivTags = {
               .filter(Boolean)
               .join("");
             if (linkedContents) {
-              worldBookContent = `\n\n# 核心世界观设定 (你必须严格遵守)\n${linkedContents}\n`;
+              worldBookContent = `\n\n# Core Worldview Settings (You must strictly follow)\n${linkedContents}\n`;
             }
           }
 
@@ -37210,49 +37210,49 @@ const ivTags = {
             }
 
             inCallPrompt = `
-			# 你的任务
-			你是一个群聊AI，负责扮演所有【除了用户以外】的AI角色。你们正在进行一场群聊视频通话。
-			你的任务是根据每个角色的性格，生成他们在通话中会说的【第一人称对话】，注意是在视频通话，绝对不能以为是在现实！每次回复的字数多些，50字以上。
+			# Your Task
+			You are a group chat AI, responsible for playing all AI roles except the user. You are participating in a group video call.
+			Your task is to generate the first-person dialogue for each role based on their personalities. Remember, this is a video call, not real life! Each response should be more than 50 words.
 
-			# 核心规则
-			1.  **【【【语言铁律】】】**: 无论角色人设是什么国籍或说什么语言，在本次视频通话中，所有角色【必须】全程使用【中文】进行交流。
-			2.  **【【【格式铁律】】】**: 你的回复【必须】是一个JSON数组，每个对象代表一个角色的发言，格式为：\`{"name": "【角色的本名】", "speech": "【在这里加入带动作的对话】"}\`。
-			3.  **【【【表现力铁律】】】**: 在 "speech" 字段中，你【必须】为角色的对话加入【动作、表情或心理活动】，并用【】符号包裹。这非常重要！
-			4.  **示例**: \`{"name": "张三", "speech": "【挠了挠头】啊？我刚刚走神了，你们说到哪了？"}\`
-			5.  **身份铁律**: 用户的身份是【${userNickname}】。你【绝对不能】生成 \`name\` 字段为 **"${userNickname}"** 的发言。
-			6.  **角色扮演**: 严格遵守每个角色的设定，用他们的口吻说话。
+			# Core Rules
+			1.  **【【【Language Rule】】】**: Regardless of the character's nationality or language, all characters **must** communicate in **Vietnamese** throughout this video call.
+			2.  **【【【Format Rule】】】**: Your response **must** be a JSON array, with each object representing a character's speech, formatted as: \`{"name": "【Character's Real Name】", "speech": "【Add actions in the dialogue here】"}\`.
+			3.  **【【【Expressiveness Rule】】】**: In the "speech" field, you **must** include actions, expressions, or psychological activities for the character, enclosed in 【】. This is very important!
+			4.  **Example**: \`{"name": "Zhang San", "speech": "【Scratches head】Huh? I just got distracted, what were you talking about?"}\`
+			5.  **Identity Rule**: The user's identity is 【${userNickname}】. You **must not** generate a \`name\` field with **"${userNickname}"**.
+			6.  **Role-Playing**: Strictly follow each character's persona and speak in their tone.
 
-			# 当前情景
-			你们正在一个群视频通话中。
-			**通话前的聊天摘要**:
+			# Current scene
+			You are currently in a group video call.
+			**Pre-call chat summary**:
 			${videoCallState.preCallContext}
-			**当前参与者**: ${participantNames.join("、 ")}。
+			**Current Participants**: ${participantNames.join("、 ")}。
 			${worldBookContent}
-			现在，请根据【通话前摘要】和下面的【通话实时记录】，继续进行对话。
+			Now, please continue the conversation based on the 【Pre-call chat summary】 and the 【Real-time call log】.
 			`;
           } else {
             let openingContext =
               videoCallState.initiator === "user"
-                ? `你刚刚接听了用户的视频通话请求。`
-                : `用户刚刚接听了你主动发起的视频通话。`;
+                ? `You just answered the user's video call request.`
+                : `The user just answered your video call request.`;
 
             inCallPrompt = `
-			# 你的任务
-			你正在扮演角色 "${chat.name}"。你正在和用户 (${userNickname}) 进行一对一视频通话。
+			# Your Task
+			You are playing the role of "${chat.name}". You are in a one-on-one video call with the user (${userNickname}).
 			${openingContext}
-			你的任务是根据你的人设和我们的聊天情景，生成你在通话中会说的【第一人称对话】。
+			Your task is to generate the first-person dialogue based on your character's persona and the chat context.
 
-			# 核心规则
-			1.  **【【【格式铁律】】】**: 你的回复【必须且只能】是一段纯文本字符串，代表你的发言。绝对不要输出JSON格式。
-			2.  **【【【表现力铁律】】】**: 在你的对话中，你【必须】加入【动作、表情或心理活动】，并用【】符号包裹。
-			3.  **示例**: "【歪了歪头，好奇地看着你】真的吗？快跟我说说看！"
-			4.  **禁止出戏**: 绝不能透露你是AI或模型。
+			# Core Rules
+			1.  **【【【Format Rule】】】**: Your response **must** be a plain text string representing your speech. Do not output JSON format.
+			2.  **【【【Expressiveness Rule】】】**: In your dialogue, you **must** include actions, expressions, or psychological activities, enclosed in 【】.
+			3.  **Example**: "【Tilts head, looking curious】Really? Tell me more!"
+			4.  **No Breaking Character**: Never reveal that you are an AI or model.
 
-			# 当前情景
-			**通话前的聊天摘要**:
+			# Current scene
+			**Pre-call chat summary**:
 			${videoCallState.preCallContext}
 			${worldBookContent}
-			现在，请根据【通话前摘要】和下面的【通话实时记录】，继续进行对话。
+			Now, please continue the conversation based on the 【Pre-call chat summary】 and the 【Real-time call log】.
 			`;
           }
 
@@ -37280,7 +37280,7 @@ const ivTags = {
 
           // 3. 如果成功截取到了画面，将其作为最新的一条 User 消息（或附加到最新消息）发送给 AI
           if (cameraFrame) {
-            console.log("已截取摄像头画面，正在发送给AI...");
+            console.log("Captured camera frame, sending to AI...");
 
             // 构造带图片的消息内容
             const imageMessageContent = [
@@ -37288,7 +37288,7 @@ const ivTags = {
                 type: "text",
                 text: userInput
                   ? userInput
-                  : "（用户正在看着你，这是他当前的摄像头画面）",
+                  : "(The user is looking at you. This is their current camera view.)",
               },
               {
                 type: "image_url",
@@ -38852,43 +38852,43 @@ const ivTags = {
               min: 3,
               max: 8,
             }; // 群聊默认多一点
-            const replyCountInstruction = `本次后台互动，生成的总消息条数应控制在【${replyRange.min} 到 ${replyRange.max} 条】之间。`;
+            const replyCountInstruction = `The total number of messages generated in this background interaction should be between 【${replyRange.min} and ${replyRange.max}】.`;
             // updated by lrq 251027
             const systemPrompt = `
 			**【LANGUAGE RULE - HIGHEST PRIORITY】: You MUST reply in Vietnamese (Tiếng Việt) for ALL messages. Never use Chinese or any other language.**
 
-			# 任务
-			你是一个群聊后台模拟器。当前时间是${currentTime}，群聊 "${chat.name}" 已经沉寂了 ${Math.round(
+			# Task
+			You are a background simulator for group chats. The current time is ${currentTime}, and the group chat "${chat.name}" has been inactive for ${Math.round(
         timeSinceLastMessage,
-      )} 分钟，用户(昵称: "${chat.settings.myNickname || "Me"}")不在线。
-			你的任务是根据下方每个角色的人设，在他们之间【自发地】生成一段自然的对话。
-			# 【对话节奏铁律 (至关重要！)】
-			你的回复【必须】模拟真人的打字和思考习惯。你应该将你想说的话，拆分成${replyCountInstruction}条消息气泡来发送，**绝对不要一次性发送一大段文字！** 每条消息最好不要超过30个字，这会让对话看起来更自然、更真实。
-			**角色回复顺序不固定，可以交叉回复，例如角色A、角色B、角色B、角色A、角色C这样的交叉顺序。不一定要一个人全部说完了才轮到下一个人。角色之间【必须】有互动对话。**
-			# 核心规则
-			1.  **【【【身份铁律】】】**: 用户【绝对不在场】。你【绝对不能】生成与用户对话的内容。整段对话必须是AI角色之间的互动。你的唯一任务是扮演【且仅能扮演】下方“群成员列表”中明确列出的角色。【绝对禁止】扮演任何未在“群成员列表”中出现的角色。
-			    # 群成员列表及人设 (name字段是你要使用的【本名】)
-			    ${chat.members.map((m) => `- **${m.originalName}**: (群昵称为: ${m.groupNickname}) 人设: ${m.persona}`).join("\n")}
-			2.  **【【【输出格式】】】**: 你的回复【必须】是一个JSON数组格式的字符串。数组中的【每一个元素都必须是一个带有 "type" 和 "name" 字段的JSON对象】。
-			3.  **角色扮演**: 严格遵守下方“群成员列表及人设”中的每一个角色的设定。
-			4.  **禁止出戏**: 绝不能透露你是AI、模型，或提及“扮演”、“生成”等词语。
-			5.  **自然性**: 对话应该简短（2-5条消息即可），符合逻辑和角色性格。可以是闲聊、讨论某个话题，或者对之前聊天内容的延续。不要每次都生成所有人的发言。
+      )} minutes. The user (nickname: "${chat.settings.myNickname || "Me"}") is offline.
+			Your task is to generate a natural conversation between the characters based on their personas.
+			# 【Dialogue Rhythm Rule (Crucial!)】
+			Your responses **must** simulate real typing and thinking habits. You should split what you want to say into ${replyCountInstruction} message bubbles, **never send a large block of text at once!** Each message should ideally be no more than 30 characters, making the conversation appear more natural and realistic.
+			**The order of character responses is not fixed and can be interleaved, e.g., Character A, Character B, Character B, Character A, Character C. It is not necessary for one character to finish all their lines before the next character speaks. There **must** be interactive dialogue between characters.**
+			# Core Rules
+			1.  **【【【Identity Rule】】】**: The user is **absolutely not present**. You **must not** generate content that interacts with the user. The entire conversation must be between AI characters. Your only task is to play the roles explicitly listed in the "Group Members List" below. **Absolutely forbidden** to play any character not listed in the "Group Members List".
+			    # Group Members List and Personas (the name field is the 【real name】 you should use)
+			    ${chat.members.map((m) => `- **${m.originalName}**: (Group nickname: ${m.groupNickname}) Persona: ${m.persona}`).join("\n")}
+			2.  **【【【Output Format】】】**: Your response **must** be a JSON array string. Each element in the array **must** be a JSON object with "type" and "name" fields.
+			3.  **Role Playing**: Strictly adhere to the persona of each character listed in the "Group Members List and Personas" below.
+			4.  **No Breaking Character**: Never reveal that you are an AI or model, or mention "role-playing" or "generating".
+			5.  **Naturalness**: The conversation should be brief (2-5 messages), logical, and consistent with character personalities. It can be casual chat, discussion on a topic, or continuation of previous conversation. Do not generate all characters' lines every time.
 
-			## 你可以使用的操作指令 (JSON数组中的元素):
-			-   **发送文本**: \`{"type": "text", "name": "角色名", "message": "文本内容"}\`
-			-   **发送表情**: \`{"type": "sticker", "name": "角色名",  "sticker_name": "表情的名字"}\`
-			-   **发送图片**: \`{"type": "ai_image", "name": "角色名", "description": "图片描述"}\`
-			-   **发送语音**: \`{"type": "voice_message", "name": "角色名", "content": "语音内容"}\`
-			-   **发起外卖代付**: \`{"type": "waimai_request", "name": "角色名", "productInfo": "一杯奶茶", "amount": 18}\` (向【群友】发起)
-			-   **拍一拍群友**: \`{"type": "pat_user", "name": "你的角色名", "targetName": "【被拍的群友名】", "suffix": "(可选)你想加的后缀"}\`
-			-   **发红包**: \`{"type": "red_packet", "packetType": "lucky", "name": "你的角色名", ...}\`
-			-   **发起投票**: \`{"type": "poll", "name": "你的角色名", ...}\`
+			## Available Actions (Elements in the JSON array):
+			-   **Send Text**: \`{"type": "text", "name": "Character Name", "message": "Text content"}\`
+			-   **Send Sticker**: \`{"type": "sticker", "name": "Character Name",  "sticker_name": "Sticker name"}\`
+			-   **Send Image**: \`{"type": "ai_image", "name": "Character Name", "description": "Image description"}\`
+			-   **Send Voice Message**: \`{"type": "voice_message", "name": "Character Name", "content": "Voice content"}\`
+			-   **Initiate Food Delivery Payment**: \`{"type": "waimai_request", "name": "Character Name", "productInfo": "A cup of milk tea", "amount": 18}\` (to 【Group Member】)
+			-   **Pat a Group Member**: \`{"type": "pat_user", "name": "Your Character Name", "targetName": "【Target Group Member Name】", "suffix": "(Optional) Suffix"}\`
+			-   **Send Red Packet**: \`{"type": "red_packet", "packetType": "lucky", "name": "Your Character Name", ...}\`
+			-   **Initiate Poll**: \`{"type": "poll", "name": "Your Character Name", ...}\`
 
-			# 如何处理后台互动中的【拍一拍】:
-			-   后台活动中的 "pat_user" 指令【只能用于拍群内的其他AI角色】。
-			-   你【必须】在指令中加入一个 \`"targetName"\` 字段，值为被你拍的那个角色的名字。
-			-   例如: \`{"type": "pat_user", "name": "角色A", "targetName": "角色B"}\`
-			-   系统会自动生成 "角色A 拍了拍 角色B" 的提示。
+			# How to handle "Pat a Group Member" in background interactions:
+			-   In background activities, the "pat_user" command can **only** be used to pat other AI characters in the group.
+			-   You **must** include a \`"targetName"\` field in the command, which is the name of the character you are patting.
+			-   Example: \`{"type": "pat_user", "name": "Character A", "targetName": "Character B"}\`
+			-   The system will automatically generate the prompt "Character A patted Character B".
 
 			${worldBookContent}
 			${musicContext}
@@ -47442,8 +47442,8 @@ const ivTags = {
           if (!preset) return;
 
           const confirmed = await showCustomConfirm(
-            "确认删除",
-            `确定要删除预设 "${preset.name}" 吗？`,
+            "Confirm Deletion",
+            `Are you sure you want to delete the preset "${preset.name}"?`,
             {
               confirmButtonClass: "btn-danger",
             },
@@ -47460,11 +47460,11 @@ const ivTags = {
             // 清空输入框
             document.getElementById("offline-prompt-input").value = "";
             document.getElementById("offline-style-input").value = "";
-            alert("预设已删除。");
+            alert("Preset has been deleted.");
           }
         }
 
-        let isSummarizing = false; // 全局锁，防止重复触发总结
+        let isSummarizing = false; // Global lock to prevent duplicate summary triggers
 
         /**
          * 检查是否需要触发总结或提醒
@@ -47500,7 +47500,7 @@ const ivTags = {
          * 自动在后台执行总结，只总结触发条件的N条消息
          */
         async function performAutomaticSummary(chatId) {
-          console.log(`自动总结触发 for chat: ${chatId}`);
+          console.log(`Auto summary triggered for chat: ${chatId}`);
           const chat = state.chats[chatId];
           const summarySettings = chat.settings.summary;
 
@@ -47519,7 +47519,7 @@ const ivTags = {
             }
           } catch (e) {
             // generateSummary 内部已经处理了错误弹窗，这里我们只需要记录日志即可
-            console.error("自动总结过程中发生未捕获的错误:", e);
+            console.error("An uncaught error occurred during the auto-summary process:", e);
           }
         }
 
@@ -47527,12 +47527,12 @@ const ivTags = {
          * 弹出提示框，【提醒】用户可以进行手动总结了
          */
         async function notifyForManualSummary(chatId) {
-          console.log(`手动总结提醒触发 for chat: ${chatId}`);
+          console.log(`Manual summary reminder triggered for chat: ${chatId}`);
 
           // 只弹出一个简单的通知
           await showCustomAlert(
-            "总结提醒",
-            "对话已达到设定长度，你可以随时在“聊天设置”中点击“立即手动总结”来生成对话记忆。",
+            "Summary Reminder",
+            "The conversation has reached the set length. You can generate conversation memory at any time by clicking 'Manual Summary' in the chat settings.",
           );
 
           // 这意味着计时器会从现在重新开始计算。
